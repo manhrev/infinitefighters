@@ -20,6 +20,3 @@ assets/audio/*
 !assets/audio/music/
 !assets/audio/sfx/
 !assets/audio/ambience/
-
-# Design docs (scenario, tech stack, specs). Overrides the global ignore of dev/.
-!dev/

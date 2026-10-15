@@ -1,4 +1,4 @@
-"""MVP audio contract, matching the audio tables in dev/game-scenario.md."""
+"""MVP audio contract, matching the audio tables in docs/game-scenario.md."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

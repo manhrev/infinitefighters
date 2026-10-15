@@ -1,4 +1,4 @@
-"""Runtime sprite contract transcribed from dev/sprite-spec.md (never modifies it)."""
+"""Runtime sprite contract transcribed from docs/sprite-spec.md (never modifies it)."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -1,6 +1,6 @@
 package main
 
-// The five slot skills ("Năm chiêu riêng", dev/game-scenario.md). One button, its effect depends on
+// The five slot skills ("Năm chiêu riêng", docs/game-scenario.md). One button, its effect depends on
 // the slot. Shared limits: a missed skill still uses its cooldown; skills never hurt or push
 // teammates, never pause the DEADLINE, cancel a boss telegraph or stun the boss.
 

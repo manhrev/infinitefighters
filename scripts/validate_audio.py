@@ -26,7 +26,7 @@ def main():
         check(e.get('seconds')==duration and e.get('priority')==priority,f'{key}: drop audio timing/priority mismatch')
         check(e.get('channels')==1 and e.get('loop') is False and e.get('category')=='sfx',f'{key}: expected mono one-shot SFX')
     # Verify actual document coverage independently of the exported manifest.
-    doc=(ROOT/'dev/game-scenario.md').read_text()
+    doc=(ROOT/'docs/game-scenario.md').read_text()
     section=doc.split('## Âm thanh',1)[1].split('## Hai chế độ',1)[0]
     # Asset-only extensions may be documented in the audio delivery contract
     # before the gameplay scenario is edited or integrated.
