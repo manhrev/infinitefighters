@@ -86,6 +86,7 @@ const (
 	actHurt   = "hurt"
 	actDown   = "down" // "Nghỉ phép"
 	actRevive = "revive"
+	actPat    = "pat" // Vought's shoulder pat: held in place
 
 	bossIdle          = "idle"
 	bossWalk          = "walk"
@@ -124,6 +125,9 @@ type fighter struct {
 	castHit      bool // P1 smash / P5 timecard: hits once per cast
 	chargeDmg    float64
 	reviveHeld   int
+	patPresses   int  // Vought: attack or dash presses while held, to break free
+	swingStamp   bool // Vought, Yasuka: this swing already broke a DEV stamp or a homing paper
+	downTicks    int  // sandbox: ticks spent down, for the free respawn
 	ping         int
 	pingTicks    int
 }
@@ -134,6 +138,7 @@ type counts struct {
 	Hits                           uint32 // keyboard swing or P1 smash confirmed on the boss
 	Casts, SkillHits, Cancels      uint32
 	Reflects, Healed, Coffees      uint32
+	Rejects                        uint32 // Yasuka sent this player back to their start
 }
 
 type Boss struct {
@@ -143,14 +148,25 @@ type Boss struct {
 	State      string
 	ticks      int // in the current state
 	cycle      int
-	Hits       uint32 // resets with the match; clients treat a decrease as a reset
-	Marks      uint32 // P3 mark applied (also resets)
+	W, H       float64 // hitbox
+	Hits       uint32  // resets with the match; clients treat a decrease as a reset
+	Marks      uint32  // P3 mark applied (also resets)
 	markTicks  int
 	target     *Player // walk target, chosen when the walk starts
 	walkFrom   float64
 	chargeFrom float64 // locked when charge_windup starts
 	chargeTo   float64
 	chargeHit  map[int]bool
+	landX      float64 // Khabib: where the teleport lands (feet), locked while he is out of sight
+	landY      float64
+	VY         float64 // Khabib: falling speed
+	chain      int     // Khabib: teleport hops still to land
+	patTarget  *Player // Vought: who is being patted
+	patHits    uint32  // Vought: Hits when the pat began; any growth is a teammate's interruption
+	counterCD  int     // Vought: ticks until the shield may counter again
+	dome       float64 // Yasuka: silence dome strength left
+	queue      []int   // Khabib: player IDs the hops go to, in order
+	nags       int     // Khabib: talk-spam words fired so far
 }
 
 type Shot struct {
@@ -163,12 +179,15 @@ type Shot struct {
 	// party: who fired it (no self-hits, kill credit, cleared on death) and whether P2 may bounce it
 	owner       int
 	reflectable bool
+	VY, G       float64 // lobbed cards: vertical speed and gravity
+	Word        string  // Khabib's talk spam: the nag drawn on the card
 }
 
 type Wave struct {
 	ID  int
 	X   float64 // centre
 	Dir int
+	Y   float64      // feet: the boss's floor, or a desk for Khabib
 	hit map[int]bool // each wave hurts a player once, even without invulnerability frames
 }
 
@@ -182,6 +201,9 @@ type match struct {
 	cards         []*Shot // boss task cards: hurt players
 	shots         []*Shot // players' shots: hurt the boss
 	waves         []*Wave
+	stamps        []*Stamp // Vought's DEV stamps on players
+	seals         []*Seal  // Yasuka's rejection seals
+	papers        []*Paper // Yasuka's homing forms
 	zones         []*Zone
 	nextShotID    int
 	bossBaseHP    int   // configurable for playtests
@@ -197,7 +219,15 @@ type match struct {
 func (r *Room) resetMatch() {
 	hp := float64(r.bossBaseHP + bossHPPerPlayer*(r.scaleN-1))
 	b := r.level.Boss
-	r.boss = Boss{X: b.X, Y: b.Y, Facing: -1, HP: hp, MaxHP: hp, State: bossIdle}
+	r.boss = Boss{X: b.X, Y: b.Y, Facing: -1, HP: hp, MaxHP: hp, State: bossIdle, W: bossW, H: bossH}
+	switch r.sandbox { // hitboxes from docs/sprite-spec.md
+	case sandboxKhabib:
+		r.boss.W = 80
+	case sandboxVought:
+		r.boss.W, r.boss.H = 36, 95
+	case sandboxYasuka:
+		r.boss.W, r.boss.H = 52, 100
+	}
 	r.cards, r.shots, r.waves, r.zones, r.drops = nil, nil, nil, nil, nil
 	r.dropCD = 0
 	r.coffeeIn = make([]int, len(r.level.Coffees))
@@ -214,7 +244,7 @@ func (r *Room) resetMatch() {
 // bossRange finds the walls left and right of the boss spawn and keeps the wall gap from both.
 func (r *Room) bossRange() (lo, hi float64) {
 	left, right := r.arenaWalls()
-	gap := wallGapTiles*float64(r.level.Tile) + bossW/2
+	gap := wallGapTiles*float64(r.level.Tile) + r.boss.W/2
 	return left + gap, right - gap
 }
 
@@ -247,7 +277,9 @@ func (r *Room) stepMatch() {
 		}
 		return
 	}
-	r.deadline--
+	if r.sandbox == "" {
+		r.deadline--
+	}
 	for _, p := range r.players {
 		r.stepPlayer(p)
 	}
@@ -259,6 +291,8 @@ func (r *Room) stepMatch() {
 	r.stepWaves()
 
 	switch {
+	case r.sandbox != "":
+		r.stepSandbox()
 	case r.boss.HP <= 0:
 		r.boss.HP, r.boss.State, r.boss.ticks, r.boss.markTicks = 0, bossDefeat, 0, 0
 		r.cards, r.shots, r.waves, r.zones, r.drops = nil, nil, nil, nil, nil
@@ -295,7 +329,10 @@ func (r *Room) stepPlayer(p *Player) {
 
 	in := p.in
 	switch p.action {
-	case actDown, actHurt, actRevive:
+	case actDown, actHurt, actRevive, actPat:
+		if p.action == actPat && (pr.attack || pr.dash) {
+			p.patPresses++
+		}
 		p.step(r.level, Input{}, false)
 		return
 	case actCharge:
@@ -327,7 +364,7 @@ func (r *Room) stepPlayer(p *Player) {
 			}
 			r.startSkill(p)
 		case pr.attack:
-			p.action, p.actionTicks, p.swingHit = actAttack, attackTicks, false
+			p.action, p.actionTicks, p.swingHit, p.swingStamp = actAttack, attackTicks, false, false
 			p.Attacks++
 		case pr.skill && p.pulseCD == 0:
 			p.action, p.actionTicks, p.pulseCD = actPulse, attackTicks, pulseCooldown
@@ -413,6 +450,10 @@ func (r *Room) stepBoss() {
 	if r.dropCD > 0 {
 		r.dropCD--
 	}
+	if r.sandbox != "" {
+		r.stepSandboxBoss()
+		return
+	}
 	set := func(s string) { b.State, b.ticks = s, 0 }
 	switch b.State {
 	case bossIdle:
@@ -457,7 +498,7 @@ func (r *Room) stepBoss() {
 		if b.ticks == 1 || ((r.scaleN >= 3 || r.enraged()) && b.ticks == r.t(extraAt)) {
 			for _, d := range []int{-1, 1} {
 				r.nextShotID++
-				r.waves = append(r.waves, &Wave{ID: r.nextShotID, X: b.X + float64(d)*(bossW/2+waveW/2), Dir: d, hit: map[int]bool{}})
+				r.waves = append(r.waves, &Wave{ID: r.nextShotID, X: b.X + float64(d)*(bossW/2+waveW/2), Y: b.Y, Dir: d, hit: map[int]bool{}})
 			}
 		}
 		if b.ticks >= r.t(waveTicks) {
@@ -466,12 +507,7 @@ func (r *Room) stepBoss() {
 	case bossCharge:
 		dur := r.chargeDur()
 		b.X = b.chargeFrom + (b.chargeTo-b.chargeFrom)*float64(min(b.ticks, dur))/float64(dur)
-		for _, p := range r.players { // only the moving body hurts, once per player per charge
-			if !b.chargeHit[p.ID] && r.canHurt(p) && overlaps(playerBox(p), r.bossBox()) {
-				b.chargeHit[p.ID] = true
-				r.hurt(p, 1, b.X)
-			}
-		}
+		r.contactHurt() // only the moving body hurts, once per player per charge
 		if b.ticks >= dur {
 			set(bossChargeRecover)
 		}
@@ -630,6 +666,18 @@ func (r *Room) stepShots() {
 		if s.life--; s.life <= 0 || !r.moveShot(s) {
 			return false
 		}
+		if r.boss.State == vReflect && overlaps(shotBox(s), r.bossBox()) {
+			r.reflectShot(s)
+			return false
+		}
+		if r.boss.State == ySilence && overlaps(shotBox(s), r.bossBox()) {
+			r.hitDome(s.Dmg)
+			return false
+		}
+		if r.boss.State == yDodgeS && overlaps(shotBox(s), r.bossBox()) {
+			r.evade() // the shot sails through the empty space she left
+			return true
+		}
 		if r.boss.State != bossDefeat && overlaps(shotBox(s), r.bossBox()) {
 			r.damageBoss(s.Dmg, s.Kind == "pulse")
 			if s.Kind == "stamp" {
@@ -645,6 +693,8 @@ func (r *Room) stepShots() {
 // moveShot reports false when the shot hits a solid tile.
 func (r *Room) moveShot(s *Shot) bool {
 	s.X += s.VX * dt
+	s.VY += s.G * dt
+	s.Y += s.VY * dt
 	ts := float64(r.level.Tile)
 	return r.level.at(cell(s.X, ts), cell(s.Y, ts)) != tileSolid
 }
@@ -653,10 +703,11 @@ func (r *Room) stepWaves() {
 	r.waves = keep(r.waves, func(w *Wave) bool {
 		w.X += float64(w.Dir) * waveSpeed * r.attackMul() * dt
 		ts := float64(r.level.Tile)
-		if r.level.at(cell(w.X+float64(w.Dir)*waveW/2, ts), cell(r.boss.Y-1, ts)) == tileSolid {
+		if r.level.at(cell(w.X+float64(w.Dir)*waveW/2, ts), cell(w.Y-1, ts)) == tileSolid ||
+			r.level.at(cell(w.X, ts), cell(w.Y, ts)) == tileEmpty { // a wall, or the edge of a desk
 			return false
 		}
-		box := rect{w.X - waveW/2, r.boss.Y - waveH, w.X + waveW/2, r.boss.Y}
+		box := rect{w.X - waveW/2, w.Y - waveH, w.X + waveW/2, w.Y}
 		for _, p := range r.players {
 			if !w.hit[p.ID] && r.canHurt(p) && overlaps(box, playerBox(p)) {
 				w.hit[p.ID] = true
@@ -672,7 +723,18 @@ func (r *Room) damageBoss(n float64, markable bool) {
 	if markable && r.boss.markTicks > 0 {
 		n *= markBonus
 	}
-	if r.boss.State == bossWind || r.boss.State == bossDropJam {
+	switch r.boss.State {
+	case vReflect:
+		r.counter() // the speech shield soaks the hit
+		return
+	case ySilence:
+		r.hitDome(n) // the silence dome soaks it
+		return
+	case yDodgeS:
+		r.evade() // the hit slides off her
+		return
+	}
+	if r.boss.State == bossWind || r.boss.State == bossDropJam || r.boss.State == khRecover {
 		n *= 2
 	}
 	r.boss.HP -= n
@@ -743,7 +805,10 @@ func playerBox(p *Player) rect { return rect{p.X - hitW/2, p.Y - hitH, p.X + hit
 
 func (r *Room) bossBox() rect {
 	b := r.boss
-	return rect{b.X - bossW/2, b.Y - bossH, b.X + bossW/2, b.Y}
+	if b.State == khTeleOut || b.State == khTeleWarn || b.State == vPatOut || b.State == vPatWarn {
+		return rect{} // out of sight: nothing can hit him
+	}
+	return rect{b.X - b.W/2, b.Y - b.H, b.X + b.W/2, b.Y}
 }
 
 func shotBox(s *Shot) rect { return rect{s.X - s.W/2, s.Y - s.H/2, s.X + s.W/2, s.Y + s.H/2} }

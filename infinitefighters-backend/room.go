@@ -55,6 +55,7 @@ type Room struct {
 	coopLevel  *Level
 	partyLevel *Level // nil: no party after the win
 	partyOnly  bool   // -party: Start goes straight to the party (playtests)
+	sandbox    string // "", or the boss of the coop-scene sandbox: sandboxKhabib, sandboxVought; no DEADLINE, no loss
 	party      partyState
 }
 
@@ -112,6 +113,10 @@ func (r *Room) handle(c *client, m clientMsg) {
 	case "start":
 		if p := c.player; p != nil && p.ID == r.hostID && r.phase == phaseLobby {
 			r.startLevel(m.Level)
+		}
+	case "end":
+		if p := c.player; p != nil && p.ID == r.hostID && r.phase == phasePlaying && r.sandbox != "" {
+			r.toLobby()
 		}
 	case "input":
 		if p := c.player; p != nil {
@@ -201,14 +206,26 @@ func (r *Room) startMsg() startMsg {
 	if r.mode == modeParty {
 		return startMsg{Type: "start", Level: partyLevelURL, Mode: modeParty}
 	}
-	return startMsg{Type: "start", Level: coopLevelURL, Mode: modeCoop}
+	m := startMsg{Type: "start", Level: coopLevelURL, Mode: modeCoop}
+	m.Boss = r.sandbox
+	return m
 }
 
 func (r *Room) start() { r.startLevel("") }
 
 // startLevel starts the level the host picked: "party" is "Anh em cây khế" (the party PvP level),
-// anything else the boss level. -party makes the party the default.
+// "sandbox" is the Khabib test arena, "sandbox-vought" Vought's, anything else the boss level. -party makes the party the default.
 func (r *Room) startLevel(level string) {
+	switch level {
+	case levelSandbox:
+		r.sandbox = sandboxKhabib
+	case levelSandboxVought:
+		r.sandbox = sandboxVought
+	case levelSandboxYasuka:
+		r.sandbox = sandboxYasuka
+	default:
+		r.sandbox = ""
+	}
 	if (level == modeParty || (level == "" && r.partyOnly)) && r.partyLevel != nil {
 		log.Printf("party started with %d players", len(r.players))
 		r.startParty()
@@ -224,7 +241,7 @@ func (r *Room) startLevel(level string) {
 
 // toLobby ends the match after a win or the party. Away players lose their slot.
 func (r *Room) toLobby() {
-	r.phase, r.mode, r.level = phaseLobby, modeCoop, r.coopLevel
+	r.phase, r.mode, r.level, r.sandbox = phaseLobby, modeCoop, r.coopLevel, ""
 	r.players = keep(r.players, func(p *Player) bool { return p.client != nil })
 	if r.byID(r.hostID) == nil {
 		r.hostID = 0
@@ -272,6 +289,21 @@ func (r *Room) snapshot() snapshotMsg {
 	if b.State == bossChargeWindup || b.State == bossCharge {
 		m.Boss.ChargeFrom, m.Boss.ChargeTo = b.chargeFrom, b.chargeTo
 	}
+	if b.State == khTeleWarn || b.State == vPatWarn {
+		m.Boss.LandX, m.Boss.LandY = b.landX, b.landY
+	}
+	if b.State == ySilence {
+		m.Boss.Shield = max(0, b.dome) / yDomeHP
+	}
+	for _, s := range r.seals {
+		m.Seals = append(m.Seals, sealState{ID: s.ID, X: s.X, Y: s.Y, Ms: ms(s.warn)})
+	}
+	for _, pp := range r.papers {
+		m.Shots = append(m.Shots, shotState{ID: pp.ID, Kind: "paper", X: pp.X, Y: pp.Y, VX: pp.VX})
+	}
+	for _, s := range r.stamps {
+		m.Stamps = append(m.Stamps, stampState{ID: s.ID, X: s.target.X, Y: s.target.Y - hitH - 12, Hp: s.hp, Ms: ms(s.ticks)})
+	}
 	for _, p := range r.players {
 		m.Players = append(m.Players, playerState{
 			ID: p.ID, X: p.X, Y: p.Y, VX: p.VX, VY: p.VY,
@@ -280,14 +312,14 @@ func (r *Room) snapshot() snapshotMsg {
 			SkillMs: ms(p.skillCD), SkillOf: ms(skillCooldown[p.Slot]), Charge: float64(p.charge) / chargeMaxTicks,
 			Attacks: p.Attacks, Pulses: p.Pulses, Dashes: p.Dashes, Hurts: p.Hurts, Hits: p.Hits,
 			Casts: p.Casts, SkillHits: p.SkillHits, Cancels: p.Cancels,
-			Reflects: p.Reflects, Healed: p.Healed, Coffees: p.Coffees,
+			Reflects: p.Reflects, Healed: p.Healed, Coffees: p.Coffees, Rejects: p.Rejects,
 		})
 	}
 	for _, s := range append(append([]*Shot{}, r.cards...), r.shots...) {
-		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: s.Kind, X: s.X, Y: s.Y, VX: s.VX})
+		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: s.Kind, X: s.X, Y: s.Y, VX: s.VX, Word: s.Word})
 	}
 	for _, w := range r.waves {
-		m.Waves = append(m.Waves, waveState{ID: w.ID, X: w.X, Dir: w.Dir})
+		m.Waves = append(m.Waves, waveState{ID: w.ID, X: w.X, Y: w.Y, Dir: w.Dir})
 	}
 	for _, d := range r.drops {
 		wait := d.delay

@@ -506,7 +506,7 @@ func TestHardModeNoInvulnerabilityAfterHit(t *testing.T) {
 		t.Fatalf("hurts %d invuln %d, want 2 hits and no grace", p.Hurts, p.invuln)
 	}
 	// a wave still hits only once while it passes through the player
-	r.waves = append(r.waves, &Wave{ID: 950, X: p.X - 40, Dir: 1, hit: map[int]bool{}})
+	r.waves = append(r.waves, &Wave{ID: 950, X: p.X - 40, Y: r.boss.Y, Dir: 1, hit: map[int]bool{}})
 	steps(r, 20)
 	if p.Hurts != 3 {
 		t.Fatalf("hurts %d, want 3: one more from the wave", p.Hurts)

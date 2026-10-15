@@ -44,6 +44,9 @@ Mới có ý tưởng một đoạn. Cần: thiết kế chi tiết.
 
 ## Ngoài các màn
 
+- 🟡 [Sandbox Khabib](levels/sandbox-khabib.md): màn thử boss Khabib chơi được (server, client, test xong). Có sprite và VFX riêng (trừ bong bóng lời giục, vẫn là chữ).
+- 🟡 [Sandbox SA Vought](levels/sandbox-vought.md): màn thử boss phụ SA Vought chơi được (server, client, test xong). Chưa cân bằng; client chưa dùng `vought-deflect-ribbon` và `vought-pat-mark`.
+- 🟡 [Sandbox Yasuka](levels/sandbox-yasuka.md): màn thử boss Yasuka chơi được với ba chiêu (né yêu cầu, đúng quy trình, im lặng là vàng). Chưa làm ba chiêu còn lại của concept; chưa cân bằng.
 - ⏸ Endgame (Phòng Điều Hành — QUY TRÌNH): tạm gác, chỉ có ý tưởng ([endgame.md](levels/endgame.md)).
 - ⬜ Trang tài liệu nhặt được (sprite `items/document.png` đã có, gameplay chưa).
 - ⬜ Checkpoint thang máy và đoạn vượt màn có camera riêng.

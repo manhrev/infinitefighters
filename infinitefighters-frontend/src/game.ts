@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import { createAnims, firstFrame, preloadAssets } from './assets'
 import { SceneAudio, preloadAudio } from './audio'
 import { PartyView } from './party'
-import { send, world, type Input, type PlayerState, type Snapshot } from './net'
+import { send, world, type Input, type PlayerState, type SandboxBoss, type Snapshot } from './net'
 
 // A compact 1280×720 view of a crowded arena (concept: assets/concepts/multiplayer-arena-sample-02.png),
 // scaled up to fill the window: characters read about 1.5× larger than at 1920×1080.
@@ -28,7 +28,50 @@ const SKILL_VFX = 'sprites/vfx/skills/'
 const BOSS_FALLBACK: Record<string, string> = {
   walk: 'idle', charge_windup: 'wave_windup', charge: 'idle', charge_recover: 'wind_clock',
   drop_windup: 'volley_windup', drop: 'volley', drop_jam: 'wind_clock',
+  // Khabib (sandbox) borrows the level 1 boss art until his own sprites exist.
+  press_windup: 'wave_windup', press: 'idle', spam_windup: 'volley_windup', spam: 'volley',
+  teleport_out: 'wave_windup', teleport_warn: 'idle', teleport_in: 'wave', recover: 'wind_clock', chain_windup: 'wave_windup',
+  // Vought
+  deflect_windup: 'volley_windup', deflect: 'volley', pat_out: 'wave_windup', pat_warn: 'idle', shoulder_pat: 'wave',
+  stamp_windup: 'volley_windup', stamp_throw: 'volley', reflect_windup: 'wave_windup', reflect_shield: 'wind_clock',
+  // Yasuka
+  dodge_windup: 'wave_windup', dodge: 'idle', procedure_windup: 'volley_windup', procedure: 'volley',
+  silence_windup: 'wave_windup', silence: 'wind_clock', flurry_windup: 'volley_windup', flurry: 'wave',
+  forms_windup: 'wave_windup', forms: 'volley',
 }
+// Sandbox bosses: own art when the pipeline has produced it (else the level 1 boss, tinted), HUD name,
+// lines said at the start of a state, fallback animations inside their own art, and hitbox width.
+type SandboxCfg = { art: string; name: string; tint: number; w: number; lines: Record<string, string>; fallback: Record<string, string> }
+const SANDBOX: Record<SandboxBoss, SandboxCfg> = {
+  khabib: {
+    art: 'sprites/boss/khabib/', name: 'KHABIB', tint: 0xc8c8ff, w: 80,
+    lines: {
+      press_windup: 'Em làm tới đâu rồi?', spam_windup: 'Anh hỏi cái này một chút!', teleport_out: 'Anh ở ngay sau lưng em đây.',
+      chain_windup: 'Anh gặp từng đứa một!',
+    },
+    fallback: { chain_windup: 'press_windup' },
+  },
+  vought: {
+    art: 'sprites/boss/vought/', name: 'SA VOUGHT', tint: 0xc8dcff, w: 36,
+    lines: {
+      deflect_windup: 'Phần này dev chủ động nhé.', shoulder_pat: 'Anh hiểu em…',
+      stamp_windup: 'Thiết kế đúng rồi, chắc do implement.', reflect_windup: 'Em đề xuất thì em làm luôn nhé.',
+    },
+    fallback: { pat_out: 'idle', pat_warn: 'idle', stamp_windup: 'deflect_windup', reflect_windup: 'deflect_windup' },
+  },
+  yasuka: {
+    art: 'sprites/boss/yasuka/', name: 'YASUKA', tint: 0xe0c8ff, w: 52,
+    lines: {
+      dodge_windup: 'Em cứ gửi lại đúng biểu mẫu nhé.', procedure_windup: 'Sai biểu mẫu rồi em.',
+      silence_windup: 'Chị sẽ không nói gì cả.', flurry_windup: 'Chị đã ghi nhận.', forms_windup: 'Chị gửi lại em biểu mẫu mới.',
+    },
+    fallback: { procedure_windup: 'dodge_windup', silence_windup: 'dodge_windup', flurry_windup: 'silence', flurry: 'procedure', forms_windup: 'dodge_windup', forms: 'procedure' },
+  },
+}
+const VOUGHT_VFX = 'sprites/vfx/vought-'
+const KHABIB_VFX = 'sprites/vfx/khabib-'
+const YASUKA_VFX = 'sprites/vfx/yasuka-'
+const PAPER = 'generated/homing-paper' // Yasuka's homing form, drawn at start-up (no sprite in the pipeline yet)
 const CORAL = '#FF5A5A', CREAM = '#F2E3C2', CYAN = '#3FE0FF', OUTLINE = '#0B1020'
 // Render this far behind the newest snapshot: two snapshot intervals at 30 Hz.
 const RENDER_DELAY_MS = 70
@@ -64,10 +107,17 @@ const text = (s: Phaser.Scene, x: number, y: number, size: number, color: string
 export class GameScene extends Phaser.Scene {
   private levelUrl = ''
   private mode: 'coop' | 'party' = 'coop'
+  private sandbox?: SandboxBoss // sandbox: this boss instead of the level 1 boss
+  private cfg?: SandboxCfg
+  private stamps = new Map<number, { sp: Phaser.GameObjects.Sprite | Phaser.GameObjects.Text; label: Phaser.GameObjects.Text }>()
+  private shield?: Phaser.GameObjects.Sprite // Vought's speech shield, or Yasuka's silence dome
+  private seals = new Map<number, Phaser.GameObjects.Sprite | Phaser.GameObjects.Rectangle>()
+  private landMark?: Phaser.GameObjects.Sprite // Khabib: landing warning, once its art exists
+  private bossArt = BOSS
   private partyView?: PartyView
   private floorY = 0
   private avatars = new Map<number, Avatar>()
-  private shots = new Map<number, Phaser.GameObjects.Sprite>()
+  private shots = new Map<number, Placed>()
   private waves = new Map<number, Phaser.GameObjects.Sprite>()
   private items = new Map<number, Phaser.GameObjects.Sprite>()
   private zones = new Map<number, Placed>()
@@ -97,9 +147,11 @@ export class GameScene extends Phaser.Scene {
 
   constructor() { super('game') }
 
-  init(data: { level: string; mode?: 'coop' | 'party' }) {
+  init(data: { level: string; mode?: 'coop' | 'party'; boss?: SandboxBoss }) {
     this.levelUrl = data.level
     this.mode = data.mode ?? 'coop'
+    this.sandbox = data.boss
+    this.cfg = data.boss && SANDBOX[data.boss]
   }
 
   preload() {
@@ -110,6 +162,7 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     createAnims(this)
+    this.makePaperTexture()
     this.sfx = new SceneAudio(this)
     const map = this.make.tilemap({ key: 'level' })
     // The whole arena fits the view, so the camera stays put, map bottom on view bottom.
@@ -136,6 +189,11 @@ export class GameScene extends Phaser.Scene {
     }
     const bossAt = objects.find(o => o.type === 'boss')
     this.boss = this.add.sprite(bossAt?.x ?? 0, bossAt?.y ?? 0, BOSS + 'idle').setOrigin(0.5, 1).setDepth(1).play(BOSS + 'idle')
+    if (this.cfg) {
+      if (this.anims.exists(this.cfg.art + 'idle')) this.bossArt = this.cfg.art
+      else this.boss.setTint(this.cfg.tint)
+      this.boss.play(this.bossArt + 'idle')
+    }
     this.bossMark = this.fx('boss-stamp-mark', 0, 0, () => this.add.circle(0, 0, 18).setStrokeStyle(3, 0xffd25e))
     this.bossMark.setVisible(false)
     this.bossLine = text(this, 0, 0, 13, CORAL).setOrigin(0.5, 1).setDepth(6)
@@ -160,13 +218,17 @@ export class GameScene extends Phaser.Scene {
     }
     this.add.image(DEADLINE_X - 16, 19, 'ui/deadline-icon').setScale(1.5).setScrollFactor(0).setDepth(11)
     if (this.mode === 'coop') {
-      text(this, VIEW_W / 2, VIEW_H - 26, 13, CREAM).setText('ĐỐC CÔNG HÔM QUA').setOrigin(0.5, 1).setScrollFactor(0).setDepth(11)
+      text(this, VIEW_W / 2, VIEW_H - 26, 13, CREAM).setText(this.cfg?.name ?? 'ĐỐC CÔNG HÔM QUA').setOrigin(0.5, 1).setScrollFactor(0).setDepth(11)
+    }
+    if (this.cfg) {
+      text(this, 12, VIEW_H - 8, 11, CREAM).setText('Esc: về phòng chờ (chủ phòng)').setOrigin(0, 1).setScrollFactor(0).setDepth(11)
     }
 
     this.keys = this.input.keyboard!.addKeys(
-      'W,A,S,D,UP,LEFT,DOWN,RIGHT,SPACE,J,K,L,SHIFT,E,R,ONE,TWO,THREE',
+      'W,A,S,D,UP,LEFT,DOWN,RIGHT,SPACE,J,K,L,SHIFT,E,R,ONE,TWO,THREE,ESC',
     ) as Record<string, Phaser.Input.Keyboard.Key>
     this.keys.R.on('down', () => this.trySkill())
+    if (this.cfg) this.keys.ESC.on('down', () => send({ type: 'end' })) // the server ignores it unless host
 
     this.startMusic()
   }
@@ -255,6 +317,7 @@ export class GameScene extends Phaser.Scene {
       if (up('pulses')) s.play('code-pulse', o)
       if (up('dashes')) s.play('dash', o)
       if (up('coffees')) s.play('coffee', o)
+      if (up('rejects')) { s.play('ping', { ...o, critical: true }); this.burst(p.x, p.y - 20, 0xff5a5a) } // Yasuka's seal: back to the start
       if (p.action === 'down' && q.action !== 'down') s.play('player-down', { ...o, critical: true })
       else if (up('hurts')) s.play('player-hurt', o)
       if (p.action === 'revive' && q.action !== 'revive') s.play('revive', o)
@@ -300,6 +363,7 @@ export class GameScene extends Phaser.Scene {
     const b = now.boss, c = was.boss
     if (b.marks > c.marks) s.play('amber-mark-hit', { x: b.x })
     if (c.markMs > 0 && b.markMs === 0 && b.marks === c.marks && now.result === '') s.play('amber-mark-expire', { x: b.x, volume: 0.6 })
+    if (this.cfg && (b.state === 'spam' || b.state === 'deflect') && now.shots.length > was.shots.length) s.throttled('nag', 150, 'boss-volley', { x: b.x, volume: 0.5 })
     if (b.hits > c.hits) s.throttled('boss-hurt', 120, 'boss-hurt', { x: b.x })
     if (b.state !== c.state) {
       const crit = { x: b.x, critical: true }
@@ -319,7 +383,35 @@ export class GameScene extends Phaser.Scene {
           break
         case 'drop_jam': s.play('boss-paper-jam', { x: b.x }); break
         case 'defeat': s.play('boss-defeat', crit); break
+        case 'press_windup': case 'chain_windup': s.play('boss-charge-windup', crit); break
+        case 'spam_windup': s.play('boss-volley-windup', crit); break
+        case 'teleport_out':
+          s.play('boss-charge', crit)
+          if (!this.vfx(KHABIB_VFX + 'portal', c.x, c.y - 50)) this.burst(c.x, c.y - 50, 0x3fe0ff)
+          break
+        case 'teleport_in':
+          s.play('boss-wave-slam', crit)
+          if (!this.vfx(KHABIB_VFX + 'portal', b.x, b.y - 50)) this.burst(b.x, b.y - 50, 0x3fe0ff)
+          this.burst(b.x, b.y - 4, 0xff5a5a)
+          break
+        case 'deflect_windup': case 'stamp_windup': case 'reflect_windup': s.play('boss-volley-windup', crit); break
+        case 'pat_out': s.play('boss-charge', crit); this.burst(c.x, c.y - 40, 0x3fe0ff); break
+        case 'shoulder_pat': this.burst(b.x, b.y - 4, 0x3fe0ff); break
+        case 'stamp_throw': s.play('boss-wave-slam', crit); break
+        case 'reflect_shield': s.play('ping', crit); break
+        case 'dodge_windup': case 'procedure_windup': case 'silence_windup': case 'flurry_windup': case 'forms_windup': s.play('boss-volley-windup', crit); break
+        case 'procedure': s.play('boss-wave-slam', crit); break
+        case 'forms': s.play('boss-volley', crit); break
+        case 'flurry':
+          s.play('boss-volley', crit)
+          this.vfx(YASUKA_VFX + 'paper-flurry', b.x, b.y - 50)
+          break
+        case 'recover':
+          if (c.state === 'dodge') this.vfx(YASUKA_VFX + 'dodge-trail', c.x, c.y - 50, c.facing < 0) // the afterimage where she stood
+          break
       }
+      const line = this.cfg?.lines[b.state]
+      if (line && c.state !== 'teleport_in') this.say(line) // not on every hop of a chain
       if (b.state === 'wind_clock') s.loop('wind', 'boss-wind-clock')
       else s.stop('wind')
       if (b.state.endsWith('windup')) { // duck the music briefly under a telegraph
@@ -421,6 +513,7 @@ export class GameScene extends Phaser.Scene {
     } else if (p.action === 'revive' && last.action !== 'revive') play('revive', 'revive', true)
     else if (p.action === 'down') play('down', 'down')
     else if (p.action === 'charge') play('skill-windup', 'attack')
+    else if (p.action === 'pat') play('hurt', 'hurt') // held by Vought's shoulder pat
     else if (p.action === '') play(!p.ground ? (p.vy < 0 ? 'jump' : 'fall') : p.vx !== 0 ? 'run' : 'idle', 'idle')
 
     if (p.ground && !last.ground && p.action === '') this.vfx('sprites/vfx/land-dust', x, y, false, 0.5, 1)
@@ -456,6 +549,8 @@ export class GameScene extends Phaser.Scene {
     } else if (p.action === 'down') {
       bar(p.revive, 0x8ef0b5)
       av.label.setText(`${av.label.text} · Nghỉ phép`)
+    } else if (p.action === 'pat') {
+      av.label.setText(`${av.label.text} · Bị vỗ vai: đập J/L để thoát`)
     } else if (p.action === 'charge') bar(p.charge, 0x3fe0ff)
   }
 
@@ -480,11 +575,16 @@ export class GameScene extends Phaser.Scene {
   private drawBoss(b: Snapshot, time: number) {
     const boss = b.boss
     this.boss.setPosition(boss.x, boss.y).setFlipX(boss.facing < 0) // art faces right
-    const own = BOSS + boss.state
-    this.boss.play(this.anims.exists(own) ? own : BOSS + (BOSS_FALLBACK[boss.state] ?? 'idle'), true)
+    const ghost = boss.state === 'teleport_out' || boss.state === 'pat_out'
+    this.boss.setAlpha(ghost ? 0.35 : 1).setVisible(boss.state !== 'teleport_warn' && boss.state !== 'pat_warn')
+    const own = this.bossArt + boss.state
+    const fallback = this.bossArt === BOSS ? BOSS_FALLBACK : this.cfg?.fallback ?? {}
+    this.boss.play(this.anims.exists(own) ? own : this.bossArt + (fallback[boss.state] ?? 'idle'), true)
+    this.drawShield(boss, time)
+    this.drawSeals(b)
     if (this.prev && b !== this.prev && boss.hits > this.prev.boss.hits) {
       this.boss.setTintFill(0xffffff)
-      this.time.delayedCall(60, () => this.boss.clearTint())
+      this.time.delayedCall(60, () => { this.boss.clearTint(); if (this.cfg && this.bossArt === BOSS) this.boss.setTint(this.cfg.tint) })
       this.vfx('sprites/vfx/hit-spark', boss.x + Phaser.Math.Between(-24, 24), boss.y - Phaser.Math.Between(40, 90))
     }
     this.bossMark.setVisible(boss.markMs > 0)
@@ -495,8 +595,21 @@ export class GameScene extends Phaser.Scene {
     const from = boss.chargeFrom, to = boss.chargeTo
     const showCharge = b.result === '' && (boss.state === 'charge_windup' || boss.state === 'charge')
       && from !== undefined && to !== undefined && from !== to
-    this.chargeWarning.setVisible(showCharge)
-    if (showCharge && from !== undefined && to !== undefined) {
+    const land = boss.landX // Khabib / Vought: coral mark where he will appear
+    const landKey = KHABIB_VFX + 'teleport-warning'
+    if (land !== undefined && this.sandbox === 'khabib' && this.textures.exists(landKey)) { // own warning art
+      if (!this.landMark) {
+        this.landMark = this.add.sprite(0, 0, landKey).setOrigin(0.5, 1).setDepth(2)
+        if (this.anims.exists(landKey)) this.landMark.play(landKey)
+      }
+      this.landMark.setPosition(land, boss.landY ?? this.floorY).setScale(1.25, 1).setVisible(true)
+    } else this.landMark?.setVisible(false)
+    const ownLand = land !== undefined && this.landMark?.visible === true
+    this.chargeWarning.setVisible(showCharge || (land !== undefined && !ownLand))
+    if (land !== undefined && !ownLand) {
+      this.chargeWarning.setPosition(land, boss.landY ?? this.floorY).setSize(this.cfg?.w ?? 70, this.chargeWarning.height).setFlipX(false)
+        .setFrame(Math.floor(time / 125) % Math.max(1, this.chargeWarning.texture.frameTotal - 1))
+    } else if (showCharge && from !== undefined && to !== undefined) {
       // The server sends centre positions; include the 70px-wide boss body at both ends.
       const frames = Math.max(1, this.chargeWarning.texture.frameTotal - 1)
       this.chargeWarning.setPosition((from + to) / 2, this.floorY)
@@ -504,12 +617,12 @@ export class GameScene extends Phaser.Scene {
         .setFlipX(to < from).setFrame(Math.floor(time / 125) % frames)
     }
     const moving = this.lastBossX !== undefined && Math.abs(boss.x - this.lastBossX) > 0.1
-    if (b.result === '' && moving && (boss.state === 'walk' || boss.state === 'charge')
+    if (b.result === '' && moving && (boss.state === 'walk' || boss.state === 'charge' || boss.state === 'press')
       && time - this.lastBossDust >= (boss.state === 'charge' ? 120 : 280)) {
       this.vfx('sprites/vfx/boss-foot-dust', boss.x - boss.facing * 30, boss.y, boss.facing < 0, 0.5, 1)?.setDepth(1)
       this.lastBossDust = time
     }
-    if (boss.state === 'walk' && moving && time >= this.bossStep) {
+    if ((boss.state === 'walk' || boss.state === 'press') && moving && time >= this.bossStep) {
       this.bossStep = time + 450
       this.sfx.play('boss-footstep', { x: boss.x })
     }
@@ -574,6 +687,8 @@ export class GameScene extends Phaser.Scene {
       returned: [SKILL_VFX + 'returned-task', 'sprites/vfx/task-card', 0x3fe0ff], // own art replaces the tint once it exists
     }
     sync(this.shots, b.shots, s => {
+      if (s.kind === 'paper') return this.add.sprite(s.x, s.y, PAPER).setDepth(4) // Yasuka's homing form
+      if (s.word) return text(this, s.x, s.y, 12, CORAL).setText(s.word).setOrigin(0.5).setDepth(4) // Khabib's talk spam
       const [own, fallback, tint] = shotArt[s.kind]
       const key = this.textures.exists(own) ? own : fallback
       const sp = this.add.sprite(s.x, s.y, key).setFlipX(s.vx < 0).setDepth(4)
@@ -582,18 +697,24 @@ export class GameScene extends Phaser.Scene {
       return sp
     }, (sprite, s) => {
       const sa = a.shots.find(o => o.id === s.id) ?? s
-      sprite.setPosition(Phaser.Math.Linear(sa.x, s.x, k), s.y)
+      sprite.setPosition(Phaser.Math.Linear(sa.x, s.x, k), Phaser.Math.Linear(sa.y, s.y, k)) // lobbed tasks move in y too
+      if (s.kind === 'paper') { // points where it flies, with a flutter
+        const dx = s.x - sa.x, dy = s.y - sa.y
+        ;(sprite as Phaser.GameObjects.Sprite).setRotation((dx || dy ? Math.atan2(dy, dx) : 0) + 0.25 * Math.sin(this.time.now / 90 + s.id))
+      }
     })
+    this.drawStamps(b)
     sync(this.items, b.items, it => {
       const key = 'sprites/items/coffee'
       return this.add.sprite(it.x, it.y, key).setOrigin(0.5, 1).play(key).setDepth(1)
     }, () => {})
     sync(this.waves, b.waves, w => {
-      const key = 'sprites/vfx/deadline-wave'
-      return this.add.sprite(w.x, this.floorY, key).setOrigin(0.5, 1).play(key).setFlipX(w.dir < 0).setDepth(4)
+      const own = KHABIB_VFX + 'press-wave'
+      const key = this.sandbox === 'khabib' && this.textures.exists(own) ? own : 'sprites/vfx/deadline-wave'
+      return this.add.sprite(w.x, w.y, key).setOrigin(0.5, 1).play(key).setFlipX(w.dir < 0).setDepth(4)
     }, (sprite, w) => {
       const wa = a.waves.find(o => o.id === w.id) ?? w
-      sprite.setPosition(Phaser.Math.Linear(wa.x, w.x, k), this.floorY)
+      sprite.setPosition(Phaser.Math.Linear(wa.x, w.x, k), w.y)
     })
 
     // Drop attack: a warning column and "!" from the start of the telegraph, then the falling stack.
@@ -665,7 +786,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.partyView) {
       const boss = b.boss
       const bw = 520, bx = VIEW_W / 2 - bw / 2
-      const open = boss.state === 'wind_clock' || boss.state === 'charge_recover' || boss.state === 'drop_jam' // good moment to hit
+      const open = ['wind_clock', 'charge_recover', 'drop_jam', 'recover'].includes(boss.state) // good moment to hit
       bossBar.fillStyle(0x0b1020).fillRect(bx - 2, VIEW_H - 22, bw + 4, 14)
       bossBar.fillStyle(open ? 0xffd25e : 0xff5a5a).fillRect(bx, VIEW_H - 20, bw * (boss.hp / Math.max(1, boss.maxHp)), 10)
     }
@@ -681,6 +802,7 @@ export class GameScene extends Phaser.Scene {
 
   // deadlineInfo is the co-op DEADLINE bar: [fraction left, label, flash in the last 10 s].
   private deadlineInfo(b: Snapshot, time: number): [number, string, boolean] {
+    if (this.cfg) return [1, `SANDBOX · ${this.cfg.name}`, false] // no DEADLINE here
     const secs = Math.ceil(Math.max(0, b.deadlineMs) / 1000)
     const flash = b.deadlineMs > 0 && b.deadlineMs <= 10_000 && Math.floor(time / 250) % 2 === 0 // with the last-10s tick
     return [Math.max(0, b.deadlineMs) / Math.max(1, b.deadlineOf),
@@ -746,6 +868,91 @@ export class GameScene extends Phaser.Scene {
     else fallback()
   }
 
+  // A cream form with a folded corner, text lines and a rejection stamp, in 2 px pixels (26×20).
+  private makePaperTexture() {
+    if (this.textures.exists(PAPER)) return
+    const g = this.make.graphics({ x: 0, y: 0 }, false)
+    const px = (x: number, y: number, w: number, h: number, c: number) => g.fillStyle(c).fillRect(x * 2, y * 2, w * 2, h * 2)
+    px(0, 0, 13, 10, 0x0b1020) // outline
+    px(1, 1, 11, 8, 0xf2e3c2) // sheet
+    px(9, 1, 3, 3, 0xc9b48c) // folded corner
+    px(9, 1, 1, 3, 0x0b1020); px(9, 3, 3, 1, 0x0b1020)
+    px(2, 3, 5, 1, 0xff5a5a); px(2, 5, 7, 1, 0x8899aa); px(2, 7, 4, 1, 0x8899aa) // text lines
+    px(8, 6, 3, 2, 0xff5a5a) // stamp
+    g.generateTexture(PAPER, 26, 20)
+    g.destroy()
+  }
+
+  // Vought's speech shield stays in front of him while it is up.
+  private drawShield(boss: Snapshot['boss'], time: number) {
+    const silence = boss.state === 'silence'
+    if (boss.state !== 'reflect_shield' && !silence) { this.shield?.destroy(); this.shield = undefined; return }
+    const key = silence ? YASUKA_VFX + 'silence-dome' : VOUGHT_VFX + 'speech-shield'
+    if (!this.shield && this.textures.exists(key)) {
+      this.shield = this.add.sprite(0, 0, key).setDepth(5)
+      if (this.anims.exists(key)) this.shield.play(key)
+    }
+    if (silence) this.shield?.setPosition(boss.x, boss.y).setOrigin(0.5, 1).setScale(2).setAlpha(0.35 + 0.6 * (boss.shield ?? 1)) // fades as it wears down
+    else this.shield?.setScale(1).setOrigin(0.5).setPosition(boss.x + boss.facing * 34, boss.y - 52).setFlipX(boss.facing < 0).setAlpha(0.8 + 0.2 * Math.sin(time / 120))
+  }
+
+  // Yasuka's seals: faint and blinking while asleep, solid once they bite.
+  private drawSeals(b: Snapshot) {
+    const live = new Set((b.seals ?? []).map(s => s.id))
+    for (const s of b.seals ?? []) {
+      let sp = this.seals.get(s.id)
+      if (!sp) {
+        const key = YASUKA_VFX + 'stamp-trap'
+        if (this.textures.exists(key)) {
+          sp = this.add.sprite(s.x, s.y, key).setOrigin(0.5, 1).setDepth(2)
+          if (this.anims.exists(key)) sp.play(key)
+        } else sp = this.add.rectangle(s.x, s.y, 32, 24, 0xff5a5a, 0.5).setOrigin(0.5, 1).setDepth(2)
+        this.seals.set(s.id, sp)
+      }
+      sp.setAlpha(s.ms > 0 ? 0.25 + 0.2 * (Math.floor(this.time.now / 120) % 2) : 1)
+    }
+    for (const [id, sp] of this.seals) {
+      if (!live.has(id)) { sp.destroy(); this.seals.delete(id) }
+    }
+  }
+
+  // Vought's DEV stamps: one over each marked player, with the hits it still takes and the seconds left.
+  private drawStamps(b: Snapshot) {
+    const live = new Set((b.stamps ?? []).map(s => s.id))
+    for (const s of b.stamps ?? []) {
+      let v = this.stamps.get(s.id)
+      if (!v) {
+        const key = VOUGHT_VFX + 'bug-stamp'
+        const sp = this.textures.exists(key)
+          ? this.add.sprite(s.x, s.y, key).setDepth(5)
+          : text(this, s.x, s.y, 14, CORAL).setText('[DEV]').setOrigin(0.5).setDepth(5)
+        if (sp instanceof Phaser.GameObjects.Sprite && this.anims.exists(key)) sp.play(key)
+        v = { sp, label: text(this, s.x, s.y - 20, 11, CORAL).setOrigin(0.5, 1).setDepth(5) }
+        this.stamps.set(s.id, v)
+        this.sfx.play('ping', { critical: true })
+      }
+      v.sp.setPosition(s.x, s.y)
+      v.label.setPosition(s.x, s.y - 20).setText(`${(s.ms / 1000).toFixed(1)}s ${'■'.repeat(s.hp)}`)
+    }
+    for (const [id, v] of this.stamps) {
+      if (live.has(id)) continue
+      this.burst(v.sp.x, v.sp.y, 0xff5a5a)
+      v.sp.destroy(); v.label.destroy()
+      this.stamps.delete(id)
+    }
+  }
+
+  // burst scatters square pixel fragments: Khabib's teleport out (cyan) and landing (coral).
+  private burst(x: number, y: number, color: number) {
+    for (let i = 0; i < 12; i++) {
+      const p = this.add.rectangle(x, y, 6, 6, color).setDepth(5)
+      this.tweens.add({
+        targets: p, x: x + Phaser.Math.Between(-60, 60), y: y + Phaser.Math.Between(-60, 20), alpha: 0,
+        duration: 500, onComplete: () => p.destroy(),
+      })
+    }
+  }
+
   // vfx plays a one-shot effect; missing art plays nothing.
   private vfx(key: string, x: number, y: number, flip = false, ox = 0.5, oy = 0.5) {
     if (!this.anims.exists(key)) return
@@ -756,9 +963,8 @@ export class GameScene extends Phaser.Scene {
 }
 
 // sync keeps one sprite per server object id.
-function sync<T extends { id: number }>(
-  sprites: Map<number, Phaser.GameObjects.Sprite>, items: T[],
-  create: (t: T) => Phaser.GameObjects.Sprite, update: (s: Phaser.GameObjects.Sprite, t: T) => void,
+function sync<T extends { id: number }, S extends Placed>(
+  sprites: Map<number, S>, items: T[], create: (t: T) => S, update: (s: S, t: T) => void,
 ) {
   const seen = new Set<number>()
   for (const it of items) {

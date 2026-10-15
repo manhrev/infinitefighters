@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { lobbyMusic, saveSettings, settings } from './audio'
 import { GameScene, VIEW_H, VIEW_W } from './game'
-import { connect, send, world, type Join, type ServerMsg } from './net'
+import { connect, send, world, type Join, type SandboxBoss, type ServerMsg } from './net'
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 const lobbyEl = $('lobby'), joinForm = $<HTMLFormElement>('join'), roomEl = $('room')
@@ -53,7 +53,7 @@ function onMessage(m: ServerMsg) {
     case 'start':
       lobbyEl.hidden = true
       lobbyMusic(false)
-      startGame(m.level, m.mode)
+      startGame(m.level, m.mode, m.boss)
       break
   }
 }
@@ -98,13 +98,14 @@ levelsEl.querySelectorAll<HTMLButtonElement>('.level').forEach(b =>
 
 let gameLevel = ''
 
-function startGame(level: string, mode: 'coop' | 'party') {
-  if (game && level === gameLevel) return // reconnect mid-match: the scene is already running
+function startGame(level: string, mode: 'coop' | 'party', boss?: SandboxBoss) {
+  const key = level + (boss ?? '')
+  if (game && key === gameLevel) return // reconnect mid-match: the scene is already running
   if (game) { // boss beaten, on to the party: a fresh scene, no old snapshots
     game.destroy(true)
     world.snapshots = []
   }
-  gameLevel = level
+  gameLevel = key
   game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
@@ -115,7 +116,7 @@ function startGame(level: string, mode: 'coop' | 'party') {
     // Fill the window, keep 16:9. pixelArt keeps nearest-neighbour, so a non-integer scale gives slightly uneven pixels, not blur.
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   })
-  game.scene.add('game', GameScene, true, { level, mode })
+  game.scene.add('game', GameScene, true, { level, mode, boss })
 }
 
 // Audio settings panel: Master / Music / SFX / mute, remembered per browser.

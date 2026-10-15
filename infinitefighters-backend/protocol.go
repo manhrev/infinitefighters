@@ -8,8 +8,10 @@ import "encoding/json"
 //
 //	{"type":"join","name":"An","code":"ABCD"}       new player (lobby only)
 //	{"type":"join","token":"..."}                   resume a kept slot
-//	{"type":"start","level":"party"}                host only, lobby only; level "coop" (boss, default)
-//	                                                or "party" (Anh em cây khế)
+//	{"type":"start","level":"party"}                host only, lobby only; level "coop" (boss, default),
+//	                                                "party" (Anh em cây khế), "sandbox" (Khabib)
+//	                                                "sandbox-vought" or "sandbox-yasuka"
+//	{"type":"end"}                                  host only, sandbox only: back to the lobby
 //	{"type":"input","left":true,"jump":false,...}   held buttons; send on every change
 //
 // Presses (jump, attack, skill, special, dash, ping) act on the up→down edge; interact acts while held,
@@ -63,9 +65,10 @@ type lobbyPlayer struct {
 }
 
 type startMsg struct {
-	Type  string `json:"type"`  // "start"
-	Level string `json:"level"` // URL of the Tiled map
-	Mode  string `json:"mode"`  // "coop" (boss) or "party" (PvP money phase); a new mode means a new scene
+	Type  string `json:"type"`           // "start"
+	Level string `json:"level"`          // URL of the Tiled map
+	Mode  string `json:"mode"`           // "coop" (boss) or "party" (PvP money phase); a new mode means a new scene
+	Boss  string `json:"boss,omitempty"` // "khabib", "vought" or "yasuka": the sandbox boss in the coop scene
 }
 
 type snapshotMsg struct {
@@ -78,11 +81,13 @@ type snapshotMsg struct {
 	Players    []playerState `json:"players"`
 	Boss       bossState     `json:"boss"`
 	Shots      []shotState   `json:"shots"`
-	Waves      []waveState   `json:"waves"` // deadline waves along the floor
-	Items      []itemState   `json:"items"` // pickups currently available
-	Zones      []zoneState   `json:"zones"` // P4 hotfix zones
-	Drops      []dropState   `json:"drops"` // falling file stacks, shown from the start of drop_windup
-	Mode       string        `json:"mode"`  // "coop" or "party"
+	Waves      []waveState   `json:"waves"`            // deadline waves along the floor
+	Items      []itemState   `json:"items"`            // pickups currently available
+	Zones      []zoneState   `json:"zones"`            // P4 hotfix zones
+	Drops      []dropState   `json:"drops"`            // falling file stacks, shown from the start of drop_windup
+	Stamps     []stampState  `json:"stamps,omitempty"` // Vought's DEV stamps
+	Seals      []sealState   `json:"seals,omitempty"`  // Yasuka's rejection seals
+	Mode       string        `json:"mode"`             // "coop" or "party"
 	Party      *partyMsg     `json:"party,omitempty"`
 }
 
@@ -116,6 +121,7 @@ type playerState struct {
 	Reflects  uint32  `json:"reflects"`  // P2 bounced a task card
 	Healed    uint32  `json:"healed"`    // this player got a heart from a hotfix zone
 	Coffees   uint32  `json:"coffees"`
+	Rejects   uint32  `json:"rejects"`       // Yasuka's seal sent this player back to their start
 	PvP       *pvpMsg `json:"pvp,omitempty"` // party only
 }
 
@@ -192,19 +198,43 @@ type bossState struct {
 	// Locked charge corridor (floor x range), set during charge_windup and charge.
 	ChargeFrom float64 `json:"chargeFrom,omitempty"`
 	ChargeTo   float64 `json:"chargeTo,omitempty"`
+	// Khabib teleport: where he lands, shown on the floor while he is out of sight.
+	LandX float64 `json:"landX,omitempty"`
+	LandY float64 `json:"landY,omitempty"`
+	// Yasuka's silence dome strength, 1 down to 0 (set only while it is up).
+	Shield float64 `json:"shield,omitempty"`
 }
 
 type shotState struct {
 	ID   int     `json:"id"`
-	Kind string  `json:"kind"` // card (boss task), pulse (code pulse), stamp (P3), returned (card bounced by P2)
+	Kind string  `json:"kind"` // card (boss task), pulse (code pulse), stamp (P3), returned (card bounced by P2), paper (Yasuka's homing form)
 	X    float64 `json:"x"`    // centre
 	Y    float64 `json:"y"`
 	VX   float64 `json:"vx"`
+	Word string  `json:"word,omitempty"` // Khabib's nag text
+}
+
+// stampState is a DEV stamp over a player: break it with hits before Ms runs out.
+type stampState struct {
+	ID int     `json:"id"`
+	X  float64 `json:"x"` // centre
+	Y  float64 `json:"y"`
+	Hp int     `json:"hp"`
+	Ms int64   `json:"ms"` // time until the bug moves to the player
+}
+
+// sealState is a rejection seal: Ms is the time until it is awake (0 = bites).
+type sealState struct {
+	ID int     `json:"id"`
+	X  float64 `json:"x"` // bottom-centre
+	Y  float64 `json:"y"`
+	Ms int64   `json:"ms"`
 }
 
 type waveState struct {
 	ID  int     `json:"id"`
 	X   float64 `json:"x"` // centre; the wave is 32×32 standing on the floor
+	Y   float64 `json:"y"` // feet; a desk top for Khabib's waves
 	Dir int     `json:"dir"`
 }
 
