@@ -24,6 +24,8 @@ type Body struct {
 	onOneWay  bool // standing only on one-way tiles, so drop-through is allowed
 	dropTicks int
 	dashTicks int     // > 0: dashing forward, no gravity
+	dashSpeed float64 // dash and P5 timecard differ
+	slow      bool    // P1 charging: walks at chargeSlow
 	pushVX    float64 // knockback overrides input while pushTicks > 0
 	pushTicks int
 }
@@ -32,8 +34,11 @@ type Body struct {
 func (b *Body) step(l *Level, in Input, jump bool) {
 	if b.dashTicks > 0 {
 		b.dashTicks--
-		b.VX, b.VY = float64(b.Facing)*dashSpeed, 0
+		b.VX, b.VY = float64(b.Facing)*b.dashSpeed, 0
 		b.moveX(l, b.VX*dt)
+		if b.VX == 0 {
+			b.dashTicks = 0 // hit a wall
+		}
 		return
 	}
 	dir := 0
@@ -44,6 +49,9 @@ func (b *Body) step(l *Level, in Input, jump bool) {
 		dir++
 	}
 	b.VX = float64(dir) * runSpeed
+	if b.slow {
+		b.VX *= chargeSlow
+	}
 	if dir != 0 {
 		b.Facing = dir
 	}

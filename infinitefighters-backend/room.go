@@ -34,8 +34,8 @@ type Player struct {
 }
 
 type presses struct {
-	jump, attack, skill, dash bool
-	ping                      int
+	jump, attack, skill, special, dash bool
+	ping                               int
 }
 
 // Room is the only game. All its state is touched only by the run goroutine;
@@ -55,6 +55,7 @@ type Room struct {
 func newRoom(code string, level *Level) *Room {
 	r := &Room{code: code, level: level, inbox: make(chan func(), 256), phase: phaseLobby, nextID: 1}
 	r.deadlineTicks = 10 * 60 * tickRate
+	r.bossBaseHP = bossBaseHP
 	return r
 }
 
@@ -108,6 +109,7 @@ func (r *Room) handle(c *client, m clientMsg) {
 			pr.attack = pr.attack || (m.Attack && !p.in.Attack)
 			pr.skill = pr.skill || (m.Skill && !p.in.Skill)
 			pr.dash = pr.dash || (m.Dash && !p.in.Dash)
+			pr.special = pr.special || (m.Special && !p.in.Special)
 			if m.Ping != 0 && m.Ping != p.in.Ping && m.Ping <= 3 {
 				pr.ping = m.Ping
 			}
@@ -224,28 +226,43 @@ func (r *Room) lobby() lobbyMsg {
 
 func (r *Room) snapshot() snapshotMsg {
 	b := r.boss
+	ms := func(ticks int) int64 { return int64(ticks) * 1000 / tickRate }
 	m := snapshotMsg{
 		Type: "snapshot", Tick: r.tick, ServerTime: time.Now().UnixMilli(),
-		DeadlineMs: int64(r.deadline) * 1000 / tickRate, DeadlineOf: int64(r.deadlineTicks) * 1000 / tickRate, Result: r.result,
-		Boss:    bossState{X: b.X, Y: b.Y, Facing: b.Facing, HP: b.HP, MaxHP: b.MaxHP, State: b.State, Hits: b.Hits},
-		Players: []playerState{}, Shots: []shotState{}, Waves: []waveState{},
+		DeadlineMs: ms(r.deadline), DeadlineOf: ms(r.deadlineTicks), Result: r.result,
+		Boss: bossState{
+			X: b.X, Y: b.Y, Facing: b.Facing, HP: b.HP, MaxHP: b.MaxHP, State: b.State,
+			Hits: b.Hits, Marks: b.Marks, MarkMs: ms(b.markTicks),
+		},
+		Players: []playerState{}, Shots: []shotState{}, Waves: []waveState{}, Items: []itemState{}, Zones: []zoneState{},
+	}
+	if b.State == bossChargeWindup || b.State == bossCharge {
+		m.Boss.ChargeFrom, m.Boss.ChargeTo = b.chargeFrom, b.chargeTo
 	}
 	for _, p := range r.players {
 		m.Players = append(m.Players, playerState{
 			ID: p.ID, X: p.X, Y: p.Y, VX: p.VX, VY: p.VY,
 			Facing: p.Facing, Ground: p.OnGround, Away: p.client == nil,
 			HP: p.HP, Action: p.action, Revive: float64(p.reviveHeld) / reviveHoldTicks, Ping: p.ping,
-			Attacks: p.Attacks, Pulses: p.Pulses, Dashes: p.Dashes, Hurts: p.Hurts,
+			SkillMs: ms(p.skillCD), SkillOf: ms(skillCooldown[p.Slot]), Charge: float64(p.charge) / chargeMaxTicks,
+			Attacks: p.Attacks, Pulses: p.Pulses, Dashes: p.Dashes, Hurts: p.Hurts, Hits: p.Hits,
+			Casts: p.Casts, SkillHits: p.SkillHits, Cancels: p.Cancels,
+			Reflects: p.Reflects, Healed: p.Healed, Coffees: p.Coffees,
 		})
 	}
-	for _, s := range r.cards {
-		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: "card", X: s.X, Y: s.Y, VX: s.VX})
-	}
-	for _, s := range r.pulses {
-		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: "pulse", X: s.X, Y: s.Y, VX: s.VX})
+	for _, s := range append(append([]*Shot{}, r.cards...), r.shots...) {
+		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: s.Kind, X: s.X, Y: s.Y, VX: s.VX})
 	}
 	for _, w := range r.waves {
 		m.Waves = append(m.Waves, waveState{ID: w.ID, X: w.X, Dir: w.Dir})
+	}
+	for _, z := range r.zones {
+		m.Zones = append(m.Zones, zoneState{ID: z.ID, X: z.X, Y: z.Y, Ms: ms(z.ticks)})
+	}
+	for i, c := range r.level.Coffees {
+		if r.coffeeIn[i] == 0 {
+			m.Items = append(m.Items, itemState{ID: i, Kind: "coffee", X: c.X, Y: c.Y})
+		}
 	}
 	return m
 }

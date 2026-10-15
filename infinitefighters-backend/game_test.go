@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 // testRoom starts a match on the real level with n connected players and `away` disconnected ones.
 func testRoom(t *testing.T, n, away int) *Room {
@@ -23,6 +26,9 @@ func testRoom(t *testing.T, n, away int) *Room {
 	return r
 }
 
+// passive is not a boss state: stepBoss does nothing, for tests that are not about the boss.
+const passive = "passive"
+
 func steps(r *Room, n int) {
 	for range n {
 		r.stepMatch()
@@ -34,14 +40,14 @@ func settle(r *Room) { steps(r, 30) }
 
 func TestBossHPScalesWithAllSlots(t *testing.T) {
 	r := testRoom(t, 2, 1) // away players count too
-	if want := bossBaseHP + 2*bossHPPerPlayer; r.boss.MaxHP != want {
-		t.Fatalf("boss HP %d, want %d", r.boss.MaxHP, want)
+	if want := float64(bossBaseHP + 2*bossHPPerPlayer); r.boss.MaxHP != want {
+		t.Fatalf("boss HP %v, want %v", r.boss.MaxHP, want)
 	}
 	r.players[0].action = actDown
 	r.players[1].action = actDown
 	steps(r, lostTicks+2) // lost, then restart
-	if r.result != "" || r.boss.MaxHP != bossBaseHP+2*bossHPPerPlayer {
-		t.Fatalf("after restart: result %q, boss HP %d", r.result, r.boss.MaxHP)
+	if r.result != "" || r.boss.MaxHP != float64(bossBaseHP+2*bossHPPerPlayer) {
+		t.Fatalf("after restart: result %q, boss HP %v", r.result, r.boss.MaxHP)
 	}
 }
 
@@ -54,7 +60,7 @@ func TestSwingHitsBossOncePerSwing(t *testing.T) {
 	p.pressed.attack = true
 	steps(r, attackTicks+2)
 	if r.boss.HP != hp-1 {
-		t.Fatalf("boss HP %d, want %d after one swing", r.boss.HP, hp-1)
+		t.Fatalf("boss HP %v, want %v after one swing", r.boss.HP, hp-1)
 	}
 
 	p.Facing = -1 // facing away
@@ -63,14 +69,14 @@ func TestSwingHitsBossOncePerSwing(t *testing.T) {
 	p.Facing = -1
 	steps(r, attackTicks+2)
 	if r.boss.HP != hp-1 {
-		t.Fatalf("swing facing away hit the boss: HP %d", r.boss.HP)
+		t.Fatalf("swing facing away hit the boss: HP %v", r.boss.HP)
 	}
 
 	p.X, p.Facing = r.boss.X, 1 // standing inside the boss is allowed and still hits
 	p.pressed.attack = true
 	steps(r, attackTicks+2)
 	if r.boss.HP != hp-2 || p.HP != playerHP {
-		t.Fatalf("inside the boss: boss HP %d (want %d), player HP %d", r.boss.HP, hp-2, p.HP)
+		t.Fatalf("inside the boss: boss HP %v (want %v), player HP %v", r.boss.HP, hp-2, p.HP)
 	}
 }
 
@@ -163,7 +169,7 @@ func TestAllConnectedDownLosesAndResets(t *testing.T) {
 	}
 	steps(r, lostTicks)
 	if r.result != "" || r.boss.HP != r.boss.MaxHP || r.deadline != r.deadlineTicks {
-		t.Fatalf("not reset: result %q boss %d/%d deadline %d", r.result, r.boss.HP, r.boss.MaxHP, r.deadline)
+		t.Fatalf("not reset: result %q boss %v/%v deadline %v", r.result, r.boss.HP, r.boss.MaxHP, r.deadline)
 	}
 	for i, p := range r.players {
 		if p.HP != playerHP || p.action != "" || p.X != r.level.Spawns[i].X {
@@ -203,7 +209,7 @@ func TestHeldInteractRevives(t *testing.T) {
 func TestWinReturnsToLobbyAndPurgesAway(t *testing.T) {
 	r := testRoom(t, 2, 1)
 	r.boss.HP = 1
-	r.damageBoss(1)
+	r.damageBoss(1, false)
 	r.stepMatch()
 	if r.result != resultWon || r.boss.State != bossDefeat {
 		t.Fatalf("result %q state %q", r.result, r.boss.State)
@@ -213,8 +219,29 @@ func TestWinReturnsToLobbyAndPurgesAway(t *testing.T) {
 		t.Fatalf("phase %q with %d players, want lobby with 2", r.phase, len(r.players))
 	}
 	r.start()
-	if r.phase != phasePlaying || r.boss.HP != bossBaseHP+bossHPPerPlayer {
-		t.Fatalf("second start: phase %q boss HP %d", r.phase, r.boss.HP)
+	if r.phase != phasePlaying || r.boss.HP != float64(bossBaseHP+bossHPPerPlayer) {
+		t.Fatalf("second start: phase %q boss HP %v", r.phase, r.boss.HP)
+	}
+}
+
+func TestCoffeeHealsHurtPlayerAndRespawns(t *testing.T) {
+	r := testRoom(t, 2, 0)
+	r.boss.State = passive
+	c := r.level.Coffees[0]
+	full, hurt := r.players[0], r.players[1]
+	full.X, full.Y = c.X, c.Y
+	r.stepMatch()
+	if r.coffeeIn[0] != 0 || full.HP != playerHP {
+		t.Fatal("full-HP player took the coffee")
+	}
+	hurt.HP, hurt.X, hurt.Y = 2, c.X, c.Y
+	r.stepMatch()
+	if hurt.HP != 3 || r.coffeeIn[0] != coffeeRespawn {
+		t.Fatalf("hurt player HP %d, coffee timer %d", hurt.HP, r.coffeeIn[0])
+	}
+	steps(r, coffeeRespawn)
+	if r.coffeeIn[0] != 0 {
+		t.Fatal("coffee did not come back")
 	}
 }
 
@@ -226,5 +253,224 @@ func TestDashIsInvulnerable(t *testing.T) {
 	r.stepMatch()
 	if p.action != actDash || r.canHurt(p) {
 		t.Fatalf("dash: action %q canHurt %v", p.action, r.canHurt(p))
+	}
+}
+
+func near(a, b float64) bool { return math.Abs(a-b) < 1e-9 }
+
+func TestBossWalksTowardTargetWithinLimits(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	p := r.players[0]
+	ts := float64(r.level.Tile)
+	start := r.boss.X
+	r.boss.State, r.boss.ticks = bossIdle, bossIdleTicks
+	for i := 0; r.boss.State == bossIdle || r.boss.State == bossWalk; i++ {
+		r.stepMatch()
+		if i > 5*tickRate {
+			t.Fatal("walk never ended")
+		}
+	}
+	walked := start - r.boss.X
+	if walked <= 0 || walked > walkMaxTiles*ts+1 {
+		t.Fatalf("walked %v px toward a player at x=%v, want 0 < d ≤ %v", walked, p.X, walkMaxTiles*ts)
+	}
+	if r.boss.X < r.bossMinX || r.boss.X > r.bossMaxX {
+		t.Fatalf("boss at %v outside [%v, %v]", r.boss.X, r.bossMinX, r.bossMaxX)
+	}
+	if lo := r.bossMinX - bossW/2; lo < 32+wallGapTiles*ts {
+		t.Fatalf("wall gap too small: body edge can reach %v", lo)
+	}
+}
+
+func TestChargeHitsFloorOnceAndMissesPlatform(t *testing.T) {
+	r := testRoom(t, 2, 0)
+	settle(r)
+	floor, high := r.players[0], r.players[1]
+	ts := float64(r.level.Tile)
+	r.boss.X = 1500
+	floor.X = 1350
+	low := r.level.PlatformTops[len(r.level.PlatformTops)-1]
+	high.X, high.Y, high.VY = 1450, low, 0 // on the right low platform, above the corridor
+	steps(r, 2)
+	if !r.lockCharge() {
+		t.Fatal("expected room to charge left")
+	}
+	if r.boss.chargeTo >= r.boss.X || r.boss.X-r.boss.chargeTo > chargeTiles*ts+1e-9 {
+		t.Fatalf("charge %v → %v", r.boss.chargeFrom, r.boss.chargeTo)
+	}
+	r.boss.State, r.boss.ticks = bossChargeWindup, 0
+	steps(r, windupTicks)
+	if floor.Hurts != 0 {
+		t.Fatal("hurt during the windup")
+	}
+	for range chargeTicks + recoverTicks {
+		r.stepMatch()
+		floor.invuln = 0 // a second overlap would hurt again if not tracked per charge
+	}
+	if floor.Hurts != 1 || high.Hurts != 0 {
+		t.Fatalf("floor hurts %d (want 1), platform hurts %d (want 0)", floor.Hurts, high.Hurts)
+	}
+}
+
+func TestJumpClearsCharge(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	p := r.players[0]
+	r.boss.X, p.X = 1500, 1300
+	if !r.lockCharge() {
+		t.Fatal("no room")
+	}
+	r.boss.State, r.boss.ticks = bossChargeWindup, 0
+	steps(r, windupTicks)
+	for i := range chargeTicks {
+		if r.boss.X-bossW/2 < p.X+hitW/2+90 && p.OnGround { // jump as the body closes in
+			p.pressed.jump = true
+		}
+		r.stepMatch()
+		_ = i
+	}
+	if p.Hurts != 0 {
+		t.Fatal("a well-timed jump should clear the charging body")
+	}
+}
+
+func TestChargeNearWallBecomesWindClock(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	r.players[0].X = 1880 // target behind the boss, toward the near wall
+	r.boss.X = r.bossMaxX - 10
+	r.boss.State, r.boss.ticks, r.boss.cycle = bossWalk, walkMaxTicks+1, 2 // next: charge
+	r.stepMatch()
+	if r.boss.State != bossWind {
+		t.Fatalf("state %q, want wind_clock when there is no room to charge", r.boss.State)
+	}
+}
+
+func TestSmashChargeScalesAndDashCancels(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	r.boss.State = passive
+	p := r.players[0]
+	p.X, p.Facing = r.boss.X-bossW/2-hitW/2-20, 1
+	hp := r.boss.HP
+	p.pressed.special, p.in.Special = true, true
+	steps(r, chargeMaxTicks+castTicks+2) // held to the cap: auto-release
+	if !near(r.boss.HP, hp-smashMax) || p.Casts != 1 {
+		t.Fatalf("full smash: boss HP %v want %v, casts %d", r.boss.HP, hp-smashMax, p.Casts)
+	}
+	if p.skillCD == 0 {
+		t.Fatal("no cooldown after release")
+	}
+
+	p.skillCD = 0
+	p.pressed.special = true
+	r.stepMatch() // charging
+	p.pressed.dash = true
+	r.stepMatch()
+	if p.Cancels != 1 || p.action != actDash || p.skillCD == 0 {
+		t.Fatalf("dash: cancels %d action %q cd %d", p.Cancels, p.action, p.skillCD)
+	}
+}
+
+func TestShieldReflectsUpToThree(t *testing.T) {
+	r := testRoom(t, 2, 0)
+	settle(r)
+	r.boss.State = passive
+	p := r.players[1]      // P2
+	p.X, p.Facing = 600, 1 // boss is to the right
+	p.pressed.special = true
+	r.stepMatch()
+	for i := range 4 {
+		r.cards = append(r.cards, &Shot{ID: 100 + i, Kind: "card", X: p.X + 40, Y: p.Y - 30, VX: -cardSpeed, W: cardW, H: cardH})
+	}
+	steps(r, 4)
+	if p.Reflects != maxReflects || p.Hurts != 1 {
+		t.Fatalf("reflects %d (want %d), hurts %d (want 1)", p.Reflects, maxReflects, p.Hurts)
+	}
+	returned := 0
+	for _, s := range r.shots {
+		if s.Kind == "returned" && s.VX > 0 {
+			returned++
+		}
+	}
+	if returned != maxReflects {
+		t.Fatalf("%d returned cards flying at the boss", returned)
+	}
+}
+
+func TestStampMarksAndBoostsKeyboard(t *testing.T) {
+	r := testRoom(t, 3, 0)
+	settle(r)
+	r.boss.State = passive
+	amber := r.players[2]
+	amber.X, amber.Facing = r.boss.X-120, 1
+	amber.pressed.special = true
+	steps(r, 20)
+	if r.boss.markTicks == 0 || r.boss.Marks != 1 {
+		t.Fatal("stamp did not mark the boss")
+	}
+	hp := r.boss.HP
+	r.damageBoss(1, true)
+	r.damageBoss(4, false) // timecard: not boosted
+	if !near(hp-r.boss.HP, markBonus+4) {
+		t.Fatalf("damage %v, want %v", hp-r.boss.HP, markBonus+4)
+	}
+	steps(r, markTicks)
+	if r.boss.markTicks != 0 {
+		t.Fatal("mark did not expire")
+	}
+}
+
+func TestHotfixHealsOncePerPlayerNotDowned(t *testing.T) {
+	r := testRoom(t, 4, 0)
+	settle(r)
+	r.boss.State = passive
+	mint := r.players[3]
+	for _, p := range r.players {
+		p.X = 400
+	}
+	mint.HP, r.players[0].HP = 2, 1
+	r.hurt(r.players[1], playerHP, 0) // downed: must not be revived
+	mint.pressed.special = true
+	steps(r, hotfixTicks+5)
+	if mint.HP != 3 || r.players[0].HP != 2 || r.players[1].action != actDown || r.players[2].Healed != 0 {
+		t.Fatalf("HP mint %d, p1 %d, downed %q, full-HP healed %d", mint.HP, r.players[0].HP, r.players[1].action, r.players[2].Healed)
+	}
+	if len(r.zones) != 0 {
+		t.Fatal("zone did not expire")
+	}
+}
+
+func TestTimecardHitsOnceStopsAtWallSharesCooldown(t *testing.T) {
+	r := testRoom(t, 5, 0)
+	settle(r)
+	r.boss.State = passive
+	orange := r.players[4]
+	orange.X, orange.Facing = r.boss.X-60, 1
+	hp := r.boss.HP
+	orange.pressed.special = true
+	r.stepMatch()
+	if r.canHurt(orange) {
+		t.Fatal("not invulnerable at the start of the lunge")
+	}
+	steps(r, timecardTicks+2)
+	if !near(hp-r.boss.HP, timecardDamage) || orange.SkillHits != 1 {
+		t.Fatalf("boss lost %v, want %v once", hp-r.boss.HP, timecardDamage)
+	}
+	if orange.dashCD == 0 {
+		t.Fatal("normal dash not on the shared cooldown")
+	}
+
+	orange.skillCD, orange.dashCD = 0, 0
+	orange.X = r.level.Spawns[0].X // near the left wall
+	orange.Facing = -1
+	orange.pressed.special = true
+	steps(r, timecardTicks-2) // 54 px to the wall: stops before the full 3 tiles
+	if orange.action == actTimecard {
+		t.Fatalf("lunge did not stop at the wall (x=%v)", orange.X)
+	}
+	if orange.X != 32+hitW/2 {
+		t.Fatalf("went through the wall: x=%v", orange.X)
 	}
 }

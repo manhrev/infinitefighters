@@ -15,11 +15,13 @@ import (
 //     tiles without it are decoration
 //   - point objects of type "spawn" give player spawn feet positions, in order P1..P5
 //   - one point object of type "boss" gives the boss feet position
+//   - point objects of type "coffee" are healing pickups (bottom-centre)
 type Level struct {
 	W, H, Tile int // size in tiles, tile size in px
 	tiles      []tileKind
 	Spawns     []Point
 	Boss       Point
+	Coffees    []Point
 	// PlatformTops are the y of every row holding one-way tiles, top to bottom.
 	PlatformTops []float64
 }
@@ -127,6 +129,8 @@ func parseLevel(data []byte) (*Level, error) {
 					l.Spawns = append(l.Spawns, Point{o.X, o.Y})
 				case "boss":
 					l.Boss, hasBoss = Point{o.X, o.Y}, true
+				case "coffee":
+					l.Coffees = append(l.Coffees, Point{o.X, o.Y})
 				}
 			}
 		}

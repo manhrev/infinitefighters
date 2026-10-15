@@ -27,6 +27,7 @@ func main() {
 	addr := flag.String("addr", ":8080", "listen address")
 	code := flag.String("code", "", "room code (default: random)")
 	deadline := flag.Duration("deadline", 10*time.Minute, "DEADLINE timer per attempt")
+	bossHP := flag.Int("boss-hp", bossBaseHP, "boss HP with one player (playtest tuning)")
 	flag.Parse()
 
 	data, err := levelFS.ReadFile("levels/sprint.json")
@@ -46,6 +47,7 @@ func main() {
 
 	room := newRoom(*code, level)
 	room.deadlineTicks = int(deadline.Seconds() * tickRate)
+	room.bossBaseHP = max(1, *bossHP)
 	go room.run(ctx)
 
 	srv := &http.Server{Addr: *addr, Handler: newMux(room)}

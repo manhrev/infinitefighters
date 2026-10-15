@@ -11,7 +11,8 @@ import "encoding/json"
 //	{"type":"start"}                                host only, lobby only
 //	{"type":"input","left":true,"jump":false,...}   held buttons; send on every change
 //
-// Presses (jump, attack, skill, dash, ping) act on the up→down edge; interact acts while held.
+// Presses (jump, attack, skill, special, dash, ping) act on the up→down edge; interact acts while held,
+// and P1's special charges while held.
 type clientMsg struct {
 	Type  string `json:"type"`
 	Name  string `json:"name,omitempty"`
@@ -29,6 +30,7 @@ type Input struct {
 	Attack   bool `json:"attack"`   // keyboard swing
 	Skill    bool `json:"skill"`    // code pulse
 	Dash     bool `json:"dash"`     // invulnerable while dashing
+	Special  bool `json:"special"`  // the slot's own skill; P1 charges while held
 	Interact bool `json:"interact"` // hold next to a downed teammate to revive
 	Ping     int  `json:"ping"`     // 0 none, 1 Tôi nhận, 2 Cần hỗ trợ, 3 Chặn scope
 }
@@ -74,6 +76,8 @@ type snapshotMsg struct {
 	Boss       bossState     `json:"boss"`
 	Shots      []shotState   `json:"shots"`
 	Waves      []waveState   `json:"waves"` // deadline waves along the floor
+	Items      []itemState   `json:"items"` // pickups currently available
+	Zones      []zoneState   `json:"zones"` // P4 hotfix zones
 }
 
 // playerState X/Y are the feet (bottom-centre of the 20×44 hitbox) in level pixels, +Y down.
@@ -87,29 +91,47 @@ type playerState struct {
 	Ground bool    `json:"ground"`
 	Away   bool    `json:"away"` // disconnected: frozen and invulnerable
 	HP     int     `json:"hp"`
-	Action string  `json:"action"` // "", attack, pulse, dash, hurt, down, revive
-	Revive float64 `json:"revive"` // 0..1 progress while a teammate revives this downed player
-	Ping   int     `json:"ping"`
-	// Counters only grow; play the one-shot animation when one changes.
-	Attacks uint32 `json:"attacks"`
-	Pulses  uint32 `json:"pulses"`
-	Dashes  uint32 `json:"dashes"`
-	Hurts   uint32 `json:"hurts"`
+	// "", attack, pulse, dash, hurt, down, revive, or a slot skill: charge, smash, shield, stamp, hotfix, timecard
+	Action  string  `json:"action"`
+	Revive  float64 `json:"revive"` // 0..1 progress while a teammate revives this downed player
+	Ping    int     `json:"ping"`
+	SkillMs int64   `json:"skillMs"` // slot skill cooldown left
+	SkillOf int64   `json:"skillOf"` // full cooldown
+	Charge  float64 `json:"charge"`  // P1: 0..1 while charging
+	// Counters only grow, across restarts too; play the one-shot animation or sound when one changes.
+	Attacks   uint32 `json:"attacks"`
+	Pulses    uint32 `json:"pulses"`
+	Dashes    uint32 `json:"dashes"`
+	Hurts     uint32 `json:"hurts"`
+	Hits      uint32 `json:"hits"`      // keyboard swing or P1 smash landed
+	Casts     uint32 `json:"casts"`     // slot skill used (P1: released)
+	SkillHits uint32 `json:"skillHits"` // P1 smash, P4 deploy pulse or P5 timecard hit the boss
+	Cancels   uint32 `json:"cancels"`   // P1 charge cancelled
+	Reflects  uint32 `json:"reflects"`  // P2 bounced a task card
+	Healed    uint32 `json:"healed"`    // this player got a heart from a hotfix zone
+	Coffees   uint32 `json:"coffees"`
 }
 
 type bossState struct {
 	X      float64 `json:"x"`
 	Y      float64 `json:"y"` // feet, hitbox 70×110
 	Facing int     `json:"facing"`
-	HP     int     `json:"hp"`
-	MaxHP  int     `json:"maxHp"`
-	State  string  `json:"state"` // idle, volley_windup, volley, wave_windup, wave, wind_clock, defeat
-	Hits   uint32  `json:"hits"`  // counter: flash and spark when it changes
+	HP     float64 `json:"hp"`
+	MaxHP  float64 `json:"maxHp"`
+	// idle, walk, volley_windup, volley, wave_windup, wave, charge_windup, charge, charge_recover, wind_clock, defeat
+	State string `json:"state"`
+	// Counters reset with each attempt: treat a decrease as a reset, not an event.
+	Hits   uint32 `json:"hits"`  // flash and spark when it grows
+	Marks  uint32 `json:"marks"` // P3 mark applied
+	MarkMs int64  `json:"markMs"`
+	// Locked charge corridor (floor x range), set during charge_windup and charge.
+	ChargeFrom float64 `json:"chargeFrom,omitempty"`
+	ChargeTo   float64 `json:"chargeTo,omitempty"`
 }
 
 type shotState struct {
 	ID   int     `json:"id"`
-	Kind string  `json:"kind"` // "card" (boss task card) or "pulse" (player code pulse)
+	Kind string  `json:"kind"` // card (boss task), pulse (code pulse), stamp (P3), returned (card bounced by P2)
 	X    float64 `json:"x"`    // centre
 	Y    float64 `json:"y"`
 	VX   float64 `json:"vx"`
@@ -119,6 +141,20 @@ type waveState struct {
 	ID  int     `json:"id"`
 	X   float64 `json:"x"` // centre; the wave is 32×32 standing on the floor
 	Dir int     `json:"dir"`
+}
+
+type zoneState struct {
+	ID int     `json:"id"`
+	X  float64 `json:"x"` // bottom-centre of a 128×48 area
+	Y  float64 `json:"y"`
+	Ms int64   `json:"ms"` // time left
+}
+
+type itemState struct {
+	ID   int     `json:"id"`
+	Kind string  `json:"kind"` // "coffee": heals 1 HP
+	X    float64 `json:"x"`    // bottom-centre
+	Y    float64 `json:"y"`
 }
 
 func encode(v any) []byte {
