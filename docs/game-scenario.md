@@ -209,11 +209,11 @@ Mỗi khu vực là một màn, chơi theo thứ tự dưới đây; mô tả tr
 | 3 | Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
 | 4 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
 
-Cốt truyện mở: màn mới luôn nối tiếp sau màn cuối hiện có (đánh số tiếp, không đánh số lại màn cũ), kèm đoạn cốt truyện nối từ màn trước. Endgame (Phòng Điều Hành — QUY TRÌNH) tạm gác, chỉ giữ ý tưởng: [endgame.md](levels/endgame.md).
+Cốt truyện mở: màn mới luôn nối tiếp sau màn cuối hiện có (đánh số tiếp, không đánh số lại màn cũ), kèm đoạn cốt truyện nối từ màn trước. Màn mới được khuyến khích thử lối chơi hoặc góc nhìn mới ngoài platformer đánh boss hiện có (ví dụ giải đố, lén lút, nhìn từ trên xuống, chạy đua, quản lý); giữ chất châm biếm công sở, nhân vật P1–P5 và chơi được 1–5 người qua LAN. Endgame (Phòng Điều Hành — QUY TRÌNH) tạm gác, chỉ giữ ý tưởng: [endgame.md](levels/endgame.md).
 
 ## Hướng hình ảnh và asset
 
-Pixel art 16-bit, silhouette rõ, nhân vật hài hước. Nền navy, màn hình cyan, mặt sàn màu kem ấm và tín hiệu nguy hiểm coral đỏ. Tất cả gameplay nhìn ngang; mép trên của bục phải rõ và nằm ngang.
+Pixel art 16-bit, silhouette rõ, nhân vật hài hước. Nền navy, màn hình cyan, mặt sàn màu kem ấm và tín hiệu nguy hiểm coral đỏ. Các màn platformer nhìn ngang; mép trên của bục phải rõ và nằm ngang. Màn có góc nhìn khác ghi rõ quy ước hình ảnh trong file màn đó.
 
 Concept bố cục và phong cách (bảng mẫu v02) đã duyệt và dùng làm cơ sở cho sprite runtime. Ảnh mẫu và prompt nằm ở `assets/concepts/` (chỉ lưu cục bộ, không đưa vào git).
 
