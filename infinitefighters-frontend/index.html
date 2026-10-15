@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Vô Tận</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0B1020; color: #F2E3C2; font: 16px/1.4 ui-monospace, Menlo, monospace; overflow: hidden; }
+    #game { position: fixed; inset: 0; }
+    .panel { max-height: calc(100% - 32px); overflow-y: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100% - 32px)); box-sizing: border-box;
+             padding: 24px; background: #14234A; border: 2px solid #3FE0FF; }
+    h1 { margin: 0 0 16px; font-size: 24px; color: #3FE0FF; letter-spacing: 2px; }
+    label { display: block; margin-bottom: 12px; }
+    input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 8px; font: inherit; color: #F2E3C2; background: #0B1530; border: 1px solid #2F4A7F; }
+    input:focus-visible, button:focus-visible { outline: 2px solid #3FE0FF; outline-offset: 2px; }
+    button { padding: 8px 16px; font: inherit; color: #0B1020; background: #F2E3C2; border: 0; cursor: pointer; }
+    ul { list-style: none; padding: 0; margin: 0 0 16px; }
+    li { padding: 4px 0; }
+    .away { opacity: .5; }
+    #status { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); margin: 0; padding: 4px 12px; background: #B8303A; color: #fff; }
+    #status:empty { display: none; }
+    .keys { margin: 16px 0 0; font-size: 13px; color: #9FB3D9; }
+    .pick { margin: 0 0 8px; }
+    .level { display: block; width: 100%; margin-bottom: 8px; text-align: left; }
+    .level b { display: block; margin-bottom: 4px; }
+    .level span { display: block; font-size: 12px; line-height: 1.35; }
+    #sound-toggle { position: fixed; bottom: 12px; right: 12px; z-index: 5; padding: 4px 10px; }
+    #sound { position: fixed; bottom: 48px; right: 12px; z-index: 5; padding: 12px 16px; background: #14234A; border: 2px solid #3FE0FF; font-size: 13px; }
+    #sound label { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    #sound input[type=range] { width: 120px; margin: 0; padding: 0; }
+    #sound input[type=checkbox] { width: auto; margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <div id="lobby" class="panel">
+    <h1>TASK VÔ TẬN</h1>
+    <form id="join">
+      <label>Tên <input name="name" maxlength="16" required autocomplete="nickname"></label>
+      <label>Mã phòng <input name="code" maxlength="4" required autocomplete="off" autocapitalize="characters"></label>
+      <button>Vào phòng</button>
+    </form>
+    <div id="room" hidden>
+      <ul id="players"></ul>
+      <div id="levels" hidden>
+        <p class="pick">Chọn màn:</p>
+        <button class="level" data-level="coop"><b>Đường Đua Sprint</b><span>Cả team đánh boss Đốc Công Hôm Qua trước DEADLINE: né task, sóng deadline, cú lao và hồ sơ rơi, cứu đồng đội. Hạ boss xong là vào tiệc.</span></button>
+        <button class="level" data-level="party"><b>Anh em cây khế</b><span>Tiệc tổng kết, quỹ thưởng chỉ đủ một suất. Nhặt tiền két phun, đánh rơi tiền của đối thủ, giữ E ở ATM 3 giây để gửi. Sau 3 phút, ai gửi nhiều nhất ôm vali.</span></button>
+      </div>
+      <p id="wait">Chờ chủ phòng chọn màn…</p>
+    </div>
+    <p class="keys">A/D chạy · Space nhảy · S+Space xuống bục · J đánh · K xung code · L/Shift lướt · R chiêu riêng · giữ E cứu đồng đội · 1/2/3 ping</p>
+  </div>
+  <p id="status" role="status"></p>
+  <button id="sound-toggle" aria-controls="sound" aria-label="Âm thanh">♪</button>
+  <div id="sound" hidden>
+    <label>Tổng <input id="vol-master" type="range" min="0" max="100"></label>
+    <label>Nhạc <input id="vol-music" type="range" min="0" max="100"></label>
+    <label>Hiệu ứng <input id="vol-sfx" type="range" min="0" max="100"></label>
+    <label>Tắt tiếng <input id="vol-mute" type="checkbox"></label>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
