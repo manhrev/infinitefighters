@@ -206,26 +206,19 @@ Mỗi khu vực là một màn, mô tả trong file riêng ở `levels/`.
 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
 | Phòng Điều Hành | QUY TRÌNH | Định hướng; gồm trận cuối và kết thúc | [05-control-room.md](levels/05-control-room.md) |
 
-## Hướng hình ảnh và asset mẫu
+## Hướng hình ảnh và asset
 
 Pixel art 16-bit, silhouette rõ, nhân vật hài hước. Nền navy, màn hình cyan, mặt sàn màu kem ấm và tín hiệu nguy hiểm coral đỏ. Tất cả gameplay nhìn ngang; mép trên của bục phải rõ và nằm ngang.
 
-### Bảng mẫu v02 để duyệt
+Concept bố cục và phong cách (bảng mẫu v02) đã duyệt và dùng làm cơ sở cho sprite runtime. Ảnh mẫu và prompt nằm ở `assets/concepts/` (chỉ lưu cục bộ, không đưa vào git).
 
-- Phần lớn diện tích dành cho một đấu trường co-op rộng với bốn người chơi nhỏ, phân bố ở nhiều vị trí và cao độ; boss ở bên phải, có chỗ chạy vòng hai bên.
-- Dải tham chiếu nhỏ bên dưới: dev đứng/chạy/nhảy/đánh, boss PM, tile sàn/bục/server, cà phê, tài liệu, chìa khóa và đạn task.
-- Giữ hướng nhân vật và màu của sample 01. Giảm tỷ lệ nhân vật so với môi trường, tăng không gian di chuyển.
-- Đây là concept để duyệt bố cục và phong cách, chưa phải atlas hoặc sprite sheet có thể cắt dùng trực tiếp.
+Danh sách asset runtime, kích thước, FPS và cờ loop: [sprite-spec.md](sprite-spec.md) và `assets/sprites/manifest.json`. Âm thanh: `assets/audio/manifest.json`.
 
-### Asset dự kiến sau khi duyệt
+### Asset còn thiếu
 
-| Nhóm | Nội dung |
-| --- | --- |
-| Người chơi | Idle, run, jump, fall, attack, dash, hurt, down, revive; 5 màu và nhãn người chơi |
-| Boss | Idle, walk, charge_windup, charge, charge_recover, báo trước đạn/sóng, đánh, lên dây đồng hồ, trúng đòn, chuyển phase, bị hạ |
-| Tile và props | Sàn nối được, bục một chiều, bàn, server, cửa thang máy, đèn, cây, biển chỉ dẫn |
-| Nền | Skyline, tường kính, nội thất xa và gần dưới dạng các lớp parallax |
-| Vật phẩm | Cà phê, trang tài liệu, chìa khóa server, checkpoint |
-| VFX và UI | Đạn task, cung đánh bàn phím, bụi đáp đất, vùng báo đòn, máu boss, nhãn P1–P5, ping và dấu cứu đồng đội |
-
-Mẫu ảnh và prompt tạo ảnh lưu trong `assets/concepts/`. Các file này phục vụ duyệt hình ảnh, không được hiểu là asset runtime đã hoàn thiện.
+| Nhóm | Còn thiếu | Ghi chú |
+| --- | --- | --- |
+| Tile và props | Server, biển chỉ dẫn | Biển chỉ dẫn dành cho Sảnh Onboarding. |
+| Vật phẩm | Chìa khóa server, checkpoint thang máy | Gameplay checkpoint chưa làm. |
+| Boss | Hoạt ảnh chuyển phase của Đốc Công Hôm Qua | Pha 2 hiện chỉ đổi nhịp đòn, chưa có hình riêng. |
+| Màn tiệc ([01b-party.md](levels/01b-party.md)) | ATM, két, bó tiền, NPC khách mời, nhạc disco | Đang dùng hình/âm tạm. |
