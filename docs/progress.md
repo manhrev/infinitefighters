@@ -2,7 +2,7 @@
 
 Cập nhật: 2026-10-15. Sửa file này mỗi khi một màn đổi trạng thái. Chi tiết thiết kế nằm trong file của từng màn ở [levels/](levels/).
 
-Ký hiệu: ✅ xong · 🟡 một phần / tạm · ⬜ chưa làm · — không áp dụng.
+Ký hiệu: ✅ xong · 🟡 một phần / tạm · ⬜ chưa làm · ⏸ tạm gác · — không áp dụng.
 
 ## Tổng quan
 
@@ -13,7 +13,6 @@ Ký hiệu: ✅ xong · 🟡 một phần / tạm · ⬜ chưa làm · — khôn
 | 2 | [Sảnh Onboarding](levels/02-onboarding.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 3 | [Tháp Kiến Trúc](levels/03-architecture-tower.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 4 | [Hầm Tri Thức](levels/04-knowledge-vault.md) | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 5 | [Phòng Điều Hành](levels/05-control-room.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Cột: **Thiết kế** là luật đã chốt trong file màn · **Map** là file trong `infinitefighters-backend/levels/` · **Server** là logic Go · **Client** là hiển thị và điều khiển trong `infinitefighters-frontend/` · **Cân bằng** là chơi thử và chỉnh số liệu.
 
@@ -43,12 +42,9 @@ Mới có ý tưởng một đoạn. Cần: thiết kế chi tiết.
 
 Đã chốt thiết kế cho bản chơi thử, chưa bắt đầu code. Cần: map, hai boss, trang tài liệu mở cầu, công tắc mở khiên, asset và âm thanh.
 
-### 5 — Phòng Điều Hành (QUY TRÌNH)
-
-Mới có ý tưởng và phác thảo trận cuối, kết thúc. Cần: thiết kế chi tiết.
-
 ## Ngoài các màn
 
+- ⏸ Endgame (Phòng Điều Hành — QUY TRÌNH): tạm gác, chỉ có ý tưởng ([endgame.md](levels/endgame.md)).
 - ⬜ Trang tài liệu nhặt được (sprite `items/document.png` đã có, gameplay chưa).
 - ⬜ Checkpoint thang máy và đoạn vượt màn có camera riêng.
 - ⬜ Chế độ Tay đôi.

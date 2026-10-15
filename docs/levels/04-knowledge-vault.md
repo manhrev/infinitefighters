@@ -4,7 +4,7 @@ Trạng thái: chốt thiết kế cho bản chơi thử ngày 2026-10-15; chưa
 
 Màn 4 · cánh NA. Tổng quan: [game-scenario.md](../game-scenario.md).
 
-Cốt truyện: trở về cánh NA, cả đội phải lấy lại kiến thức bàn giao bị giữ kín để mở đường lên Phòng Điều Hành ([05-control-room.md](05-control-room.md)).
+Cốt truyện: trở về cánh NA, cả đội phải lấy lại kiến thức bàn giao bị giữ kín để mở đường đi tiếp.
 
 Tóm tắt: Hai boss đứng ở hai cụm bục, khóa cầu nối bằng code bí truyền. Nhặt trang tài liệu để mở đường; đánh công tắc hai bên để vô hiệu khiên. Solo cho phép kích hoạt tuần tự trong cửa sổ dài hơn. Thoại: “Không hiểu thì cứ hỏi.” — trạng thái: Đang bận.
 

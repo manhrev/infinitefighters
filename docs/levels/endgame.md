@@ -1,6 +1,6 @@
 # Phòng Điều Hành — QUY TRÌNH
 
-Màn 5 · màn cuối của chiến dịch. Trạng thái: định hướng, chưa có thiết kế chi tiết. Tổng quan: [game-scenario.md](../game-scenario.md).
+Endgame, tạm gác. Game dài hơi, chưa chốt chiến dịch có bao nhiêu màn trước trận cuối; nội dung dưới đây chỉ là ý tưởng giữ lại, chưa xếp số màn. Tổng quan: [game-scenario.md](../game-scenario.md).
 
 Cốt truyện: phòng máy chủ nơi QUY TRÌNH giữ nút Approve, cũng là thứ đang treo quỹ thưởng từ tiệc màn 1b.
 

@@ -43,7 +43,7 @@ Bạn là dev vừa nhận việc. HR đưa laptop, thẻ ra vào và lời chà
 
 Đêm chốt sprint, Đốc Công Hôm Qua dí cả đội ngay tại cánh NA (màn 1). Sprint “done”, cả đội được mời đi tiệc tổng kết và quay sang giành nhau quỹ thưởng (màn 1b). Quỹ thưởng hóa ra đang chờ Approve.
 
-Tiệc tan, hệ thống quản trị biến thành thực thể QUY TRÌNH, khóa cửa văn phòng: “Muốn tan làm, vui lòng hoàn thành các đầu việc còn tồn đọng.” Mỗi task xong lại sinh hai task mới. Để tìm người có quyền bấm Approve, cả đội đi tiếp bốn khu vực: sang cánh Vacancy qua Sảnh Onboarding (màn 2) và Tháp Kiến Trúc (màn 3), trở về cánh NA xuống Hầm Tri Thức (màn 4), rồi lên Phòng Điều Hành đối mặt QUY TRÌNH (màn 5).
+Tiệc tan, hệ thống quản trị biến thành thực thể QUY TRÌNH, khóa cửa văn phòng: “Muốn tan làm, vui lòng hoàn thành các đầu việc còn tồn đọng.” Mỗi task xong lại sinh hai task mới. Để tìm người có quyền bấm Approve, cả đội đi tiếp từng khu vực: sang cánh Vacancy qua Sảnh Onboarding (màn 2) và Tháp Kiến Trúc (màn 3), rồi trở về cánh NA xuống Hầm Tri Thức (màn 4). Chiến dịch còn dài; trận cuối với QUY TRÌNH chưa tính ([endgame.md](levels/endgame.md)).
 
 ## Cách chơi cốt lõi
 
@@ -208,7 +208,8 @@ Mỗi khu vực là một màn, chơi theo thứ tự dưới đây; mô tả tr
 | 2 | Sảnh Onboarding — Vacancy | Ngài Định Hướng | Định hướng | [02-onboarding.md](levels/02-onboarding.md) |
 | 3 | Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
 | 4 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
-| 5 | Phòng Điều Hành | QUY TRÌNH | Định hướng; gồm trận cuối và kết thúc | [05-control-room.md](levels/05-control-room.md) |
+
+Màn mới thêm vào sau màn 4. Endgame (Phòng Điều Hành — QUY TRÌNH) tạm gác, chỉ giữ ý tưởng: [endgame.md](levels/endgame.md).
 
 ## Hướng hình ảnh và asset
 
