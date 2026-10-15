@@ -209,7 +209,7 @@ Mỗi khu vực là một màn, chơi theo thứ tự dưới đây; mô tả tr
 | 3 | Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
 | 4 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
 
-Màn mới thêm vào sau màn 4. Endgame (Phòng Điều Hành — QUY TRÌNH) tạm gác, chỉ giữ ý tưởng: [endgame.md](levels/endgame.md).
+Cốt truyện mở: màn mới luôn nối tiếp sau màn cuối hiện có (đánh số tiếp, không đánh số lại màn cũ), kèm đoạn cốt truyện nối từ màn trước. Endgame (Phòng Điều Hành — QUY TRÌNH) tạm gác, chỉ giữ ý tưởng: [endgame.md](levels/endgame.md).
 
 ## Hướng hình ảnh và asset
 

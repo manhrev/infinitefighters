@@ -23,3 +23,4 @@
 - Keep `docs/` in sync with code: level rules/numbers in `docs/levels/`, status in `docs/progress.md`.
 - Code comments in English; docs in Vietnamese.
 - Do not commit build output (`web/`, binaries) or asset sources.
+- Open-ended story: new levels are appended after the last numbered level (`docs/levels/NN-<slug>.md`, NN = last + 1). Never renumber existing levels. Add the row to the zone table in `docs/game-scenario.md` and to `docs/progress.md`, and link the story hook from the previous level. Endgame (`docs/levels/endgame.md`) stays parked; do not design it unless asked.
