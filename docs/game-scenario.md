@@ -23,7 +23,7 @@ Nhân vật và công ty đều hư cấu. Sự hài hước đến từ cách l
 
 ### Trạng thái triển khai
 
-Số liệu đang chạy, điều khiển và điểm lệch so với thiết kế: [03-sprint.md](levels/03-sprint.md) (co-op) và [06-party.md](levels/06-party.md) (loạn đấu).
+Số liệu đang chạy, điều khiển và điểm lệch so với thiết kế: [01-sprint.md](levels/01-sprint.md) (co-op) và [06-party.md](levels/06-party.md) (loạn đấu).
 
 **Chưa làm:** trang tài liệu nhặt được, checkpoint thang máy, chế độ Tay đôi, các khu vực và boss khác, trận cuối, phần NPC của extension.
 
@@ -199,9 +199,9 @@ Mỗi khu vực là một màn, mô tả trong file riêng ở `levels/`.
 
 | Khu vực | Boss | Trạng thái | Mô tả |
 | --- | --- | --- | --- |
-| Sảnh Onboarding — Vacancy | Ngài Định Hướng | Định hướng | [01-onboarding.md](levels/01-onboarding.md) |
-| Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [02-architecture-tower.md](levels/02-architecture-tower.md) |
-| Đường Đua Sprint — NA | Đốc Công Hôm Qua | Đã triển khai (MVP) | [03-sprint.md](levels/03-sprint.md) |
+| Đường Đua Sprint — NA | Đốc Công Hôm Qua | Đã triển khai (MVP) | [01-sprint.md](levels/01-sprint.md) |
+| Sảnh Onboarding — Vacancy | Ngài Định Hướng | Định hướng | [02-onboarding.md](levels/02-onboarding.md) |
+| Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
 | Phòng Điều Hành | QUY TRÌNH | Định hướng; gồm trận cuối và kết thúc | [05-control-room.md](levels/05-control-room.md) |
 
