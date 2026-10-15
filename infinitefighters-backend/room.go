@@ -21,14 +21,21 @@ const (
 )
 
 type Player struct {
-	ID     int
-	Name   string
-	Token  string
-	Slot   int
-	client *client // nil while disconnected
-	in     Input
-	jumped bool // jump press latched until the next tick consumes it
+	ID      int
+	Name    string
+	Token   string
+	Slot    int
+	client  *client // nil while disconnected
+	in      Input   // held buttons
+	pressed presses // press edges latched until the next tick consumes them
 	Body
+	fighter
+	counts
+}
+
+type presses struct {
+	jump, attack, skill, dash bool
+	ping                      int
 }
 
 // Room is the only game. All its state is touched only by the run goroutine;
@@ -42,10 +49,13 @@ type Room struct {
 	nextID  int
 	hostID  int
 	tick    uint64
+	match
 }
 
 func newRoom(code string, level *Level) *Room {
-	return &Room{code: code, level: level, inbox: make(chan func(), 256), phase: phaseLobby, nextID: 1}
+	r := &Room{code: code, level: level, inbox: make(chan func(), 256), phase: phaseLobby, nextID: 1}
+	r.deadlineTicks = 10 * 60 * tickRate
+	return r
 }
 
 func (r *Room) run(ctx context.Context) {
@@ -68,12 +78,9 @@ func (r *Room) update() {
 	if r.phase != phasePlaying || !r.anyConnected() {
 		return
 	}
-	for _, p := range r.players {
-		if p.client == nil {
-			continue // away: frozen
-		}
-		p.step(r.level, p.in, p.jumped)
-		p.jumped = false
+	r.stepMatch()
+	if r.phase != phasePlaying {
+		return // the win sent everyone back to the lobby
 	}
 	r.tick++
 	if r.tick%snapshotEvery == 0 {
@@ -96,8 +103,13 @@ func (r *Room) handle(c *client, m clientMsg) {
 		}
 	case "input":
 		if p := c.player; p != nil {
-			if m.Jump && !p.in.Jump {
-				p.jumped = true
+			pr := &p.pressed
+			pr.jump = pr.jump || (m.Jump && !p.in.Jump)
+			pr.attack = pr.attack || (m.Attack && !p.in.Attack)
+			pr.skill = pr.skill || (m.Skill && !p.in.Skill)
+			pr.dash = pr.dash || (m.Dash && !p.in.Dash)
+			if m.Ping != 0 && m.Ping != p.in.Ping && m.Ping <= 3 {
+				pr.ping = m.Ping
 			}
 			p.in = m.Input
 		}
@@ -136,7 +148,7 @@ func (r *Room) join(c *client, m clientMsg) {
 
 func (r *Room) attach(p *Player, c *client) {
 	p.client, c.player = c, p
-	p.in, p.jumped = Input{}, false
+	p.in, p.pressed = Input{}, presses{}
 	c.push(encode(welcomeMsg{Type: "welcome", ID: p.ID, Token: p.Token, Phase: r.phase}))
 	if r.phase == phasePlaying {
 		c.push(encode(startMsg{Type: "start", Level: levelURL}))
@@ -150,7 +162,7 @@ func (r *Room) disconnect(c *client) {
 		return
 	}
 	p.client, c.player = nil, nil
-	p.in, p.jumped = Input{}, false
+	p.in, p.pressed = Input{}, presses{}
 	if r.phase == phaseLobby { // nothing to keep yet: free the slot
 		for i, q := range r.players {
 			if q == p {
@@ -174,12 +186,24 @@ func (r *Room) disconnect(c *client) {
 
 func (r *Room) start() {
 	r.phase, r.tick = phasePlaying, 0
-	for i, p := range r.players {
-		s := r.level.Spawns[i%len(r.level.Spawns)]
-		p.Body = Body{X: s.X, Y: s.Y, Facing: 1}
-	}
+	r.scaleN = len(r.players) // fixed for the whole match, restarts included
+	r.resetMatch()
 	log.Printf("match started with %d players", len(r.players))
 	r.broadcast(encode(startMsg{Type: "start", Level: levelURL}))
+}
+
+// toLobby ends the match after a win. Away players lose their slot.
+func (r *Room) toLobby() {
+	r.phase = phaseLobby
+	r.players = keep(r.players, func(p *Player) bool { return p.client != nil })
+	if r.byID(r.hostID) == nil {
+		r.hostID = 0
+		if len(r.players) > 0 {
+			r.hostID = r.players[0].ID
+		}
+	}
+	log.Printf("match won, back to lobby")
+	r.broadcast(encode(r.lobby()))
 }
 
 func (r *Room) broadcast(b []byte) {
@@ -191,7 +215,7 @@ func (r *Room) broadcast(b []byte) {
 }
 
 func (r *Room) lobby() lobbyMsg {
-	m := lobbyMsg{Type: "lobby", Players: []lobbyPlayer{}}
+	m := lobbyMsg{Type: "lobby", Phase: r.phase, Players: []lobbyPlayer{}}
 	for _, p := range r.players {
 		m.Players = append(m.Players, lobbyPlayer{ID: p.ID, Name: p.Name, Slot: p.Slot, Host: p.ID == r.hostID, Connected: p.client != nil})
 	}
@@ -199,12 +223,29 @@ func (r *Room) lobby() lobbyMsg {
 }
 
 func (r *Room) snapshot() snapshotMsg {
-	m := snapshotMsg{Type: "snapshot", Tick: r.tick, ServerTime: time.Now().UnixMilli()}
+	b := r.boss
+	m := snapshotMsg{
+		Type: "snapshot", Tick: r.tick, ServerTime: time.Now().UnixMilli(),
+		DeadlineMs: int64(r.deadline) * 1000 / tickRate, DeadlineOf: int64(r.deadlineTicks) * 1000 / tickRate, Result: r.result,
+		Boss:    bossState{X: b.X, Y: b.Y, Facing: b.Facing, HP: b.HP, MaxHP: b.MaxHP, State: b.State, Hits: b.Hits},
+		Players: []playerState{}, Shots: []shotState{}, Waves: []waveState{},
+	}
 	for _, p := range r.players {
 		m.Players = append(m.Players, playerState{
 			ID: p.ID, X: p.X, Y: p.Y, VX: p.VX, VY: p.VY,
 			Facing: p.Facing, Ground: p.OnGround, Away: p.client == nil,
+			HP: p.HP, Action: p.action, Revive: float64(p.reviveHeld) / reviveHoldTicks, Ping: p.ping,
+			Attacks: p.Attacks, Pulses: p.Pulses, Dashes: p.Dashes, Hurts: p.Hurts,
 		})
+	}
+	for _, s := range r.cards {
+		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: "card", X: s.X, Y: s.Y, VX: s.VX})
+	}
+	for _, s := range r.pulses {
+		m.Shots = append(m.Shots, shotState{ID: s.ID, Kind: "pulse", X: s.X, Y: s.Y, VX: s.VX})
+	}
+	for _, w := range r.waves {
+		m.Waves = append(m.Waves, waveState{ID: w.ID, X: w.X, Dir: w.Dir})
 	}
 	return m
 }
@@ -216,6 +257,15 @@ func (r *Room) anyConnected() bool {
 		}
 	}
 	return false
+}
+
+func (r *Room) byID(id int) *Player {
+	for _, p := range r.players {
+		if p.ID == id {
+			return p
+		}
+	}
+	return nil
 }
 
 func (r *Room) byToken(t string) *Player {

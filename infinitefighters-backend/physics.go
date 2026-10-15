@@ -23,10 +23,19 @@ type Body struct {
 	OnGround  bool
 	onOneWay  bool // standing only on one-way tiles, so drop-through is allowed
 	dropTicks int
+	dashTicks int     // > 0: dashing forward, no gravity
+	pushVX    float64 // knockback overrides input while pushTicks > 0
+	pushTicks int
 }
 
 // step advances one tick. jump is the latched press edge, not the held button.
 func (b *Body) step(l *Level, in Input, jump bool) {
+	if b.dashTicks > 0 {
+		b.dashTicks--
+		b.VX, b.VY = float64(b.Facing)*dashSpeed, 0
+		b.moveX(l, b.VX*dt)
+		return
+	}
 	dir := 0
 	if in.Left {
 		dir--
@@ -37,6 +46,10 @@ func (b *Body) step(l *Level, in Input, jump bool) {
 	b.VX = float64(dir) * runSpeed
 	if dir != 0 {
 		b.Facing = dir
+	}
+	if b.pushTicks > 0 {
+		b.pushTicks--
+		b.VX = b.pushVX
 	}
 	if jump && b.OnGround {
 		if in.Down && b.onOneWay {

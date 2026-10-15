@@ -14,10 +14,14 @@ import (
 //   - a tileset tile collides when it has the string property collision = "solid" | "oneway";
 //     tiles without it are decoration
 //   - point objects of type "spawn" give player spawn feet positions, in order P1..P5
+//   - one point object of type "boss" gives the boss feet position
 type Level struct {
 	W, H, Tile int // size in tiles, tile size in px
 	tiles      []tileKind
 	Spawns     []Point
+	Boss       Point
+	// PlatformTops are the y of every row holding one-way tiles, top to bottom.
+	PlatformTops []float64
 }
 
 type Point struct{ X, Y float64 }
@@ -104,6 +108,7 @@ func parseLevel(data []byte) (*Level, error) {
 	}
 
 	l := &Level{W: m.Width, H: m.Height, Tile: m.TileWidth, tiles: make([]tileKind, m.Width*m.Height)}
+	hasBoss := false
 	for _, layer := range m.Layers {
 		switch layer.Type {
 		case "tilelayer":
@@ -117,14 +122,28 @@ func parseLevel(data []byte) (*Level, error) {
 			}
 		case "objectgroup":
 			for _, o := range layer.Objects {
-				if o.Type == "spawn" {
+				switch o.Type {
+				case "spawn":
 					l.Spawns = append(l.Spawns, Point{o.X, o.Y})
+				case "boss":
+					l.Boss, hasBoss = Point{o.X, o.Y}, true
 				}
 			}
 		}
 	}
 	if len(l.Spawns) == 0 {
 		return nil, errors.New(`tiled map: needs at least one "spawn" point object`)
+	}
+	if !hasBoss {
+		return nil, errors.New(`tiled map: needs a "boss" point object`)
+	}
+	for row := range l.H {
+		for col := range l.W {
+			if l.tiles[row*l.W+col] == tileOneWay {
+				l.PlatformTops = append(l.PlatformTops, float64(row*l.Tile))
+				break
+			}
+		}
 	}
 	return l, nil
 }

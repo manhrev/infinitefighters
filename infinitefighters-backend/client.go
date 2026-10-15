@@ -17,11 +17,11 @@ const (
 )
 
 type client struct {
-	conn   *websocket.Conn
-	send   chan []byte
-	cancel context.CancelFunc
-	player *Player // owned by the room goroutine
-	closing bool   // owned by the room goroutine
+	conn    *websocket.Conn
+	send    chan []byte
+	cancel  context.CancelFunc
+	player  *Player // owned by the room goroutine
+	closing bool    // owned by the room goroutine
 }
 
 // push never blocks the room: a client whose buffer is full is dropped.
