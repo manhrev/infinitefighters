@@ -25,6 +25,8 @@ Nhân vật và công ty đều hư cấu. Sự hài hước đến từ cách l
 
 Số liệu đang chạy, điều khiển và điểm lệch so với thiết kế: [01-sprint.md](levels/01-sprint.md) (co-op) và [01b-party.md](levels/01b-party.md) (extension loạn đấu).
 
+Bảng tiến độ của mọi màn: [progress.md](progress.md).
+
 **Chưa làm:** trang tài liệu nhặt được, checkpoint thang máy, chế độ Tay đôi, các khu vực và boss khác, trận cuối, phần NPC của extension.
 
 **Cờ server:** `-code` (mã phòng cố định), `-deadline 10m`, `-boss-hp 120` (máu boss khi có 1 người, để chơi thử), `-hard` (mode khó), `-party` (vào thẳng tiệc), `-addr :8080`. Mở trang với `?debug` để đọc trạng thái trận trong console khi test.
