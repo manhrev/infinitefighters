@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-// Party PvP level "Anh em cây khế" (docs/levels/party.md, extension "Anh em hết mình, tiền tình hết hồn").
+// Party PvP level "Anh em cây khế" (docs/levels/06-party.md, extension "Anh em hết mình, tiền tình hết hồn").
 // It follows a boss win, or the host starts it directly from the lobby.
 // Everyone fights everyone for coins: grab coins the safe sprays, hit rivals to knock coins out of their
 // wallets, and deposit at an ATM. Only deposited coins count when the 180 s run out.

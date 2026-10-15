@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-// Combat, boss and match flow for the MVP level (docs/levels/sprint.md).
+// Combat, boss and match flow for the MVP level (docs/levels/03-sprint.md).
 //
 // Rules this file guarantees:
 //   - Boss HP and attack directions are computed once at match start from every slot in the
