@@ -8,18 +8,5 @@ infinitefighters-backend/web/
 infinitefighters-backend/infinitefighters
 infinitefighters-backend/infinitefighters-backend
 
-# Only runtime art/audio is tracked (what the frontend imports). Sources, concepts and previews stay local.
-assets/*
-!assets/sprites/
-!assets/tiles/
-!assets/backgrounds/
-!assets/ui/
-!assets/audio/
-assets/audio/*
-!assets/audio/manifest.json
-!assets/audio/music/
-!assets/audio/sfx/
-!assets/audio/ambience/
-
 # Shared agent instructions (overrides the global ignore). CLAUDE.md stays local.
 !/AGENTS.md

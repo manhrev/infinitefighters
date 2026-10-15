@@ -1,0 +1,12 @@
+Production source sprite animation atlas, EXACTLY SIX columns and SIX rows on solid pure magenta #FF00FF backdrop. Equal cells, no labels, no text, no grid lines, no ground shadows. Same single fictional angry stout manager in every cell, facing RIGHT, orthographic side view, dark navy suit, cream tie (NO RED clothing), black swept hair, expressive eyebrows, oversized silver/cream stopwatch with cyan face and blank unnumbered dial. Consistent body and face, 16-bit pixel art, upper-left lighting, dark #0B1020 outlines. Full body and props stay inside each cell, clear margins. Boss stout body about120 pixels tall at final native size160x160. Upper body and head recognizable even at small size. Palette navy #0B1530 #14234A, blue #22345F #2F4A7F, cream #F2E3C2 #C9B48C, skin #F6C9A0 #E0A274 #A86B4A, cyan #3FE0FF. Coral #FF5A5A and #B8303A ONLY on dangerous task cards, never clothing. White means cream, no text anywhere, no watch numbers.
+Read left-to-right top-to-bottom:
+Cells1-4 IDLE: four tapping-foot/glaring poses, holds large stopwatch in front.
+Cells5-8 VOLLEY WINDUP: four different anticipation poses, draws arm back progressively holding several coral blank task cards.
+Cells9-12 VOLLEY RELEASE: four different clear forward arm throwing poses, task cards leave hand to RIGHT.
+Cells13-16 WAVE WINDUP: four poses progressively lifting giant stopwatch from waist to overhead, knees brace.
+Cells17-20 WAVE SLAM: four poses swing stopwatch down toward floor, deep crouch on final impact, full character still visible.
+Cells21-26 WIND CLOCK: six sequential different vulnerable poses bent over stopwatch, winding knob, sweating cyan drops, distracted.
+Cells27-28 HURT: two recoiling poses.
+Cells29-34 DEFEAT: six stages from stunned to knees to sitting to collapsing sideways on floor, broken stopwatch nearby and a few cream blank papers flying. Keep head size consistent across all poses.
+Cells35-36 leave completely magenta EMPTY.
+No unrelated effects, no panel borders. Characters separate without overlap. SIX by SIX regular cell grid, all characters face RIGHT.

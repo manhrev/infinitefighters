@@ -1,0 +1,15 @@
+Production 2D pixel-art office TILESET SOURCE, not scene or concept board. EXACT 4 columns by4 rows of square cells, each cell full-bleed and fills its own square, NO gutters, NO labels, NO borders between cells, NO text or watermark. Flat side view 16-bit office platformer. Palette #0B1020 #0B1530 #14234A #22345F #2F4A7F #3FE0FF #F2E3C2 #C9B48C. Upper-left light.
+Read left-right top-bottom:
+cell1 floor top-left edge: cream thin perfectly horizontal top slab, dark blue metal base, left end cap.
+cell2 floor top-middle seamless horizontal repeat, same cream perfectly level slab and metal base.
+cell3 floor top-right edge, same level cream slab and base with right end cap.
+cell4 full floor fill below the slab, dark blue metal with subtle panel rivets, full square.
+cell5 one-way floating desk-platform LEFT END, cream perfectly flat top and metal thin bottom, TOTAL platform thickness only upper 3/8 of cell, rest pure magenta #FF00FF for transparency.
+cell6 matching MIDDLE desk platform, same upper 3/8 slab, rest magenta.
+cell7 matching RIGHT END desk platform, same thickness rest magenta.
+cell8 narrow vertical support leg centered, navy metal, magenta background.
+cell9 server-block TOP HALF of a tall server, full cell, cyan tiny lights and dark metal face, no text.
+cell10 server-block BOTTOM HALF continuation, full cell, dark vent grille, cyan tiny light.
+cell11 dark navy wall-fill full cell, subtle tileable horizontal wall seams.
+cells12-16 completely EMPTY pure magenta.
+No perspective or top-down surfaces, front view of tiles only. Every cell exact equal square. Tiny pixel details readable when downscaled32x32. All top slabs must be precisely at top edge of each cell.

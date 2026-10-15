@@ -1,0 +1,9 @@
+{
+  "targetHairToSoleHeight": 120,
+  "method": "Visual hair-to-sole reference in first source pose; one fixed scale per animation, never normalize each pose independently.",
+  "sourceBodyHeights": {
+    "drop_windup": 359,
+    "drop": 427,
+    "drop_jam": 323
+  }
+}

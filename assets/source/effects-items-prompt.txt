@@ -1,0 +1,11 @@
+Production pixel-art source atlas for a 2D office platformer. NOT a concept board. Solid pure magenta #FF00FF background for removal. Exactly FOUR columns by NINE rows, evenly sized rectangular cells. Each cell has one separate centered object, generous magenta margins, no overlap. No text, no letters, no digits, no captions, no grid lines, no watermarks. Crisp flat side-view 16-bit pixel art, upper left light, navy outline on physical items.
+ROW1: four animation frames of spinning coral-red rectangular dangerous task card, cream BLANK stripe only, progressively rotated.
+ROW2: four animation frames of coral-red flame-like FLOOR WAVE occupying lower half, flat continuous horizontally tileable base and varied flame tips. Colors #FF5A5A #B8303A and cream highlights.
+ROW3: two DIFFERENT coral-red diagonal striped floor-warning bars horizontal thin 4:1 aspect ratio. Third and fourth cells EMPTY MAGENTA.
+ROW4: four animation frames of cyan crescent melee arc, progressing from short narrow curve to wide crescent then dissipating. No weapon or person.
+ROW5: four frames cyan fast energy bolt, abstract angular zigzag shape and little sparks, no glyphs or readable symbols.
+ROW6: four expanding and dissipating cream landing-dust puffs with flat bottoms, no ground.
+ROW7: three frames cyan/cream impact star small then large then tiny fading sparks; fourth cell EMPTY MAGENTA.
+ROW8: four identical cream coffee mug silhouettes with navy outline, handle facing right, simple cyan square emblem not a letter. ONLY the two steam wisps vary between frames. 16px icon design eventual native16x16. No red on coffee.
+ROW9: first cell one cream document collectible with folded upper right corner, navy outline, totally blank no writing. Other three cells EMPTY MAGENTA.
+Palette only #0B1020 #0B1530 #14234A #22345F #2F4A7F #3FE0FF #F2E3C2 #C9B48C #FF5A5A #B8303A, plus magenta background. No gradients, no shading with blur. All objects have hard edges. Four columns NINE rows.

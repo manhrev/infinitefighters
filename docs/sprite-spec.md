@@ -1,6 +1,6 @@
-# Sprite Spec — MVP
+# Sprite Spec
 
-Status: ready for generation (2026-10-15). Covers only the MVP level: "Đường Đua Sprint", boss "Đốc Công Hôm Qua", 1–5 players. See `game-scenario.md` for the game and `tech-stack.md` for the engine (Phaser 3, `pixelArt: true`).
+Status: ready for generation (2026-10-15). Covers level 1 "Đường Đua Sprint", boss "Đốc Công Hôm Qua", 1–5 players. Each new level adds its own section here. How to build, validate and add assets: `asset-pipeline.md`. See `game-scenario.md` for the game and `tech-stack.md` for the engine (Phaser 3, `pixelArt: true`).
 
 Style reference: `assets/concepts/multiplayer-arena-sample-02.png`. That image is concept art only. Match its look, not its pixel sizes.
 
@@ -11,7 +11,7 @@ Style reference: `assets/concepts/multiplayer-arena-sample-02.png`. That image i
 - **Alpha:** characters, tiles, props and items use only fully transparent (alpha 0) or fully opaque (alpha 255) pixels. No anti-aliasing, no soft shadows, no blur. VFX may use partial alpha.
 - **Outline:** 1 px dark outline `#0B1020` around characters, items and props.
 - **Light:** from upper left.
-- **View:** flat orthographic side view. No perspective, no isometric.
+- **View:** platformer levels use a flat orthographic side view. No perspective, no isometric. A level with another view (for example top-down) states its own view rule in its section here and in its level doc.
 - **Animation strips:** one PNG per animation. Frames laid left to right in a single row, all frames the same size, no padding or gaps between frames. Strip width = frame width × frame count.
 - **Anchor:** characters stand on the bottom edge of the frame, horizontally centered. The feet must be at the same pixel row in every frame, otherwise the sprite jitters.
 - **Facing:** all characters face right. The game mirrors them to face left.
@@ -229,6 +229,6 @@ Each delivered PNG must pass:
 5. No text, no watermark, no background behind characters or items.
 6. Background layers tile seamlessly left-to-right.
 
-## Not in MVP
+## Not yet covered
 
-Other bosses and zones, Tay đôi mode, server key item, final-boss assets, boss phase-change animation.
+Other bosses and zones, Tay đôi mode, server key item, final-boss assets, boss phase-change animation, party extension art (ATM, safe, money bundles, NPC guests).

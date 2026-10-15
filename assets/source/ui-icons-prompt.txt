@@ -1,0 +1,5 @@
+Production SOURCE sprite icons for a16-bit pixel office platformer. Three isolated icons in ONE horizontal row with generous equal spacing and margins, on solid pure magenta #FF00FF background. No labels, no text, no digits, no watermark. Flat orthographic game UI icon style, upper-left light, dark #0B1020 thin outlines.
+LEFT icon: a simple FULL HEART silhouette, filled cyan #3FE0FF with cream #F2E3C2 tiny upper-left glint, navy outline, intended downsample native9x8 pixels.
+MIDDLE icon: SAME heart silhouette and size but EMPTY, navy #14234A interior and muted office blue #2F4A7F inner rim, dark #0B1020 outline.
+RIGHT icon: small round STOPWATCH, cream #F2E3C2 rim and winding knob, navy case #22345F #0B1020, cyan #3FE0FF clock face, one dark hand pointing upper right. BLANK face NO numbers and NO tick markings. Intended downsample native16x16 pixels.
+No red at all: hearts are cyan because coral is reserved for hazards. Crisp hard square pixels, no glow, no blur, no shadows cast on background, no decorations, no characters. All icons fully visible.

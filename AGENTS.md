@@ -6,9 +6,9 @@
 
 - `infinitefighters-backend/` — Go server; embeds `web/` (built frontend) and `levels/*.json` (Tiled maps).
 - `infinitefighters-frontend/` — Phaser 3 + TypeScript + Vite; builds into `../infinitefighters-backend/web`.
-- `assets/` — runtime art/audio imported by the frontend. Only `sprites/ tiles/ backgrounds/ ui/` and audio `manifest.json` + `music/ sfx/ ambience/` are in git; sources, concepts, previews stay local.
-- `scripts/` — Python asset pipeline (sprites, audio, level generation, validators).
-- `docs/` — design, in Vietnamese. `game-scenario.md` overview + audio; `levels/NN-*.md` one file per level; `progress.md` level tracker; `sprite-spec.md`, `tech-stack.md`.
+- `assets/` — runtime art/audio imported by the frontend, plus their sources (`source/`, `sprite-masks/`, `audio/source/`), previews and concepts. All tracked in git.
+- `scripts/` — Python asset pipeline (sprites, audio, level generation, validators). See `docs/asset-pipeline.md`.
+- `docs/` — design, in Vietnamese. `game-scenario.md` overview + audio; `levels/NN-*.md` one file per level; `progress.md` level tracker; `sprite-spec.md` art rules; `asset-pipeline.md` scripts and asset workflow; `tech-stack.md`.
 
 ## Commands
 
@@ -22,5 +22,5 @@
 
 - Keep `docs/` in sync with code: level rules/numbers in `docs/levels/`, status in `docs/progress.md`.
 - Code comments in English; docs in Vietnamese.
-- Do not commit build output (`web/`, binaries) or asset sources.
+- Do not commit build output (`web/`, binaries). Commit asset sources together with the runtime files they produce.
 - Open-ended story: new levels are appended after the last numbered level (`docs/levels/NN-<slug>.md`, NN = last + 1). Never renumber existing levels. Add the row to the zone table in `docs/game-scenario.md` and to `docs/progress.md`, and link the story hook from the previous level. New levels are welcome to bring new gameplay or camera perspectives beyond the boss-arena platformer (puzzle, stealth, top-down, racing, management...); keep the office satire, P1–P5 characters and 1–5 player LAN play, and state any new visual conventions in the level doc. Endgame (`docs/levels/endgame.md`) stays parked; do not design it unless asked.

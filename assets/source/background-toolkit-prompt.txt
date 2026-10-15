@@ -1,0 +1,14 @@
+Production SOURCE ART for parallax backgrounds of crisp16-bit corporate 2D platform game. An asset toolkit, not a full gameplay screenshot. Exactly FOUR columns by THREE rows, equally spaced cells, all objects isolated on pure magenta #FF00FF background. No labels, no text, no watermark. Flat orthographic side view. Upper-left light. Dark low-contrast palette ONLY #0B1020 #0B1530 #14234A #22345F #2F4A7F. Brightest lit windows are muted #2F4A7F, no neon, no cream, no coral, no teal. Generous margins between cells.
+ROW1 FOUR separate skyline clusters: each cluster 2-4 distant city skyscrapers with small rectangular lit windows and roofs, varied tall/short silhouettes, flat bottom, faint dark blue. No sky behind, magenta around building silhouettes.
+ROW2 four objects:
+cell1 a round pixel-art moon with crater pattern, muted blue #2F4A7F, no glow outside the circle.
+cell2 a straight vertical office window pillar, dark navy frame with subtle blue highlight along left edge, perfectly vertical, no perspective, no scenery.
+cell3 a straight horizontal window crossbeam, wide thin dark navy bar with muted blue highlight on top edge.
+cell4 a second simple window pillar with paired thin parallel vertical frame strips.
+ROW3 four separated FAR OFFICE silhouettes: 
+cell1 wide desk with two monitors and filing drawers;
+cell2 pair of office chairs next to low cabinets;
+cell3 filing cabinets and potted blue-leaf plant;
+cell4 printer station and water cooler.
+Furniture low contrast dark navy and blue only, no cyan screens, floorless silhouettes with magenta above and around, flat bottoms.
+No playable characters, no platforms, no HUD, no floors, no city attached to other rows. Source objects suitable to downsample and COMPOSE at native1920x1080 into seamlessly repeating horizontal parallax layers.

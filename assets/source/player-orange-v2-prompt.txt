@@ -1,0 +1,13 @@
+Use case: stylized-concept.
+Asset type: production pixel-art character animation source sheet for side-view office platformer TASK VO TAN.
+Input image: style reference only, existing teal hoodie developer. Match crisp dark navy outline, limited 16-bit palette, cream sneakers, navy trousers, handheld computer keyboard weapon. Redesign body anatomy and face as specified; not merely a color swap.
+Composition: EXACTLY 8 columns by 5 rows, 40 evenly sized rectangular cells, landscape sheet, regular grid with large clear gutters. No visible grid lines, text, labels or decorations. One isolated full-body pose per occupied cell, facing RIGHT. Fully transparent background. Consistent character proportions, hair, clothes and keyboard in every pose. Keep feet within each cell. No glow, motion trails, missiles, extra people or antialiasing. Keyboard must remain recognizable.
+Cell order left-to-right:
+Row1: 4 distinct idle breathing poses, 2 jumping poses, 2 falling poses.
+Row2: 8 distinct run-cycle poses.
+Row3: 5 keyboard melee swing poses (windup, raised, swing, followthrough, recover), 2 hurt recoil poses, last cell EMPTY.
+Row4: 4 low forward dash poses, 4 sitting/downed poses with closed eyes.
+Row5: 4 revive poses progressing from seated to kneeling to crouched to standing; remaining 4 cells EMPTY.
+Use visibly different animation poses, a stable scale and baseline, and coherent anatomy throughout. Flat side-on gameplay art, no perspective ground, no backdrop, no watermark.
+
+Character identity: AVERAGE HEIGHT STOCKY middle-aged male developer with a visible pot belly, sturdy legs, receding dark hair and small moustache, relaxed slouch. Orange zip hoodie over cream t-shirt. Upright height about 48 native pixels, broad 32px silhouette. Distinct from very short obese purple character.

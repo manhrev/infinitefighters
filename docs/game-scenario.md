@@ -215,9 +215,9 @@ Cốt truyện mở: màn mới luôn nối tiếp sau màn cuối hiện có (�
 
 Pixel art 16-bit, silhouette rõ, nhân vật hài hước. Nền navy, màn hình cyan, mặt sàn màu kem ấm và tín hiệu nguy hiểm coral đỏ. Các màn platformer nhìn ngang; mép trên của bục phải rõ và nằm ngang. Màn có góc nhìn khác ghi rõ quy ước hình ảnh trong file màn đó.
 
-Concept bố cục và phong cách (bảng mẫu v02) đã duyệt và dùng làm cơ sở cho sprite runtime. Ảnh mẫu và prompt nằm ở `assets/concepts/` (chỉ lưu cục bộ, không đưa vào git).
+Concept bố cục và phong cách (bảng mẫu v02) đã duyệt và dùng làm cơ sở cho sprite runtime. Ảnh mẫu và prompt nằm ở `assets/concepts/`.
 
-Danh sách asset runtime, kích thước, FPS và cờ loop: [sprite-spec.md](sprite-spec.md) và `assets/sprites/manifest.json`. Âm thanh: `assets/audio/manifest.json`.
+Danh sách asset runtime, kích thước, FPS và cờ loop: [sprite-spec.md](sprite-spec.md); cách tạo lại và thêm asset: [asset-pipeline.md](asset-pipeline.md) và `assets/sprites/manifest.json`. Âm thanh: `assets/audio/manifest.json`.
 
 ### Asset còn thiếu
 

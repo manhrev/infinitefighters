@@ -1,0 +1,11 @@
+Create SOURCE ART for production runtime pixel sprites, not a concept board. Sprite animation atlas on flat pure magenta #FF00FF background, no text, no labels, no gridlines, no drop shadows. EXACT layout SEVEN equal columns by FIVE equal rows, all 35 cells occupied, regular grid spanning whole image. Each cell contains one full body side view teal hoodie young developer facing RIGHT, with keyboard weapon. Uniform character proportions, same face black tousled hair, dark blue pants, cream sneakers, teal hoodie with hood folded on back. Crisp 16-bit pixel art matching corporate comedy platform game. Strong black-navy outlines, upper-left lighting. Full silhouette contained within each cell with generous margins; nothing overlaps cell boundaries. Character body about 32px wide and48px tall when eventually downsampled, not overly detailed. Keyboard cream keys on navy case, no teal keyboard. Teal shades only on hoodie. Palette: outline #0B1020, navy #0B1530 #14234A, office blue #22345F #2F4A7F, cream #F2E3C2 #C9B48C, skin #F6C9A0 #E0A274 #A86B4A, hoodie #0E5E66 #1A9AA0 #4FD1C5, cyan #3FE0FF only tiny badge. No red.
+READ CELLS LEFT TO RIGHT THEN TOP TO BOTTOM:
+1-4 idle breathing holding keyboard low (4 distinct subtly different poses).
+5-12 RUN CYCLE 8 different sequential poses, alternate legs full cycle, keyboard held in front: contact right foot, passing, lift, flight, contact left foot, passing, lift, flight.
+13-14 rising jump, 15-16 falling jump: knees tucked and then legs extending, keyboard retained, no ground.
+17-21 KEYBOARD MELEE SWING five distinct sequential poses: pull back, raise overhead, strike forward, follow through, recover. No effect arc, weapon itself clearly visible.
+22-25 dash four low forward lunging poses, legs extended, retain keyboard.
+26-27 hurt recoil two poses facing right.
+28-31 down state four sitting asleep poses, eyes closed, seated on floor with keyboard in lap. NO Z letters or bubbles.
+32-35 revive four poses: seated, kneeling, crouching, standing.
+Every pose full body visible; face RIGHT always, orthographic side view. Equal grid cell allocation even seated characters; same head size in all cells. Do not repeat identical frames; real movement silhouette changes. No external decorations. Landscape atlas 7:5 proportions.

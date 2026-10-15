@@ -1,0 +1,17 @@
+Runtime office prop SOURCE atlas, crisp16-bit pixel art, flat ORTHOGRAPHIC SIDE VIEW front elevations, upper-left lighting, dark navy #0B1020 outlines. Match satirical pixel office platform game. All objects isolated on solid pure magenta #FF00FF for background removal. No text, no captions, no digits, no watermark, no grid lines. Exactly FOUR columns by THREE rows, equal cell spacing, objects fully inside each cell with generous margins.
+ROW1 left to right:
+1 a wide desk, flat cream tabletop perfectly horizontal, navy drawers and legs, no monitor on it.
+2 office swivel chair side view navy padded seat and back, caster legs.
+3 desktop computer monitor, cyan screen, blank screen, navy stand, straight-on side-game elevation.
+4 potted leafy plant, foliage uses OFFICE BLUE SHADES ONLY (no green), cream/navy pot.
+ROW2:
+1 tall navy filing cabinet with three drawers, cream drawer handles, no labels.
+2 water cooler with cyan water bottle and navy cabinet, cream drip tray.
+3 long hanging ceiling fluorescent light, cream illuminated panel, navy metal housing, tiny suspension cables.
+4 blank cream poster sheet with navy thin frame, empty no lines or writing.
+ROW3: four frames SAME checkpoint elevator opening left-to-right in time. Tall elevator consistent exact same outer navy frame, cyan hard outline glow, blank dark indicator panel with no text.
+frame1 CLOSED two cream-blue metal doors meeting center.
+frame2 PARTLY OPEN two doors retreating horizontally.
+frame3 MOSTLY OPEN narrow door panels at sides.
+frame4 FULLY OPEN navy inside shaft visible, side doors hidden, cream lit threshold.
+Elevator geometry must remain identical across four frames except sliding door panels. Four elevator images occupy four equal cells. Palette ONLY #0B1020 #0B1530 #14234A #22345F #2F4A7F #3FE0FF #F2E3C2 #C9B48C plus magenta background. No red. All objects side view, no visible top-down perspective.
