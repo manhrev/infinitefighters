@@ -1,0 +1,25 @@
+{
+  "tileSize": 32,
+  "columns": 8,
+  "rows": 2,
+  "spacing": 0,
+  "margin": 0,
+  "tiles": {
+    "floor-left": 0,
+    "floor-middle": 1,
+    "floor-right": 2,
+    "floor-fill": 3,
+    "platform-left": 4,
+    "platform-middle": 5,
+    "platform-right": 6,
+    "support-leg": 7,
+    "server-top": 8,
+    "server-bottom": 9,
+    "wall-fill": 10,
+    "empty-11": 11,
+    "empty-12": 12,
+    "empty-13": 13,
+    "empty-14": 14,
+    "empty-15": 15
+  }
+}

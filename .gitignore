@@ -1,0 +1,22 @@
+.DS_Store
+__pycache__/
+.venv-sprites/
+node_modules/
+
+# Build output: `make build` in infinitefighters-backend regenerates web/ and the binary.
+infinitefighters-backend/web/
+infinitefighters-backend/infinitefighters
+infinitefighters-backend/infinitefighters-backend
+
+# Only runtime art/audio is tracked (what the frontend imports). Sources, concepts and previews stay local.
+assets/*
+!assets/sprites/
+!assets/tiles/
+!assets/backgrounds/
+!assets/ui/
+!assets/audio/
+assets/audio/*
+!assets/audio/manifest.json
+!assets/audio/music/
+!assets/audio/sfx/
+!assets/audio/ambience/

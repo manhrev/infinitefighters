@@ -1,0 +1,1096 @@
+{
+  "pixelArt": true,
+  "scaleMode": "NEAREST",
+  "entries": [
+    {
+      "path": "assets/sprites/player/teal/idle.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/run.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/jump.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/fall.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/attack.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 5,
+      "fps": 18,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/dash.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/hurt.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/down.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/revive.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/idle.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/run.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/jump.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/fall.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/attack.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 5,
+      "fps": 18,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/dash.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/hurt.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/down.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/violet/revive.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/idle.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/run.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/jump.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/fall.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/attack.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 5,
+      "fps": 18,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/dash.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/hurt.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/down.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/amber/revive.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/idle.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/run.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/jump.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/fall.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/attack.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 5,
+      "fps": 18,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/dash.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/hurt.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/down.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/mint/revive.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/idle.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/run.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/jump.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/fall.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/attack.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 5,
+      "fps": 18,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/dash.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/hurt.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/down.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/orange/revive.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "kind": "player"
+    },
+    {
+      "path": "assets/sprites/player/teal/skill-windup.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/player/teal/skill-cast.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/keyboard-cleave.png",
+      "frameWidth": 80,
+      "frameHeight": 80,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/keyboard-charge.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/ui/skills/one-line-fix.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    },
+    {
+      "path": "assets/sprites/player/violet/skill-windup.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/player/violet/skill-cast.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/forward-shield.png",
+      "frameWidth": 48,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/returned-task.png",
+      "frameWidth": 32,
+      "frameHeight": 24,
+      "frames": 4,
+      "fps": 16,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/ui/skills/out-of-scope.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    },
+    {
+      "path": "assets/sprites/player/amber/skill-windup.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/player/amber/skill-cast.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/stamp-projectile.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 14,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/boss-stamp-mark.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/ui/skills/meeting-minutes.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    },
+    {
+      "path": "assets/sprites/player/mint/skill-windup.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/player/mint/skill-cast.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/hotfix-burst.png",
+      "frameWidth": 128,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/hotfix-zone.png",
+      "frameWidth": 128,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/ui/skills/works-on-my-machine.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    },
+    {
+      "path": "assets/sprites/player/orange/skill-windup.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/player/orange/skill-cast.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "player-skill"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/timecard-trail.png",
+      "frameWidth": 96,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 16,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/skills/timecard-impact.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 18,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/ui/skills/clock-out.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/idle.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/volley_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/volley.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/wave_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/wave.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/wind_clock.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/hurt.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/defeat.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/walk.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/charge_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 5,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/charge.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/charge_recover.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 4,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/vfx/boss-foot-dust.png",
+      "frameWidth": 64,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/charge-warning.png",
+      "frameWidth": 64,
+      "frameHeight": 16,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/drop_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/drop.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/doc-cong/drop_jam.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/vfx/file-stack.png",
+      "frameWidth": 64,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/file-burst.png",
+      "frameWidth": 96,
+      "frameHeight": 48,
+      "frames": 5,
+      "fps": 18,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/drop-warning.png",
+      "frameWidth": 64,
+      "frameHeight": 32,
+      "frames": 2,
+      "fps": 6,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/alert-mark.png",
+      "frameWidth": 16,
+      "frameHeight": 24,
+      "frames": 2,
+      "fps": 6,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/task-card.png",
+      "frameWidth": 16,
+      "frameHeight": 12,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/deadline-wave.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/floor-warning.png",
+      "frameWidth": 32,
+      "frameHeight": 8,
+      "frames": 2,
+      "fps": 6,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/swing-arc.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 18,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/code-pulse.png",
+      "frameWidth": 32,
+      "frameHeight": 16,
+      "frames": 4,
+      "fps": 16,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/land-dust.png",
+      "frameWidth": 32,
+      "frameHeight": 16,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/hit-spark.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 3,
+      "fps": 18,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/items/coffee.png",
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "item"
+    },
+    {
+      "path": "assets/sprites/items/document.png",
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "item"
+    },
+    {
+      "path": "assets/tiles/office.png",
+      "frameWidth": 256,
+      "frameHeight": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "tiles"
+    },
+    {
+      "path": "assets/sprites/props/desk.png",
+      "frameWidth": 96,
+      "frameHeight": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/chair.png",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/monitor.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/plant.png",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/filing-cabinet.png",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/water-cooler.png",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/ceiling-light.png",
+      "frameWidth": 64,
+      "frameHeight": 16,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/poster.png",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/sprites/props/elevator.png",
+      "frameWidth": 64,
+      "frameHeight": 96,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "prop"
+    },
+    {
+      "path": "assets/backgrounds/bg-0-sky.png",
+      "frameWidth": 1920,
+      "frameHeight": 1080,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "background"
+    },
+    {
+      "path": "assets/backgrounds/bg-1-windows.png",
+      "frameWidth": 1920,
+      "frameHeight": 1080,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "background"
+    },
+    {
+      "path": "assets/backgrounds/bg-2-office.png",
+      "frameWidth": 1920,
+      "frameHeight": 1080,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "background"
+    },
+    {
+      "path": "assets/ui/heart.png",
+      "frameWidth": 9,
+      "frameHeight": 8,
+      "frames": 2,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    },
+    {
+      "path": "assets/ui/portrait.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "portrait"
+    },
+    {
+      "path": "assets/ui/portrait-violet.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "portrait"
+    },
+    {
+      "path": "assets/ui/portrait-amber.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "portrait"
+    },
+    {
+      "path": "assets/ui/portrait-mint.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "portrait"
+    },
+    {
+      "path": "assets/ui/portrait-orange.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "portrait"
+    },
+    {
+      "path": "assets/ui/deadline-icon.png",
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "kind": "ui"
+    }
+  ],
+  "playerHitbox": {
+    "width": 20,
+    "height": 44,
+    "anchor": "bottom-center"
+  },
+  "bossHitbox": {
+    "width": 70,
+    "height": 110,
+    "anchor": "bottom-center"
+  }
+}
