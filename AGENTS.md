@@ -20,6 +20,7 @@
 
 ## Rules
 
+- Follow `CONTRIBUTING.md` (branch/commit/PR flow, checks, level and asset rules).
 - Keep `docs/` in sync with code: level rules/numbers in `docs/levels/`, status in `docs/progress.md`.
 - Code comments in English; docs in Vietnamese.
 - Do not commit build output (`web/`, binaries). Commit asset sources together with the runtime files they produce.

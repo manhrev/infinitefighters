@@ -23,9 +23,7 @@ Server in ra địa chỉ và mã phòng 4 ký tự. Mở địa chỉ trên tr�
 
 ## Đóng góp
 
-- Cốt truyện mở: màn mới nối tiếp sau màn cuối, được khuyến khích thử lối chơi và góc nhìn mới. Rule chi tiết trong [AGENTS.md](AGENTS.md).
-- Sửa luật hoặc số liệu thì cập nhật file màn trong `docs/levels/` và `docs/progress.md` cùng lúc.
-- Asset: commit cả nguồn lẫn file runtime; chạy validator trước khi gửi.
+Đọc [CONTRIBUTING.md](CONTRIBUTING.md): quy trình branch/PR, lệnh kiểm tra, cách thêm màn mới và rule asset.
 
 ## License
 
