@@ -32,8 +32,8 @@ uv pip install --python .venv-sprites/bin/python -r scripts/requirements-sprites
 
 | Script | Việc | Chạy |
 | --- | --- | --- |
-| `build_sprites.py` | Cắt ảnh nguồn thành sprite runtime; `all` chạy mọi stage rồi ghi `assets/sprites/manifest.json` | `build_sprites.py all` hoặc một stage: `player skills boss boss-motion boss-drop effects tiles props backgrounds ui` |
-| `build_player_roster.py`, `build_skill_sprites.py`, `build_boss_movement.py`, `build_boss_drop.py` | Stage con của `build_sprites.py` | Gọi qua `build_sprites.py <stage>` |
+| `build_sprites.py` | Cắt ảnh nguồn thành sprite runtime; `all` chạy mọi stage rồi ghi `assets/sprites/manifest.json` | `build_sprites.py all` hoặc một stage: `player skills boss boss-motion boss-drop boss-khabib boss-vought boss-yasuka effects tiles props backgrounds ui` |
+| `build_player_roster.py`, `build_skill_sprites.py`, `build_boss_movement.py`, `build_boss_drop.py`, `build_boss_khabib.py`, `build_boss_vought.py`, `build_boss_yasuka.py` | Stage con của `build_sprites.py` | Gọi qua `build_sprites.py <stage>` |
 | `palette_swap.py` | Đổi màu áo nhân vật, giữ nguyên hình | Tự chạy trong `build_sprites.py all` |
 | `sprite_manifest.py` | Hợp đồng sprite (tên, kích thước, FPS, loop) chép từ `sprite-spec.md` | Thư viện, không chạy riêng |
 | `make_sprite_preview.py`, `make_roster_preview.py` | Ảnh xem duyệt phóng 4× vào `assets/preview/` | Chạy sau khi build |

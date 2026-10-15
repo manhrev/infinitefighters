@@ -1,0 +1,11 @@
+Use case: stylized-concept.
+Asset type: standalone 16-bit PIXEL ART VFX sheet for boss SA VOUGHT's attacks in corporate satire platformer TASK VO TAN.
+Reference concept: assets/concepts/boss-sa-vought-v1.png.
+
+Sheet layout:
+Solid pure magenta #FF00FF background. Exactly 4 columns and 4 rows of equal cells, generous gutters between effects, no character, no ground, no UI, no real readable words or watermark. Hard 16-bit pixel clusters.
+
+Row 1: DEFLECTION RIBBON (4 frames): curved dynamic swooshing trajectory arrows in cyan #3FE0FF and cream #F2E3C2 redirecting incoming task cards up and over. Frame target 48x48.
+Row 2: BUG STAMP PROJECTILE (4 frames): coral red #FF5A5A bug pictogram stamped on cream document card, spinning/flying RIGHT with speed streaks. Frame target 32x32.
+Row 3: SPEECH BUBBLE SHIELD (4 frames): glowing cyan #3FE0FF speech bubble barrier shaped with an inner `>` cursor arrow, pulsing glints. Frame target 48x48.
+Row 4: SHOULDER PAT AMBUSH MARK (4 frames): cyan #3FE0FF dotted silhouette residue and coral #FF5A5A warning sparkles for the shoulder pat attack. Frame target 32x32.

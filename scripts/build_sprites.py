@@ -378,12 +378,15 @@ def ui():
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('stage',choices=['player','skills','boss','boss-motion','boss-drop','effects','tiles','props','backgrounds','ui','all'])
+    parser.add_argument('stage',choices=['player','skills','boss','boss-motion','boss-drop','boss-khabib','boss-vought','boss-yasuka','effects','tiles','props','backgrounds','ui','all'])
     args=parser.parse_args()
     from build_skill_sprites import main as skills
     from build_boss_movement import main as boss_motion
     from build_boss_drop import main as boss_drop
-    stages={'player':players,'skills':skills,'boss':boss,'boss-motion':boss_motion,'boss-drop':boss_drop,'effects':effects,'tiles':tiles,'props':props,'backgrounds':backgrounds,'ui':ui}
+    from build_boss_khabib import main as boss_khabib
+    from build_boss_vought import main as boss_vought
+    from build_boss_yasuka import main as boss_yasuka
+    stages={'player':players,'skills':skills,'boss':boss,'boss-motion':boss_motion,'boss-drop':boss_drop,'boss-khabib':boss_khabib,'boss-vought':boss_vought,'boss-yasuka':boss_yasuka,'effects':effects,'tiles':tiles,'props':props,'backgrounds':backgrounds,'ui':ui}
     for name,fn in stages.items():
         if args.stage in [name,'all']: fn()
     if args.stage=='all':

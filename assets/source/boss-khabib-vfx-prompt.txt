@@ -1,0 +1,11 @@
+Use case: stylized-concept.
+Asset type: standalone 16-bit PIXEL ART VFX sheet for boss KHABIB's attacks in corporate satire platformer TASK VO TAN.
+Reference concept: assets/concepts/boss-khabib-v1.png (panels 1, 2, 3).
+
+Sheet layout:
+Solid pure magenta #FF00FF backdrop. Exactly 4 columns and 4 rows of equal cells, generous gutters between effects, no character, no ground, no UI, no real readable words or watermark. Hard 16-bit pixel clusters.
+
+Row 1: PRESSING SHOCKWAVE (4 frames): expanding concentric curved acoustic / pressure waves traveling RIGHT. Curved sonic arcs, coral red #FF5A5A and dark red #B8303A hazard glow with cyan #3FE0FF edge glints. Frame target 48x48.
+Row 2: TALK SPAM PROJECTILE (4 frames): angular office speech bubble / memo bullet flying RIGHT. Pointed speech tail pointing left, cream #F2E3C2 interior with blank horizontal red warning stripes (no real readable text, abstract text bars), glowing coral outline. Frame target 32x24.
+Row 3: TELEPORT LANDING WARNING (4 frames): coral red #FF5A5A sharp jagged ground pressure teeth / landing warning spikes pointing UP from floor baseline. Frame target 64x32.
+Row 4: DIGITAL DISPERSE / PORTAL (4 frames): swirling cyan #3FE0FF pixel portal fragments, square particles dispersing outwards. Frame target 48x48.

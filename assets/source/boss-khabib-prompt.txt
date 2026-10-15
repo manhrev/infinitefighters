@@ -1,0 +1,17 @@
+Use case: stylized-concept.
+Asset type: production sprite sheet atlas for boss KHABIB, corporate satire 2D pixel-art co-op platformer TASK VO TAN.
+Reference image: assets/concepts/boss-khabib-v1.png.
+
+Character:
+Enormously obese, wide office executive boss named KHABIB. Bald hairless head, pale white ivory skin, prominent protruding domed forehead in profile, small sharp squinting eyes, heavy jowly cheeks and double chin. Dark navy business suit (#0B1530 / #14234A) stretched over an enormous round protruding belly, cream shirt, cream necktie (NO RED clothing, red is reserved for hazards), dark navy trousers, tiny polished brown/cream shoes. Smug overbearing micromanager. Facing RIGHT in orthographic 2D platformer side view. 16-bit pixel art with clean #0B1020 dark pixel outlines and upper-left light. No anti-aliasing, no blur.
+
+Atlas layout:
+Solid pure magenta #FF00FF backdrop. Exactly 6 columns and 6 rows of equal cells, generous gutters between poses, no overlap, feet on shared baseline inside each row, no ground shadow, no text, no labels, no grid lines, no speech bubbles or arrows on character. Boss body about 120 pixels tall inside each cell.
+
+Grid cells:
+- Row 1 (Cells 1-4): IDLE (4 poses): smug standing, belly breathing, right hand with one finger raised lecturing, feet planted. Cells 5-6: WALK (first 2 steps).
+- Row 2: WALK (2 more steps completing 4-step heavy walk cycle). Cells 9-12: PRESSING WINDUP (4 poses): leans back, puffs chest and belly, draws arm back preparing belly rush.
+- Row 3 (Cells 13-16): PRESSING ATTACK (4 poses): lunges forward aggressively, belly leading, arm thrusting forward. Cells 17-18: HURT (2 poses): shocked recoil, flinching backwards.
+- Row 4 (Cells 19-24): TALK SPAM / NAGGING (6 poses): mouth wide open shouting/scolding, pointing finger jabbing aggressively, chest heaving.
+- Row 5 (Cells 25-28): TELEPORT DISAPPEAR / REAPPEAR (4 poses): crouches, dissolves/phases into digital posture and re-solidifies. Cells 29-30: VULNERABLE / EXHAUSTED (2 poses): panting, wiping forehead, catching breath.
+- Row 6 (Cells 31-36): DEFEAT (6 sequential poses): reeling, stunned, knees buckle, sitting down heavily, falling onto belly/side on floor, suit disheveled.

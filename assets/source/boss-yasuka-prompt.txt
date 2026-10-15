@@ -1,0 +1,15 @@
+Use case: stylized-concept.
+Asset type: production sprite sheet atlas for boss YASUKA, corporate satire 2D pixel-art co-op platformer TASK VO TAN.
+Reference image: assets/concepts/boss-yasuka-v1.png.
+
+Character:
+YASUKA, mature middle-aged female senior HR executive. Voluminous shoulder-length softly wavy dark brown hair (#22345F / #14234A). Dignified conservative attire: high-neck ruffled cream blouse (#F2E3C2), deep muted plum-navy tailored blazer (#2F4A7F / #14234A), long below-knee tailored skirt, dark closed low heels. Holding a thick dark navy HR binder with cream label. Impassive, aloof expression, chin slightly tilted up, looking away with cold detachment. NO RED clothing (red is reserved exclusively for danger VFX). Elegant upright posture, body height about 100 pixels tall. Facing RIGHT in flat orthographic 2D platformer side view. 16-bit pixel art with clean #0B1020 dark pixel outlines and upper-left light. No anti-aliasing, no blur.
+
+Atlas layout:
+Solid pure magenta #FF00FF backdrop. Exactly 6 columns and 6 rows of equal cells.
+- Row 1: IDLE (4 poses) + WALK (first 2 steps).
+- Row 2: WALK (next 2 steps) + EVASIVE DODGE WINDUP (4 poses).
+- Row 3: DODGE EVASION SLIDE (4 poses) + HURT (2 poses).
+- Row 4: PROCEDURE / REJECTION STAMP (4 poses) + SILENCE SHIELD CAST (2 poses).
+- Row 5: SILENCE SHIELD POSE (4 poses) + RECOVER / VULNERABLE (2 poses).
+- Row 6: DEFEAT (6 sequential poses).

@@ -1,0 +1,11 @@
+Use case: stylized-concept.
+Asset type: standalone 16-bit PIXEL ART VFX sheet for boss YASUKA's attacks in corporate satire platformer TASK VO TAN.
+Reference concept: assets/concepts/boss-yasuka-v1.png.
+
+Sheet layout:
+Solid pure magenta #FF00FF background. Exactly 4 columns and 4 rows of equal cells, generous gutters between effects, no character, no ground, no UI, no real readable words or watermark. Hard 16-bit pixel clusters.
+
+Row 1: SILENCE DOME BARRIER (4 frames): glowing semicircular protective energy dome / arch with coral red #FF5A5A / cream outline and a prominent inner `...` three-dot speech bubble symbol pulsing at the peak. Frame target 64x48.
+Row 2: EVASION AFTERIMAGE RESIDUE (4 frames): graceful cyan #3FE0FF and pale office-blue silhouette afterimage echoes with speed lines fading to the right. Frame target 48x48.
+Row 3: PROCEDURE STAMP TRAP (4 frames): square coral red #FF5A5A rejection stamp mark / red stamp seal pulsing on floor with danger rays. Frame target 32x32.
+Row 4: PAPER FLURRY / BURST (4 frames): scatter of flying cream #F2E3C2 office document sheets, memos, and rejection notices fluttering in all directions. Frame target 48x48.

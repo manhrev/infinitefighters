@@ -1,0 +1,15 @@
+Use case: stylized-concept.
+Asset type: production sprite sheet atlas for boss SA VOUGHT, corporate satire 2D pixel-art co-op platformer TASK VO TAN.
+Reference image: assets/concepts/boss-sa-vought-v1.png.
+
+Character:
+SA VOUGHT, tall, exceptionally slim, narrow-cheeked solution architect. Neatly side-parted black hair, black rectangular eyeglasses (clear lenses). Slate-blue short sleeve polo shirt (#2F4A7F / #22345F) tucked into charcoal dress trousers (#14234A / #0B1530), black leather belt, polished dark loafers. NO RED clothing (red is reserved exclusively for hazard VFX). Slender silhouette, long limbs, relaxed persuasive smile, open gesturing hands. Facing RIGHT in flat orthographic 2D platformer side view. 16-bit pixel art with clean #0B1020 dark pixel outlines and upper-left light. No anti-aliasing, no blur.
+
+Atlas layout:
+Solid pure magenta #FF00FF backdrop. Exactly 6 rows on solid magenta backdrop.
+- Row 1: IDLE (4 poses) + WALK (4 poses).
+- Row 2: WALK continuation + DEFLECT / MUA MOM WINDUP (4 poses).
+- Row 3: DEFLECT ACTION (4 poses) + HURT (2 poses).
+- Row 4: BUG STAMP THROW (4 poses) + SHOULDER PAT (2 poses).
+- Row 5: REFLECT SHIELD (4 poses) + RECOVER / VULNERABLE (2 poses).
+- Row 6: DEFEAT (6 sequential poses).

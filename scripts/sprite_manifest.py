@@ -29,6 +29,21 @@ BOSS_MOVEMENT_VFX = {'boss-foot-dust':(64,32,4,12,False),'charge-warning':(64,16
 BOSS_DROP = {'drop_windup':(4,8,False),'drop':(4,12,False),'drop_jam':(6,8,True)}
 BOSS_DROP_VFX = {'file-stack':(64,48,4,12,True),'file-burst':(96,48,5,18,False),
                  'drop-warning':(64,32,2,6,True),'alert-mark':(16,24,2,6,True)}
+BOSS_KHABIB = {'idle':(4,6,True),'walk':(4,8,True),'press_windup':(4,8,False),'press':(4,12,False),
+               'spam_windup':(4,8,False),'spam':(4,12,True),'teleport_out':(2,8,False),
+               'teleport_in':(2,10,False),'recover':(2,6,True),'hurt':(2,10,False),'defeat':(6,8,False)}
+BOSS_KHABIB_VFX = {'khabib-press-wave':(48,48,4,14,True),'khabib-nag-projectile':(32,24,4,12,True),
+                   'khabib-teleport-warning':(64,32,4,8,True),'khabib-portal':(48,48,4,12,False)}
+BOSS_VOUGHT = {'idle':(4,6,True),'walk':(4,8,True),'deflect_windup':(4,8,False),'deflect':(4,12,False),
+               'stamp_throw':(4,12,False),'shoulder_pat':(2,8,False),'reflect_shield':(4,10,True),
+               'recover':(2,6,True),'hurt':(2,10,False),'defeat':(6,8,False)}
+BOSS_VOUGHT_VFX = {'vought-deflect-ribbon':(48,48,4,12,True),'vought-bug-stamp':(32,32,4,12,True),
+                   'vought-speech-shield':(48,48,4,10,True),'vought-pat-mark':(32,32,4,8,True)}
+BOSS_YASUKA = {'idle':(4,6,True),'walk':(4,8,True),'dodge_windup':(4,8,False),'dodge':(4,12,False),
+               'procedure':(4,12,False),'silence':(4,8,True),'recover':(2,6,True),
+               'hurt':(2,10,False),'defeat':(6,8,False)}
+BOSS_YASUKA_VFX = {'yasuka-silence-dome':(64,48,4,10,True),'yasuka-dodge-trail':(48,48,4,12,False),
+                   'yasuka-stamp-trap':(32,32,4,8,True),'yasuka-paper-flurry':(48,48,4,12,False)}
 VFX = {'task-card':(16,12,4,12,True),'deadline-wave':(32,32,4,12,True),'floor-warning':(32,8,2,6,True),'swing-arc':(48,48,4,18,False),'code-pulse':(32,16,4,16,True),'land-dust':(32,16,4,16,False),'hit-spark':(24,24,3,18,False)}
 PROPS = {'desk':(96,48),'chair':(32,48),'monitor':(32,32),'plant':(32,48),'filing-cabinet':(32,48),'water-cooler':(32,48),'ceiling-light':(64,16),'poster':(32,48)}
 
@@ -57,6 +72,18 @@ def entries():
     for name,(n,fps,loop) in BOSS_DROP.items():
         add(f'assets/sprites/boss/doc-cong/{name}.png',160,160,n,fps,loop,'boss')
     for name,(w,h,n,fps,loop) in BOSS_DROP_VFX.items():
+        add(f'assets/sprites/vfx/{name}.png',w,h,n,fps,loop,'vfx')
+    for name,(n,fps,loop) in BOSS_KHABIB.items():
+        add(f'assets/sprites/boss/khabib/{name}.png',160,160,n,fps,loop,'boss')
+    for name,(w,h,n,fps,loop) in BOSS_KHABIB_VFX.items():
+        add(f'assets/sprites/vfx/{name}.png',w,h,n,fps,loop,'vfx')
+    for name,(n,fps,loop) in BOSS_VOUGHT.items():
+        add(f'assets/sprites/boss/vought/{name}.png',160,160,n,fps,loop,'boss')
+    for name,(w,h,n,fps,loop) in BOSS_VOUGHT_VFX.items():
+        add(f'assets/sprites/vfx/{name}.png',w,h,n,fps,loop,'vfx')
+    for name,(n,fps,loop) in BOSS_YASUKA.items():
+        add(f'assets/sprites/boss/yasuka/{name}.png',160,160,n,fps,loop,'boss')
+    for name,(w,h,n,fps,loop) in BOSS_YASUKA_VFX.items():
         add(f'assets/sprites/vfx/{name}.png',w,h,n,fps,loop,'vfx')
     for name,(w,h,n,fps,loop) in VFX.items():
         add(f'assets/sprites/vfx/{name}.png',w,h,n,fps,loop,'vfx')

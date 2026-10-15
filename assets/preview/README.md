@@ -1,5 +1,41 @@
 # MVP runtime sprite delivery
 
+## Boss Yasuka — Sếp Lớn Nhân Sự (Đang Chờ Phản Hồi)
+
+Thirteen additional runtime strips: 9 boss animation strips under `assets/sprites/boss/yasuka/`:
+`idle` (4 × 160 × 160, 6 FPS, loop), `walk` (4 × 160 × 160, 8 FPS, loop), `dodge_windup` (4 × 160 × 160, 8 FPS, no loop), `dodge` (4 × 160 × 160, 12 FPS, no loop), `procedure` (4 × 160 × 160, 12 FPS, no loop), `silence` (4 × 160 × 160, 8 FPS, loop), `recover` (2 × 160 × 160, 6 FPS, loop), `hurt` (2 × 160 × 160, 10 FPS, no loop), `defeat` (6 × 160 × 160, 8 FPS, no loop).
+
+Four attack VFX strips under `assets/sprites/vfx/`:
+`yasuka-silence-dome` (4 × 64 × 48, 10 FPS, loop), `yasuka-dodge-trail` (4 × 48 × 48, 12 FPS, no loop), `yasuka-stamp-trap` (4 × 32 × 32, 8 FPS, loop), `yasuka-paper-flurry` (4 × 48 × 48, 12 FPS, no loop).
+
+Source sheets and prompts: `assets/source/boss-yasuka.png`, `boss-yasuka-prompt.txt`, `boss-yasuka-vfx.png`, `boss-yasuka-vfx-prompt.txt`. Exact cell slices are recorded in `boss-yasuka-regions.json` and `boss-yasuka-vfx-regions.json`.
+Inspect previews at `assets/preview/boss-yasuka.png` and `assets/preview/boss-yasuka-vfx.png`.
+Rebuild: `.venv-sprites/bin/python scripts/build_sprites.py boss-yasuka`.
+
+## Boss phụ SA Vought — Solution Architect Sang Tên Bug
+
+Fourteen additional runtime strips: 10 boss animation strips under `assets/sprites/boss/vought/`:
+`idle` (4 × 160 × 160, 6 FPS, loop), `walk` (4 × 160 × 160, 8 FPS, loop), `deflect_windup` (4 × 160 × 160, 8 FPS, no loop), `deflect` (4 × 160 × 160, 12 FPS, no loop), `stamp_throw` (4 × 160 × 160, 12 FPS, no loop), `shoulder_pat` (2 × 160 × 160, 8 FPS, no loop), `reflect_shield` (4 × 160 × 160, 10 FPS, loop), `recover` (2 × 160 × 160, 6 FPS, loop), `hurt` (2 × 160 × 160, 10 FPS, no loop), `defeat` (6 × 160 × 160, 8 FPS, no loop).
+
+Four attack VFX strips under `assets/sprites/vfx/`:
+`vought-deflect-ribbon` (4 × 48 × 48, 12 FPS, loop), `vought-bug-stamp` (4 × 32 × 32, 12 FPS, loop), `vought-speech-shield` (4 × 48 × 48, 10 FPS, loop), `vought-pat-mark` (4 × 32 × 32, 8 FPS, loop).
+
+Source sheets and prompts: `assets/source/boss-vought.png`, `boss-vought-prompt.txt`, `boss-vought-vfx.png`, `boss-vought-vfx-prompt.txt`. Exact cell slices are recorded in `boss-vought-regions.json` and `boss-vought-vfx-regions.json`.
+Inspect previews at `assets/preview/boss-vought.png` and `assets/preview/boss-vought-vfx.png`.
+Rebuild: `.venv-sprites/bin/python scripts/build_sprites.py boss-vought`.
+
+## Boss Khabib — Quản Lý Vi Mô (Micromanager 24/7)
+
+Fifteen additional runtime strips: 11 boss animation strips under `assets/sprites/boss/khabib/`:
+`idle` (4 × 160 × 160, 6 FPS, loop), `walk` (4 × 160 × 160, 8 FPS, loop), `press_windup` (4 × 160 × 160, 8 FPS, no loop), `press` (4 × 160 × 160, 12 FPS, no loop), `spam_windup` (4 × 160 × 160, 8 FPS, no loop), `spam` (4 × 160 × 160, 12 FPS, loop), `teleport_out` (2 × 160 × 160, 8 FPS, no loop), `teleport_in` (2 × 160 × 160, 10 FPS, no loop), `recover` (2 × 160 × 160, 6 FPS, loop), `hurt` (2 × 160 × 160, 10 FPS, no loop), `defeat` (6 × 160 × 160, 8 FPS, no loop).
+
+Four attack VFX strips under `assets/sprites/vfx/`:
+`khabib-press-wave` (4 × 48 × 48, 14 FPS, loop), `khabib-nag-projectile` (4 × 32 × 24, 12 FPS, loop), `khabib-teleport-warning` (4 × 64 × 32, 8 FPS, loop), `khabib-portal` (4 × 48 × 48, 12 FPS, no loop).
+
+Source sheets and prompts: `assets/source/boss-khabib.png`, `boss-khabib-prompt.txt`, `boss-khabib-vfx.png`, `boss-khabib-vfx-prompt.txt`. Exact cell slices are recorded in `boss-khabib-regions.json` and `boss-khabib-vfx-regions.json`.
+Inspect previews at `assets/preview/boss-khabib.png` and `assets/preview/boss-khabib-vfx.png`.
+Rebuild: `.venv-sprites/bin/python scripts/build_sprites.py boss-khabib`.
+
 ## Falling-file attack — Task rơi từ trên cao
 
 Seven additional runtime strips: `drop_windup` (4 × 160 × 160, 8 FPS, no loop), `drop` (4 × 160 × 160, 12 FPS, no loop), `drop_jam` (6 × 160 × 160, 8 FPS, loop); `file-stack` (4 × 64 × 48, 12 FPS, loop), `file-burst` (5 × 96 × 48, 18 FPS, no loop), `drop-warning` (2 × 64 × 32, 6 FPS, loop) and `alert-mark` (2 × 16 × 24, 6 FPS, loop). Every new entry is in `assets/sprites/manifest.json`.

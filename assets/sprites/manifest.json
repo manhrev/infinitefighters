@@ -822,6 +822,384 @@
       "kind": "vfx"
     },
     {
+      "path": "assets/sprites/boss/khabib/idle.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/walk.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/press_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/press.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/spam_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/spam.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/teleport_out.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/teleport_in.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/recover.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/hurt.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/khabib/defeat.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/vfx/khabib-press-wave.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 14,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/khabib-nag-projectile.png",
+      "frameWidth": 32,
+      "frameHeight": 24,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/khabib-teleport-warning.png",
+      "frameWidth": 64,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/khabib-portal.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/boss/vought/idle.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/walk.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/deflect_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/deflect.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/stamp_throw.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/shoulder_pat.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/reflect_shield.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/recover.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/hurt.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/vought/defeat.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/vfx/vought-deflect-ribbon.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/vought-bug-stamp.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 12,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/vought-speech-shield.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/vought-pat-mark.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/idle.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/walk.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/dodge_windup.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/dodge.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/procedure.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/silence.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/recover.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 6,
+      "loop": true,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/hurt.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/boss/yasuka/defeat.png",
+      "frameWidth": 160,
+      "frameHeight": 160,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "kind": "boss"
+    },
+    {
+      "path": "assets/sprites/vfx/yasuka-silence-dome.png",
+      "frameWidth": 64,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/yasuka-dodge-trail.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/yasuka-stamp-trap.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "kind": "vfx"
+    },
+    {
+      "path": "assets/sprites/vfx/yasuka-paper-flurry.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "kind": "vfx"
+    },
+    {
       "path": "assets/sprites/vfx/task-card.png",
       "frameWidth": 16,
       "frameHeight": 12,

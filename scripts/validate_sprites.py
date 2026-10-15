@@ -29,7 +29,10 @@ def validate():
     all_teal=np.array([rgb(c) for c in COLORS['teal']])
     danger=np.array([rgb('FF5A5A'),rgb('B8303A')])
     allowed_hazards={'task-card.png','deadline-wave.png','floor-warning.png','charge-warning.png','volley.png','volley_windup.png',
-                     'file-stack.png','file-burst.png','drop-warning.png','alert-mark.png'}
+                     'file-stack.png','file-burst.png','drop-warning.png','alert-mark.png',
+                     'khabib-press-wave.png','khabib-nag-projectile.png','khabib-teleport-warning.png',
+                     'vought-bug-stamp.png','vought-pat-mark.png',
+                     'yasuka-silence-dome.png','yasuka-stamp-trap.png'}
     for e in entries():
         path=ROOT/e['path']; tag=e['path']
         check(path.is_file(),f'{tag}: missing')
