@@ -1,0 +1,30 @@
+# Concept boss Mansa — v1
+
+Ảnh: `boss-mansa-v1.png`. Tạo bằng imagegen tích hợp, tham chiếu trực tiếp ba concept Khabib, Yasuka và Sa Vought. Tạo lại v1 để đồng bộ nét vẽ chi tiết, tỷ lệ nhân vật, nền văn phòng và bố cục; không dùng bản Mansa cũ làm tham chiếu. Nhân vật hư cấu trong Task Vô Tận. Đây là đề xuất tạo hình và kỹ năng, chưa triển khai gameplay hoặc sprite runtime.
+
+## Tạo hình
+
+PM (project manager) chẳng biết quản lý gì: dáng trung bình hơi mềm, tóc rối dựng một lọn, quầng thâm, trán đẫm mồ hôi. Áo sơ mi kem xắn tay, cà vạt vàng mù tạt lệch, quần chinos than chì, giày thể thao trắng, dây đeo thẻ «PM» ngược mặt. Một tay ôm laptop dán sticker robot AI, tay kia cầm điện thoại đang gọi. Cạnh vai luôn lơ lửng một con robot AI hình hộp nhỏ làm hết việc thay hắn. Vẻ mặt tự tin khi mọi thứ chạy, hoảng loạn ngay khi có lỗi.
+
+## Chiêu đề xuất
+
+- **Hỏi AI đi:** gõ vội một dòng prompt, robot AI nhả ra những viên patch xanh trông rất ổn. Chạm đất, mỗi patch nở thành hai con bug đỏ. «Để anh hỏi AI.» Màn hình laptop sáng và tiếng gõ phím báo trước; đánh trúng robot làm hắn đứng ngơ vì không còn gì để làm.
+- **Em ơi giúp anh tí:** gọi điện réo đồng nghiệp. Mỗi cuộc gọi kéo một nhân viên mệt mỏi từ mép màn hình chạy ngang đấu trường, ôm hồ sơ tồn đọng, vừa chạy vừa than. «Em ơi, giúp anh tí.» Mỗi làn một người, có chấm than báo trước; người chơi nhảy qua hoặc chặn đường để họ dừng lại.
+- **Lỗi rồi, tại ai?:** laptop sập màn hình xanh, hắn hoảng loạn rồi chỉ tay vào một người chơi. Đèn rọi đỏ khóa mục tiêu, sóng lỗi dồn về người bị chỉ. «Ai làm vậy?!» Đồng đội bước vào vòng đèn để chia nhỏ sát thương; đèn rọi có thời gian khóa trước khi nổ.
+
+Nguyên tắc phản công đề xuất: né patch trước khi nở bug, chặn hoặc nhảy qua đồng nghiệp bị réo, chia nhỏ vòng đèn rọi cùng đồng đội, và đánh robot AI để hắn đứng ngơ. Chưa chốt sát thương, thời gian hoặc thông số cân bằng.
+
+## Prompt đã dùng
+
+Use case: stylized-concept.
+Asset type: landscape boss character concept approval board for TASK VO TAN, a fictional office-satire co-op platformer.
+Primary request: Generate MANSA in exactly the same visual art direction as the three supplied reference boards: KHABIB, YASUKA and SA VOUGHT. These images are STYLE AND PRESENTATION REFERENCES ONLY; do not copy their characters. Match their detailed polished 16-bit illustrated pixel art, substantial anatomical shapes, expressive faces, fine pixel outlines, rich stepped shading, densely furnished layered midnight office backgrounds, bold cream block typography, cyan numbered header boxes and thin blue panel borders. The large character must have the SAME level of rendering detail and pixel density as SA VOUGHT, not a primitive low-resolution sprite. No oversized square pixels, stick figures, flat block limbs, or simplified voxel characters. Match reference landscape aspect ratio approximately 1536x1024.
+Subject: original fictional male boss MANSA, a frantic incompetent project manager. Medium height, slightly soft adult build, messy dark hair with one tuft, dark eye bags, sweaty forehead, anxious overconfident grin. Cream rolled-sleeve button shirt, crooked mustard tie, charcoal chinos, white sneakers, lanyard with reversed badge. One arm hugs a closed laptop with a cute cyan AI robot sticker, other hand holds smartphone to ear. Small floating cube AI helper with expressive glowing cyan screen face beside shoulder. No jacket, beard or glasses. Keep his identity and clothing consistent in every panel. Gameplay height approximately 1.8 times the teal hoodie developer.
+Composition: left 40 percent large detailed full-body three-quarter character facing right, tiny teal hoodie keyboard-wielding developer beside his feet for scale. Bottom left smaller SIDE VIEW, BACK VIEW and SILHOUETTE studies aligned like the Khabib reference. Right 60 percent exactly THREE wide horizontal gameplay vignette panels stacked vertically like Khabib, each with one distinct numbered header. Fully visible feet, generous margins. Flat orthographic side-view platforms, never isometric.
+Panel 1 'HOI AI DI': Mansa types hurriedly on an open laptop, cyan AI helper launches cream patch cards with green check marks on a clear curved trajectory toward the developer. At the floor one patch splits into TWO coral red bug creatures. Small cream speech bubble 'DE ANH HOI AI'. Show cause and effect clearly.
+Panel 2 'EM OI GIUP ANH': Mansa at the right holding phone to ear, three tired coworkers in distinct office outfits rush across separate platform lanes with overflowing folders and coral warning exclamation marks. Teal developer jumps over one coworker. Small bubble 'EM OI GIUP ANH TI'. Coworkers weary rather than malicious.
+Panel 3 'LOI TAI AI': Mansa panics holding laptop with blue crash screen and clearly points at a teal developer. A coral red spotlight locks onto that developer, and a purple hoodie teammate steps into the SAME floor circle to share the attack. Coral warning fragments surround the circle. Small bubble 'AI LAM VAY'.
+Scene: richly furnished midnight office matching all references: deep navy walls, large windows overlooking blue city buildings with warm tiny window lights, hanging desk lamps, monitors, desks, filing cabinets, potted plants, cream tiled floor tops. Background detailed but subdued behind characters.
+Palette: dark outlines #0B1020, navy #0B1530 #14234A, office blues #22345F #2F4A7F, cyan #3FE0FF, cream #F2E3C2, coral #FF5A5A for danger, mustard tie. Upper-left lighting. Fine intentional hard-edged pixel clusters and detailed stepped shading, same finish as supplied references.
+Text: title 'MANSA'; subtitle 'BOSS CONCEPT / TASK VO TAN'; unique numbered headers '1 HOI AI DI', '2 EM OI GIUP ANH', '3 LOI TAI AI'; study labels 'SIDE VIEW', 'BACK VIEW', 'SILHOUETTE'. Short speech bubbles as specified only.
+Avoid: coarse blocky pixelation, low-detail placeholder art, Mansa previous boards, photorealism, 3D, painterly smoothing, isometric perspective, copied reference characters, firearms, watermarks, cropped bodies, runtime atlas.
