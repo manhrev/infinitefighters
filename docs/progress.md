@@ -6,33 +6,30 @@ Ký hiệu: ✅ xong · 🟡 một phần / tạm · ⬜ chưa làm · — khôn
 
 ## Tổng quan
 
-| # | Màn | Thiết kế | Map | Server | Client | Sprite | Âm thanh | Test | Cân bằng |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [Đường Đua Sprint](levels/01-sprint.md) | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 |
-| 1b | [Anh em cây khế](levels/01b-party.md) (extension màn 1) | 🟡 | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ⬜ |
-| 2 | [Sảnh Onboarding](levels/02-onboarding.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 3 | [Tháp Kiến Trúc](levels/03-architecture-tower.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 4 | [Hầm Tri Thức](levels/04-knowledge-vault.md) | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 5 | [Phòng Điều Hành](levels/05-control-room.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| # | Màn | Thiết kế | Map | Server | Client | Sprite | Âm thanh | Cân bằng |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [Đường Đua Sprint](levels/01-sprint.md) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 1b | [Anh em cây khế](levels/01b-party.md) (extension màn 1) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 2 | [Sảnh Onboarding](levels/02-onboarding.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| 3 | [Tháp Kiến Trúc](levels/03-architecture-tower.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| 4 | [Hầm Tri Thức](levels/04-knowledge-vault.md) | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| 5 | [Phòng Điều Hành](levels/05-control-room.md) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
-Cột: **Thiết kế** là luật đã chốt trong file màn · **Map** là file trong `infinitefighters-backend/levels/` · **Server** là logic Go · **Client** là hiển thị và điều khiển trong `infinitefighters-frontend/` · **Test** là Go test · **Cân bằng** là chơi thử và chỉnh số liệu.
+Cột: **Thiết kế** là luật đã chốt trong file màn · **Map** là file trong `infinitefighters-backend/levels/` · **Server** là logic Go · **Client** là hiển thị và điều khiển trong `infinitefighters-frontend/` · **Cân bằng** là chơi thử và chỉnh số liệu.
 
 ## Chi tiết từng màn
 
 ### 1 — Đường Đua Sprint (Đốc Công Hôm Qua)
 
-Đã chơi được từ đầu đến cuối, 1–5 người. Map `levels/sprint.json`; code `game.go`, `skills.go`, `drop.go`; test `game_test.go`, `drop_test.go`, `room_test.go`.
+Hoàn thành, 1–5 người. Map `levels/sprint.json`; code `game.go`, `skills.go`, `drop.go`.
 
-- ⬜ Sprite chuyển phase của boss (pha 2 hiện chỉ đổi nhịp đòn).
-- 🟡 Cân bằng: thông số đang chạy là mốc khởi đầu, cần chơi thử thêm.
+Để sau (không chặn hoàn thành): sprite chuyển phase của boss (pha 2 hiện chỉ đổi nhịp đòn).
 
 ### 1b — Anh em cây khế (extension màn 1)
 
-Chơi được sau khi hạ boss màn 1, hoặc chọn thẳng ở phòng chờ. Map `levels/party.json`; code `party.go`; test `party_test.go`.
+Hoàn thành. Vào sau khi hạ boss màn 1, hoặc chọn thẳng ở phòng chờ. Map `levels/party.json`; code `party.go`.
 
-- ⬜ Phần “Tiền + gái”: NPC khách mời, tặng quà, kết quả “Ai có hẹn”. Chưa có luật chốt.
-- 🟡 Hình và âm riêng: ATM, két, bó tiền, nhạc disco đang dùng tạm.
-- ⬜ Cân bằng: chưa chơi thử có ghi nhận.
+Để sau (không chặn hoàn thành): phần “Tiền + gái” (NPC khách mời, tặng quà, “Ai có hẹn”, chưa có luật chốt); hình và âm riêng cho ATM, két, bó tiền, nhạc disco (đang dùng tạm).
 
 ### 2 — Sảnh Onboarding (Ngài Định Hướng)
 
