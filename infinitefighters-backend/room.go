@@ -234,7 +234,7 @@ func (r *Room) snapshot() snapshotMsg {
 			X: b.X, Y: b.Y, Facing: b.Facing, HP: b.HP, MaxHP: b.MaxHP, State: b.State,
 			Hits: b.Hits, Marks: b.Marks, MarkMs: ms(b.markTicks),
 		},
-		Players: []playerState{}, Shots: []shotState{}, Waves: []waveState{}, Items: []itemState{}, Zones: []zoneState{},
+		Players: []playerState{}, Shots: []shotState{}, Waves: []waveState{}, Items: []itemState{}, Zones: []zoneState{}, Drops: []dropState{},
 	}
 	if b.State == bossChargeWindup || b.State == bossCharge {
 		m.Boss.ChargeFrom, m.Boss.ChargeTo = b.chargeFrom, b.chargeTo
@@ -255,6 +255,13 @@ func (r *Room) snapshot() snapshotMsg {
 	}
 	for _, w := range r.waves {
 		m.Waves = append(m.Waves, waveState{ID: w.ID, X: w.X, Dir: w.Dir})
+	}
+	for _, d := range r.drops {
+		wait := d.delay
+		if b.State == bossDropWindup {
+			wait += dropWindupTicks - b.ticks
+		}
+		m.Drops = append(m.Drops, dropState{ID: d.ID, X: d.X, Top: d.Top, Bottom: d.Bottom, Y: d.Y, Ms: ms(wait)})
 	}
 	for _, z := range r.zones {
 		m.Zones = append(m.Zones, zoneState{ID: z.ID, X: z.X, Y: z.Y, Ms: ms(z.ticks)})

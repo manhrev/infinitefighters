@@ -78,6 +78,7 @@ type snapshotMsg struct {
 	Waves      []waveState   `json:"waves"` // deadline waves along the floor
 	Items      []itemState   `json:"items"` // pickups currently available
 	Zones      []zoneState   `json:"zones"` // P4 hotfix zones
+	Drops      []dropState   `json:"drops"` // falling file stacks, shown from the start of drop_windup
 }
 
 // playerState X/Y are the feet (bottom-centre of the 20×44 hitbox) in level pixels, +Y down.
@@ -118,7 +119,8 @@ type bossState struct {
 	Facing int     `json:"facing"`
 	HP     float64 `json:"hp"`
 	MaxHP  float64 `json:"maxHp"`
-	// idle, walk, volley_windup, volley, wave_windup, wave, charge_windup, charge, charge_recover, wind_clock, defeat
+	// idle, walk, volley_windup, volley, wave_windup, wave, charge_windup, charge, charge_recover,
+	// drop_windup, drop, drop_jam, wind_clock, defeat
 	State string `json:"state"`
 	// Counters reset with each attempt: treat a decrease as a reset, not an event.
 	Hits   uint32 `json:"hits"`  // flash and spark when it grows
@@ -141,6 +143,16 @@ type waveState struct {
 	ID  int     `json:"id"`
 	X   float64 `json:"x"` // centre; the wave is 32×32 standing on the floor
 	Dir int     `json:"dir"`
+}
+
+// dropState is one locked column of the drop attack: warn from Top to Bottom until the stack falls.
+type dropState struct {
+	ID     int     `json:"id"`
+	X      float64 `json:"x"`      // centre; the column is 64 px wide
+	Top    float64 `json:"top"`    // the fall starts here (under the desk above, or the ceiling)
+	Bottom float64 `json:"bottom"` // target desk top: the stack breaks here
+	Y      float64 `json:"y"`      // bottom of the 64×48 stack
+	Ms     int64   `json:"ms"`     // time until it starts falling; 0 while falling
 }
 
 type zoneState struct {

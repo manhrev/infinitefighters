@@ -180,13 +180,17 @@ type match struct {
 	coffeeIn      []int // per level coffee point: ticks until it is back; 0 = on the shelf
 	bossMinX      float64
 	bossMaxX      float64
+	drops         []*Drop
+	dropHit       map[int]bool // players hit in the current drop turn
+	dropCD        int          // ticks until the drop attack may be used again
 }
 
 func (r *Room) resetMatch() {
 	hp := float64(r.bossBaseHP + bossHPPerPlayer*(r.scaleN-1))
 	b := r.level.Boss
 	r.boss = Boss{X: b.X, Y: b.Y, Facing: -1, HP: hp, MaxHP: hp, State: bossIdle}
-	r.cards, r.shots, r.waves, r.zones = nil, nil, nil, nil
+	r.cards, r.shots, r.waves, r.zones, r.drops = nil, nil, nil, nil, nil
+	r.dropCD = 0
 	r.coffeeIn = make([]int, len(r.level.Coffees))
 	r.deadline, r.result, r.resultTicks = r.deadlineTicks, "", 0
 	r.bossMinX, r.bossMaxX = r.bossRange()
@@ -238,7 +242,7 @@ func (r *Room) stepMatch() {
 	switch {
 	case r.boss.HP <= 0:
 		r.boss.HP, r.boss.State, r.boss.ticks, r.boss.markTicks = 0, bossDefeat, 0, 0
-		r.cards, r.shots, r.waves, r.zones = nil, nil, nil, nil
+		r.cards, r.shots, r.waves, r.zones, r.drops = nil, nil, nil, nil, nil
 		r.result, r.resultTicks = resultWon, wonTicks
 	case r.deadline <= 0 || r.allDown():
 		r.result, r.resultTicks = resultLost, lostTicks
@@ -387,6 +391,9 @@ func (r *Room) stepBoss() {
 	if b.markTicks > 0 {
 		b.markTicks--
 	}
+	if r.dropCD > 0 {
+		r.dropCD--
+	}
 	set := func(s string) { b.State, b.ticks = s, 0 }
 	switch b.State {
 	case bossIdle:
@@ -401,6 +408,9 @@ func (r *Room) stepBoss() {
 			b.cycle++
 			if next == bossChargeWindup && !r.lockCharge() {
 				next = bossWind // no room to charge safely
+			}
+			if next == bossVolleyWindup && r.lockDrops() {
+				next = bossDropWindup // someone is camping on a desk
 			}
 			set(next)
 		}
@@ -444,6 +454,18 @@ func (r *Room) stepBoss() {
 		}
 		if b.ticks >= chargeTicks {
 			set(bossChargeRecover)
+		}
+	case bossDropWindup:
+		if b.ticks >= dropWindupTicks {
+			set(bossDrop)
+		}
+	case bossDrop:
+		if r.stepDrops() {
+			set(bossDropJam)
+		}
+	case bossDropJam:
+		if b.ticks >= dropJamTicks {
+			set(bossIdle)
 		}
 	case bossChargeRecover:
 		if b.ticks >= recoverTicks {
@@ -590,7 +612,7 @@ func (r *Room) damageBoss(n float64, markable bool) {
 	if markable && r.boss.markTicks > 0 {
 		n *= markBonus
 	}
-	if r.boss.State == bossWind {
+	if r.boss.State == bossWind || r.boss.State == bossDropJam {
 		n *= 2
 	}
 	r.boss.HP -= n

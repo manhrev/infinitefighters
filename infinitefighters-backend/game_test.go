@@ -84,7 +84,7 @@ func TestVolleyMissesFloor(t *testing.T) {
 	r := testRoom(t, 5, 0) // 5 players: both sides, two salvos
 	settle(r)
 	for i, p := range r.players { // spread across the floor on both sides of the boss
-		p.X = []float64{100, 600, 1100, 1450, 1800}[i]
+		p.X = []float64{100, 400, 700, 950, 1200}[i]
 	}
 	r.boss.State, r.boss.ticks = bossVolley, 0
 	fired := 0
@@ -116,7 +116,7 @@ func TestWaveMissesLowestPlatform(t *testing.T) {
 	r := testRoom(t, 4, 0)
 	settle(r)
 	low := r.level.PlatformTops[len(r.level.PlatformTops)-1]
-	xs := []float64{300, 1500, 300, 1500} // over the two lowest platforms in sprint.json
+	xs := []float64{300, 950, 300, 950} // over the two lowest desks in sprint.json
 	for i, p := range r.players {
 		p.X, p.Y, p.VY = xs[i], low, 0
 	}
@@ -288,10 +288,10 @@ func TestChargeHitsFloorOnceAndMissesPlatform(t *testing.T) {
 	settle(r)
 	floor, high := r.players[0], r.players[1]
 	ts := float64(r.level.Tile)
-	r.boss.X = 1500
-	floor.X = 1350
+	r.boss.X = 1100
+	floor.X = 900
 	low := r.level.PlatformTops[len(r.level.PlatformTops)-1]
-	high.X, high.Y, high.VY = 1450, low, 0 // on the right low platform, above the corridor
+	high.X, high.Y, high.VY = 950, low, 0 // on the right low desk, above the corridor
 	steps(r, 2)
 	if !r.lockCharge() {
 		t.Fatal("expected room to charge left")
@@ -317,7 +317,7 @@ func TestJumpClearsCharge(t *testing.T) {
 	r := testRoom(t, 1, 0)
 	settle(r)
 	p := r.players[0]
-	r.boss.X, p.X = 1500, 1300
+	r.boss.X, p.X = 1100, 900
 	if !r.lockCharge() {
 		t.Fatal("no room")
 	}
@@ -338,7 +338,7 @@ func TestJumpClearsCharge(t *testing.T) {
 func TestChargeNearWallBecomesWindClock(t *testing.T) {
 	r := testRoom(t, 1, 0)
 	settle(r)
-	r.players[0].X = 1880 // target behind the boss, toward the near wall
+	r.players[0].X = 1230 // target behind the boss, toward the near wall
 	r.boss.X = r.bossMaxX - 10
 	r.boss.State, r.boss.ticks, r.boss.cycle = bossWalk, walkMaxTicks+1, 2 // next: charge
 	r.stepMatch()

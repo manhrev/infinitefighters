@@ -24,6 +24,15 @@ func TestSprintLevelParses(t *testing.T) {
 	if len(l.Spawns) != maxPlayers {
 		t.Fatalf("got %d spawns, want %d", len(l.Spawns), maxPlayers)
 	}
+	// Each desk level is reachable from the one below: the step is under the jump apex with margin.
+	apex := jumpSpeed * jumpSpeed / (2 * gravity)
+	below := l.Spawns[0].Y // floor
+	for i := len(l.PlatformTops) - 1; i >= 0; i-- {
+		if step := below - l.PlatformTops[i]; step <= 0 || step > apex-16 {
+			t.Fatalf("desk level y=%v is %v px above the one below, jump apex %v", l.PlatformTops[i], step, apex)
+		}
+		below = l.PlatformTops[i]
+	}
 	for _, s := range l.Spawns { // every spawn stands on solid floor
 		if l.at(cell(s.X, 32), cell(s.Y, 32)) != tileSolid {
 			t.Fatalf("spawn %v is not on the floor", s)
