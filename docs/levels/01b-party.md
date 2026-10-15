@@ -1,6 +1,6 @@
 # Extension màn 1 — Anh em hết mình, tiền tình hết hồn
 
-Extension của màn Đường Đua Sprint ([01-sprint.md](01-sprint.md)): hạ Đốc Công Hôm Qua xong, những người chơi còn kết nối được mời đến tiệc tổng kết.
+Extension của màn Đường Đua Sprint ([01-sprint.md](01-sprint.md)): hạ Đốc Công Hôm Qua xong, những người chơi còn kết nối được mời đến tiệc tổng kết sprint. Sau tiệc là màn 2 ([02-onboarding.md](02-onboarding.md)).
 
 HR công bố quỹ thưởng chỉ đủ cho một người, kèm danh hiệu “Người gánh team” và một buổi hẹn do các cô nàng NPC khách mời tự chọn người tham gia. Màn hình hiện bảng công trạng: ai cũng được ghi là người đóng góp chính, trừ phần trách nhiệm. Một người nói: “Tiền chia sao cũng được, anh em là chính.” Ngay sau đó, người ấy nhặt chiếc vali tiền và chạy.
 
@@ -63,8 +63,8 @@ Các cô nàng NPC là khách mời có tên, cá tính và gu riêng: người 
 
 Đánh nhau cạnh bàn của một NPC có thể làm mất thiện cảm với cô ấy. Cảnh hài chính: hai ông đang tranh công lấy lòng thì bị cả hai từ chối vì làm đổ ly nước. Các quyết định và phản ứng đều có tín hiệu ngắn, rõ trên màn hình để người chơi hiểu mình vừa được cộng hay trừ điểm.
 
-## Đoạn kết mở rộng
+## Đoạn kết màn 1
 
 Kết quả hiện thành hai mục riêng: **Ai ôm tiền** và **Ai có hẹn**. Một người có thể thắng cả hai, chỉ được một, hoặc trắng tay. Người thắng tiền nâng vali lên thì nhận thông báo: “Khoản thưởng đang chờ Approve.” Người có hẹn vừa ra tới cửa thì điện thoại rung: “Em rảnh tối nay không? Tiện xem giúp chị cái lỗi production.”
 
-Khung hình cuối: cả nhóm ngồi trước cửa công ty, người ôm vali khóa, người ôm laptop. Câu thoại: “Mai vẫn party nhé?” — “Ừ. Nhưng bật chia loot từ đầu.”
+Khung hình cuối: cả nhóm kéo nhau ra thang máy, người ôm vali khóa, người ôm laptop. Câu thoại: “Mai vẫn party nhé?” — “Ừ. Nhưng bật chia loot từ đầu.” Cửa thang máy không mở; màn hình sảnh hiện QUY TRÌNH: “Muốn tan làm, vui lòng hoàn thành các đầu việc còn tồn đọng.” Chuyển sang màn 2.

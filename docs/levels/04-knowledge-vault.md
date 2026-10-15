@@ -2,7 +2,11 @@
 
 Trạng thái: chốt thiết kế cho bản chơi thử ngày 2026-10-15; chưa triển khai. Các số liệu là cấu hình khởi đầu, cần cân bằng bằng chơi thử. Tài liệu này là nguồn thiết kế chi tiết của màn Hầm Tri Thức; không thay đổi luật màn Sprint.
 
-Tóm tắt trong bảng khu vực của [game-scenario.md](../game-scenario.md): Hai boss đứng ở hai cụm bục, khóa cầu nối bằng code bí truyền. Nhặt trang tài liệu để mở đường; đánh công tắc hai bên để vô hiệu khiên. Solo cho phép kích hoạt tuần tự trong cửa sổ dài hơn. Thoại: “Không hiểu thì cứ hỏi.” — trạng thái: Đang bận.
+Màn 4 · cánh NA. Tổng quan: [game-scenario.md](../game-scenario.md).
+
+Cốt truyện: trở về cánh NA, cả đội phải lấy lại kiến thức bàn giao bị giữ kín để mở đường lên Phòng Điều Hành ([05-control-room.md](05-control-room.md)).
+
+Tóm tắt: Hai boss đứng ở hai cụm bục, khóa cầu nối bằng code bí truyền. Nhặt trang tài liệu để mở đường; đánh công tắc hai bên để vô hiệu khiên. Solo cho phép kích hoạt tuần tự trong cửa sổ dài hơn. Thoại: “Không hiểu thì cứ hỏi.” — trạng thái: Đang bận.
 
 ## Mục tiêu và phạm vi
 
@@ -73,7 +77,7 @@ Thứ tự mỗi tick: xử lý thao tác người chơi và sát thương lên 
 
 Thua hiện lý do 4 giây rồi reset toàn bộ lượt: cả hai boss, tài liệu, cầu, công tắc, cà phê, người chơi, đạn và deadline. Thắng hiện 6 giây rồi sang tiệc nếu được cấu hình, nếu không về lobby. Reconnect khôi phục toàn bộ trạng thái hiện tại, không đặt lại timer hoặc phát lại hiệu ứng cũ. Tất cả rớt mạng thì dừng mọi timer gameplay.
 
-Bản đầu cho chủ phòng chọn Sprint hoặc Hầm Tri Thức trong lobby; mặc định Sprint. Server gửi ID/URL màn đã chọn khi start và reconnect. Chưa tự nối Sprint → Hầm Tri Thức; giữ nhánh tiệc sau màn được chọn. Thay đổi lựa chọn chỉ hợp lệ trong lobby.
+Bản đầu cho chủ phòng chọn Sprint hoặc Hầm Tri Thức trong lobby; mặc định Sprint. Server gửi ID/URL màn đã chọn khi start và reconnect. Chưa tự nối Sprint → Hầm Tri Thức; nhánh tiệc chỉ nối sau Sprint (extension màn 1); thắng Hầm Tri Thức thì về phòng chờ. Thay đổi lựa chọn chỉ hợp lệ trong lobby.
 
 ## Hiển thị, asset và hợp đồng kỹ thuật
 

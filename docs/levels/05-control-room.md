@@ -1,6 +1,8 @@
 # Phòng Điều Hành — QUY TRÌNH
 
-Khu vực cuối của chiến dịch. Trạng thái: định hướng, chưa có thiết kế chi tiết. Tổng quan: [game-scenario.md](../game-scenario.md).
+Màn 5 · màn cuối của chiến dịch. Trạng thái: định hướng, chưa có thiết kế chi tiết. Tổng quan: [game-scenario.md](../game-scenario.md).
+
+Cốt truyện: phòng máy chủ nơi QUY TRÌNH giữ nút Approve, cũng là thứ đang treo quỹ thưởng từ tiệc màn 1b.
 
 Máy in khổng lồ có tay máy, kết hợp task, khiên và sóng deadline. Những đường giấy nối sang các phòng ban chuyển sát thương đi; cắt đường giấy bằng đòn đánh, rồi đánh lõi máy in lúc nó kẹt giấy.
 

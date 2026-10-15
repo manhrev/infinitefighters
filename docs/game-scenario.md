@@ -41,7 +41,9 @@ Chi nhánh Việt Nam vừa thành lập của tập đoàn Trách Nhiệm Hữu
 
 Bạn là dev vừa nhận việc. HR đưa laptop, thẻ ra vào và lời chào: “Ở đây ai cũng có ownership. Quyền quyết định đang chờ cấp.”
 
-Một đêm, hệ thống quản trị biến thành thực thể QUY TRÌNH, khóa cửa văn phòng: “Muốn tan làm, vui lòng hoàn thành các đầu việc còn tồn đọng.” Mỗi task xong lại sinh hai task mới. Cả đội phải vượt qua năm khu vực để tìm người có quyền bấm Approve.
+Đêm chốt sprint, Đốc Công Hôm Qua dí cả đội ngay tại cánh NA (màn 1). Sprint “done”, cả đội được mời đi tiệc tổng kết và quay sang giành nhau quỹ thưởng (màn 1b). Quỹ thưởng hóa ra đang chờ Approve.
+
+Tiệc tan, hệ thống quản trị biến thành thực thể QUY TRÌNH, khóa cửa văn phòng: “Muốn tan làm, vui lòng hoàn thành các đầu việc còn tồn đọng.” Mỗi task xong lại sinh hai task mới. Để tìm người có quyền bấm Approve, cả đội đi tiếp bốn khu vực: sang cánh Vacancy qua Sảnh Onboarding (màn 2) và Tháp Kiến Trúc (màn 3), trở về cánh NA xuống Hầm Tri Thức (màn 4), rồi lên Phòng Điều Hành đối mặt QUY TRÌNH (màn 5).
 
 ## Cách chơi cốt lõi
 
@@ -172,7 +174,7 @@ Mỗi khu vực có một âm sắc riêng: Sảnh Onboarding dùng chuông họ
 - Đấu khoảng 3–5 phút. Thắng khi hạ đối thủ; hết giờ so máu còn lại.
 - Phản đòn đúng lúc kích hoạt “Có biên bản”, bật lại đạn task.
 
-### Co-op — Sprint cuối cùng
+### Co-op — Chiến dịch
 
 - Mục tiêu ban đầu: 1–5 người. Sample hình ảnh thể hiện 4 người.
 - Cùng vượt màn và đánh boss; tắt sát thương và va chạm cứng giữa đồng đội để tránh chặn đường nhau.
@@ -197,16 +199,16 @@ Thông số dưới đây là giả định thiết kế ban đầu, cần thử
 
 ## Các khu vực và boss
 
-Mỗi khu vực là một màn, mô tả trong file riêng ở `levels/`.
+Mỗi khu vực là một màn, chơi theo thứ tự dưới đây; mô tả trong file riêng ở `levels/`.
 
-| Khu vực | Boss | Trạng thái | Mô tả |
-| --- | --- | --- | --- |
-| Đường Đua Sprint — NA | Đốc Công Hôm Qua | Đã triển khai (MVP) | [01-sprint.md](levels/01-sprint.md) |
-| ↳ Extension màn 1: “Anh em cây khế” | Không (loạn đấu giành tiền) | Đã triển khai, trừ phần NPC | [01b-party.md](levels/01b-party.md) |
-| Sảnh Onboarding — Vacancy | Ngài Định Hướng | Định hướng | [02-onboarding.md](levels/02-onboarding.md) |
-| Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
-| Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
-| Phòng Điều Hành | QUY TRÌNH | Định hướng; gồm trận cuối và kết thúc | [05-control-room.md](levels/05-control-room.md) |
+| # | Khu vực | Boss | Trạng thái | Mô tả |
+| --- | --- | --- | --- | --- |
+| 1 | Đường Đua Sprint — NA | Đốc Công Hôm Qua | Đã triển khai (MVP) | [01-sprint.md](levels/01-sprint.md) |
+| 1b | ↳ Extension màn 1: “Anh em cây khế” | Không (loạn đấu giành tiền) | Đã triển khai, trừ phần NPC | [01b-party.md](levels/01b-party.md) |
+| 2 | Sảnh Onboarding — Vacancy | Ngài Định Hướng | Định hướng | [02-onboarding.md](levels/02-onboarding.md) |
+| 3 | Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
+| 4 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
+| 5 | Phòng Điều Hành | QUY TRÌNH | Định hướng; gồm trận cuối và kết thúc | [05-control-room.md](levels/05-control-room.md) |
 
 ## Hướng hình ảnh và asset
 
