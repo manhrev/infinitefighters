@@ -17,7 +17,10 @@ const sheets = new Set(assets.filter(a => a.frames > 1).map(a => a.key))
 
 export function preloadAssets(scene: Phaser.Scene) {
   for (const a of assets) {
-    if (!a.url) throw new Error(`asset missing on disk: ${a.path}`)
+    if (!a.url) { // the generator may list art before it is written: skip it, the game falls back
+      console.warn(`asset missing on disk: ${a.path}`)
+      continue
+    }
     if (a.frames > 1) scene.load.spritesheet(a.key, a.url, { frameWidth: a.frameWidth, frameHeight: a.frameHeight })
     else scene.load.image(a.key, a.url)
   }
@@ -25,7 +28,7 @@ export function preloadAssets(scene: Phaser.Scene) {
 
 export function createAnims(scene: Phaser.Scene) {
   for (const a of assets) {
-    if (a.frames > 1 && a.fps > 0) {
+    if (a.frames > 1 && a.fps > 0 && scene.textures.exists(a.key)) {
       scene.anims.create({ key: a.key, frames: scene.anims.generateFrameNumbers(a.key), frameRate: a.fps, repeat: a.loop ? -1 : 0 })
     }
   }

@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { lobbyMusic, saveSettings, settings } from './audio'
 import { GameScene, VIEW_H, VIEW_W } from './game'
 import { connect, send, world, type Join, type ServerMsg } from './net'
 
@@ -26,6 +27,7 @@ function onMessage(m: ServerMsg) {
       statusEl.textContent = ''
       joinForm.hidden = true
       roomEl.hidden = false
+      if (m.phase === 'lobby') lobbyMusic(true)
       break
     case 'lobby': {
       world.lobby = m.players
@@ -43,11 +45,13 @@ function onMessage(m: ServerMsg) {
         game = undefined
         world.snapshots = []
         lobbyEl.hidden = false
+        lobbyMusic(true)
       }
       break
     }
     case 'start':
       lobbyEl.hidden = true
+      lobbyMusic(false)
       startGame(m.level)
       break
   }
@@ -104,6 +108,20 @@ function startGame(level: string) {
   })
   game.scene.add('game', GameScene, true, { level })
 }
+
+// Audio settings panel: Master / Music / SFX / mute, remembered per browser.
+for (const k of ['master', 'music', 'sfx'] as const) {
+  const input = $<HTMLInputElement>(`vol-${k}`)
+  input.value = String(Math.round(settings[k] * 100))
+  input.addEventListener('input', () => { settings[k] = Number(input.value) / 100; saveSettings() })
+}
+const muteBox = $<HTMLInputElement>('vol-mute')
+muteBox.checked = settings.muted
+muteBox.addEventListener('change', () => { settings.muted = muteBox.checked; saveSettings() })
+$('sound-toggle').addEventListener('click', () => { $('sound').hidden = !$('sound').hidden })
+// Browsers block sound until the first interaction: retry the lobby music then.
+addEventListener('pointerdown', () => { if (!game && !roomEl.hidden) lobbyMusic(true) }, { once: true })
+addEventListener('keydown', () => { if (!game && !roomEl.hidden) lobbyMusic(true) }, { once: true })
 
 if (session.token) join(session)
 else showJoin()

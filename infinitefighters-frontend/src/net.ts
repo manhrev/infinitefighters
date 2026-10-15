@@ -2,7 +2,7 @@
 
 export type Input = {
   left: boolean; right: boolean; down: boolean; jump: boolean
-  attack: boolean; skill: boolean; dash: boolean; interact: boolean
+  attack: boolean; skill: boolean; special: boolean; dash: boolean; interact: boolean
   ping: number // 0 none, 1 Tôi nhận, 2 Cần hỗ trợ, 3 Chặn scope
 }
 
@@ -14,21 +14,31 @@ export type PlayerState = {
   facing: number; ground: boolean; away: boolean
   hp: number
   action: '' | 'attack' | 'pulse' | 'dash' | 'hurt' | 'down' | 'revive'
+    | 'charge' | 'smash' | 'shield' | 'stamp' | 'hotfix' | 'timecard'
   revive: number // 0..1
   ping: number
+  skillMs: number; skillOf: number // slot skill cooldown left / full
+  charge: number // P1: 0..1 while charging
   // Counters only grow: a change means "play the one-shot now".
-  attacks: number; pulses: number; dashes: number; hurts: number
+  attacks: number; pulses: number; dashes: number; hurts: number; hits: number
+  casts: number; skillHits: number; cancels: number; reflects: number; healed: number; coffees: number
 }
 
-export type BossState = { x: number; y: number; facing: number; hp: number; maxHp: number; state: string; hits: number }
-export type ShotState = { id: number; kind: 'card' | 'pulse'; x: number; y: number; vx: number }
+export type BossState = {
+  x: number; y: number; facing: number; hp: number; maxHp: number; state: string
+  hits: number; marks: number; markMs: number // counters reset each attempt: a decrease is a reset
+  chargeFrom?: number; chargeTo?: number // locked charge corridor
+}
+export type ShotState = { id: number; kind: 'card' | 'pulse' | 'stamp' | 'returned'; x: number; y: number; vx: number }
+export type ZoneState = { id: number; x: number; y: number; ms: number }
 export type WaveState = { id: number; x: number; dir: number }
+export type ItemState = { id: number; kind: 'coffee'; x: number; y: number }
 
 export type Snapshot = {
   type: 'snapshot'; tick: number; serverTime: number
   deadlineMs: number; deadlineOf: number
   result: '' | 'won' | 'lost'
-  players: PlayerState[]; boss: BossState; shots: ShotState[]; waves: WaveState[]
+  players: PlayerState[]; boss: BossState; shots: ShotState[]; waves: WaveState[]; items: ItemState[]; zones: ZoneState[]
 }
 
 export type ServerMsg =
