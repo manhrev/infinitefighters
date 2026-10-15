@@ -7,7 +7,7 @@
   <style>
     html, body { margin: 0; height: 100%; background: #0B1020; color: #F2E3C2; font: 16px/1.4 ui-monospace, Menlo, monospace; overflow: hidden; }
     #game { position: fixed; inset: 0; }
-    .panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100% - 32px)); box-sizing: border-box;
+    .panel { max-height: calc(100% - 32px); overflow-y: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100% - 32px)); box-sizing: border-box;
              padding: 24px; background: #14234A; border: 2px solid #3FE0FF; }
     h1 { margin: 0 0 16px; font-size: 24px; color: #3FE0FF; letter-spacing: 2px; }
     label { display: block; margin-bottom: 12px; }
@@ -20,6 +20,10 @@
     #status { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); margin: 0; padding: 4px 12px; background: #B8303A; color: #fff; }
     #status:empty { display: none; }
     .keys { margin: 16px 0 0; font-size: 13px; color: #9FB3D9; }
+    .pick { margin: 0 0 8px; }
+    .level { display: block; width: 100%; margin-bottom: 8px; text-align: left; }
+    .level b { display: block; margin-bottom: 4px; }
+    .level span { display: block; font-size: 12px; line-height: 1.35; }
     #sound-toggle { position: fixed; bottom: 12px; right: 12px; z-index: 5; padding: 4px 10px; }
     #sound { position: fixed; bottom: 48px; right: 12px; z-index: 5; padding: 12px 16px; background: #14234A; border: 2px solid #3FE0FF; font-size: 13px; }
     #sound label { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -38,8 +42,12 @@
     </form>
     <div id="room" hidden>
       <ul id="players"></ul>
-      <button id="start" hidden>Bắt đầu</button>
-      <p id="wait">Chờ chủ phòng bắt đầu…</p>
+      <div id="levels" hidden>
+        <p class="pick">Chọn màn:</p>
+        <button class="level" data-level="coop"><b>Đường Đua Sprint</b><span>Cả team đánh boss Đốc Công Hôm Qua trước DEADLINE: né task, sóng deadline, cú lao và hồ sơ rơi, cứu đồng đội. Hạ boss xong là vào tiệc.</span></button>
+        <button class="level" data-level="party"><b>Anh em cây khế</b><span>Tiệc tổng kết, quỹ thưởng chỉ đủ một suất. Nhặt tiền két phun, đánh rơi tiền của đối thủ, giữ E ở ATM 3 giây để gửi. Sau 3 phút, ai gửi nhiều nhất ôm vali.</span></button>
+      </div>
+      <p id="wait">Chờ chủ phòng chọn màn…</p>
     </div>
     <p class="keys">A/D chạy · Space nhảy · S+Space xuống bục · J đánh · K xung code · L/Shift lướt · R chiêu riêng · giữ E cứu đồng đội · 1/2/3 ping</p>
   </div>

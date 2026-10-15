@@ -26,7 +26,7 @@ const level = (group: 'music' | 'sfx') => settings.muted ? 0 : settings.master *
 
 export function preloadAudio(scene: Phaser.Scene) {
   for (const a of manifest.assets) {
-    if (a.key.startsWith('player-') || a.key === 'lobby' || a.key === 'sprint') continue
+    if (a.key.startsWith('player-') || a.key === 'lobby' || a.key === 'sprint') continue // not used in a match
     const files = [url(a.path), url(a.fallback)].filter(Boolean)
     if (files.length) scene.load.audio(a.key, files)
   }

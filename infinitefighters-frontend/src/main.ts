@@ -5,7 +5,7 @@ import { connect, send, world, type Join, type ServerMsg } from './net'
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 const lobbyEl = $('lobby'), joinForm = $<HTMLFormElement>('join'), roomEl = $('room')
-const playersEl = $('players'), startBtn = $<HTMLButtonElement>('start'), waitEl = $('wait'), statusEl = $('status')
+const playersEl = $('players'), levelsEl = $('levels'), waitEl = $('wait'), statusEl = $('status')
 
 // Remembered so a reload or a dropped socket resumes the same character.
 type Session = { name: string; code: string; token: string }
@@ -38,11 +38,12 @@ function onMessage(m: ServerMsg) {
         li.classList.toggle('away', !p.connected)
         return li
       }))
-      startBtn.hidden = !me?.host
+      levelsEl.hidden = !me?.host
       waitEl.hidden = !!me?.host
       if (m.phase === 'lobby' && game) { // match won: back to the lobby
         game.destroy(true)
         game = undefined
+        gameLevel = ''
         world.snapshots = []
         lobbyEl.hidden = false
         lobbyMusic(true)
@@ -52,7 +53,7 @@ function onMessage(m: ServerMsg) {
     case 'start':
       lobbyEl.hidden = true
       lobbyMusic(false)
-      startGame(m.level)
+      startGame(m.level, m.mode)
       break
   }
 }
@@ -92,10 +93,18 @@ joinForm.addEventListener('submit', e => {
   save()
   join(session)
 })
-startBtn.addEventListener('click', () => send({ type: 'start' }))
+levelsEl.querySelectorAll<HTMLButtonElement>('.level').forEach(b =>
+  b.addEventListener('click', () => send({ type: 'start', level: b.dataset.level })))
 
-function startGame(level: string) {
-  if (game) return // reconnect mid-match: the scene is already running
+let gameLevel = ''
+
+function startGame(level: string, mode: 'coop' | 'party') {
+  if (game && level === gameLevel) return // reconnect mid-match: the scene is already running
+  if (game) { // boss beaten, on to the party: a fresh scene, no old snapshots
+    game.destroy(true)
+    world.snapshots = []
+  }
+  gameLevel = level
   game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
@@ -106,7 +115,7 @@ function startGame(level: string) {
     // Fill the window, keep 16:9. pixelArt keeps nearest-neighbour, so a non-integer scale gives slightly uneven pixels, not blur.
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   })
-  game.scene.add('game', GameScene, true, { level })
+  game.scene.add('game', GameScene, true, { level, mode })
 }
 
 // Audio settings panel: Master / Music / SFX / mute, remembered per browser.

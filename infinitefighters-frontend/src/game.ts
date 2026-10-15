@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { createAnims, firstFrame, preloadAssets } from './assets'
 import { SceneAudio, preloadAudio } from './audio'
+import { PartyView } from './party'
 import { send, world, type Input, type PlayerState, type Snapshot } from './net'
 
 // A compact 1280×720 view of a crowded arena (concept: assets/concepts/multiplayer-arena-sample-02.png),
@@ -33,6 +34,7 @@ const CORAL = '#FF5A5A', CREAM = '#F2E3C2', CYAN = '#3FE0FF', OUTLINE = '#0B1020
 const RENDER_DELAY_MS = 70
 // HUD rows, top of the view: player chips, then the own skill panel; the arena below stays clear.
 const CHIP_W = 124
+const PARTY_CHIP_W = 150 // room for HP, wallet and deposited coins
 const DEADLINE_X = 760, DEADLINE_W = 480 // top right, clear of the chips
 const SKILL_Y = 52
 // Background decoration is dimmed so players, desks and hazards stand out.
@@ -45,19 +47,24 @@ type Avatar = {
   sprite: Phaser.GameObjects.Sprite
   label: Phaser.GameObjects.Text
   ping: Phaser.GameObjects.Text
-  bar: Phaser.GameObjects.Graphics // revive progress or P1 charge
+  bar: Phaser.GameObjects.Graphics // revive progress, P1 charge, or party HP
   fx?: Placed // effect following the player during a held skill
   fxAction?: string
   step: number // next footstep time
 }
 
-type Chip = { portrait: Phaser.GameObjects.Image; name: Phaser.GameObjects.Text; hearts: Phaser.GameObjects.Image[] }
+type Chip = {
+  portrait: Phaser.GameObjects.Image; name: Phaser.GameObjects.Text
+  hearts: Phaser.GameObjects.Image[]; money?: Phaser.GameObjects.Text // money: party only
+}
 
 const text = (s: Phaser.Scene, x: number, y: number, size: number, color: string) =>
   s.add.text(x, y, '', { fontFamily: 'monospace', fontSize: `${size}px`, fontStyle: 'bold', color, stroke: OUTLINE, strokeThickness: 4 })
 
 export class GameScene extends Phaser.Scene {
   private levelUrl = ''
+  private mode: 'coop' | 'party' = 'coop'
+  private partyView?: PartyView
   private floorY = 0
   private avatars = new Map<number, Avatar>()
   private shots = new Map<number, Phaser.GameObjects.Sprite>()
@@ -90,7 +97,10 @@ export class GameScene extends Phaser.Scene {
 
   constructor() { super('game') }
 
-  init(data: { level: string }) { this.levelUrl = data.level }
+  init(data: { level: string; mode?: 'coop' | 'party' }) {
+    this.levelUrl = data.level
+    this.mode = data.mode ?? 'coop'
+  }
 
   preload() {
     preloadAssets(this)
@@ -119,6 +129,7 @@ export class GameScene extends Phaser.Scene {
     for (const o of objects) {
       if (o.type === 'prop') {
         const key = `sprites/props/${o.name}`
+        if (!this.textures.exists(key)) continue // party art not generated yet
         this.add.image(o.x!, o.y!, key, firstFrame(key)).setOrigin(0.5, 1).setTint(DIM)
         if (o.name === 'ceiling-light') this.hangLight(o.x!, o.y!)
       }
@@ -128,6 +139,10 @@ export class GameScene extends Phaser.Scene {
     this.bossMark = this.fx('boss-stamp-mark', 0, 0, () => this.add.circle(0, 0, 18).setStrokeStyle(3, 0xffd25e))
     this.bossMark.setVisible(false)
     this.bossLine = text(this, 0, 0, 13, CORAL).setOrigin(0.5, 1).setDepth(6)
+    if (this.mode === 'party') {
+      this.boss.setVisible(false)
+      this.partyView = new PartyView(this, this.sfx, objects)
+    }
     // Floor telegraphs sit on the floor line only, never over platform edges.
     this.warning = this.add.tileSprite(map.tileWidth, this.floorY, map.widthInPixels - 2 * map.tileWidth, 8, 'sprites/vfx/floor-warning', 0)
       .setOrigin(0, 1).setVisible(false)
@@ -144,7 +159,9 @@ export class GameScene extends Phaser.Scene {
       skillBar: this.add.graphics().setScrollFactor(0).setDepth(10),
     }
     this.add.image(DEADLINE_X - 16, 19, 'ui/deadline-icon').setScale(1.5).setScrollFactor(0).setDepth(11)
-    text(this, VIEW_W / 2, VIEW_H - 26, 13, CREAM).setText('ĐỐC CÔNG HÔM QUA').setOrigin(0.5, 1).setScrollFactor(0).setDepth(11)
+    if (this.mode === 'coop') {
+      text(this, VIEW_W / 2, VIEW_H - 26, 13, CREAM).setText('ĐỐC CÔNG HÔM QUA').setOrigin(0.5, 1).setScrollFactor(0).setDepth(11)
+    }
 
     this.keys = this.input.keyboard!.addKeys(
       'W,A,S,D,UP,LEFT,DOWN,RIGHT,SPACE,J,K,L,SHIFT,E,R,ONE,TWO,THREE',
@@ -160,11 +177,15 @@ export class GameScene extends Phaser.Scene {
     if (!pair) return
     const [a, b, k] = pair
     if (b !== this.prev) {
-      if (this.prev) this.playEvents(this.prev, b)
+      if (this.prev) {
+        this.playEvents(this.prev, b)
+        this.partyView?.events(this.prev, b)
+      }
       this.prev = b
     }
     this.drawPlayers(a, b, k, time)
-    this.drawBoss(b, time)
+    if (this.partyView) this.partyView.update(a, b, k)
+    else this.drawBoss(b, time)
     this.drawHazards(a, b, k)
     this.drawHud(b, time)
   }
@@ -209,7 +230,7 @@ export class GameScene extends Phaser.Scene {
 
   private startMusic() {
     this.urgent = false
-    this.sfx.loop('music', 'boss', 'music')
+    this.sfx.loop('music', this.mode === 'party' && this.sfx.has('party') ? 'party' : 'boss', 'music')
     this.sfx.loop('ambience', 'office', 'music')
   }
 
@@ -274,6 +295,7 @@ export class GameScene extends Phaser.Scene {
     // One heal cue per snapshot, however many players were healed.
     if (now.players.some(p => p.healed > (was.players.find(o => o.id === p.id)?.healed ?? p.healed))) s.play('mint-hotfix-heal')
 
+    if (this.mode === 'party') return // no boss; party cues are in PartyView
     // Boss. Its counters reset with each attempt: only growth is an event.
     const b = now.boss, c = was.boss
     if (b.marks > c.marks) s.play('amber-mark-hit', { x: b.x })
@@ -292,7 +314,7 @@ export class GameScene extends Phaser.Scene {
           break
         case 'charge': s.play('boss-charge', crit); break
         case 'drop_windup':
-          s.play(s.has('boss-drop-windup') ? 'boss-drop-windup' : 'ping', crit) // placeholder until the sound exists
+          s.play(s.has('boss-drop-windup') ? 'boss-drop-windup' : 'ping', crit)
           this.say('Em đang ở trên thì tiện nhận luôn nhé!')
           break
         case 'drop_jam': s.play('boss-paper-jam', { x: b.x }); break
@@ -350,7 +372,7 @@ export class GameScene extends Phaser.Scene {
   // Players standing close together: lift each label above the ones it would overlap.
   private unstackLabels() {
     const placed: Phaser.Geom.Rectangle[] = []
-    const avs = [...this.avatars.values()].sort((a, b) => b.label.y - a.label.y)
+    const avs = [...this.avatars.values()].filter(av => av.label.visible).sort((a, b) => b.label.y - a.label.y)
     for (const av of avs) {
       let box = av.label.getBounds()
       while (placed.some(p => Phaser.Geom.Intersects.RectangleToRectangle(p, box))) {
@@ -413,10 +435,11 @@ export class GameScene extends Phaser.Scene {
     }
     this.attachedFx(av, p, x, y)
 
-    s.setPosition(x, y).setFlipX(p.facing < 0).setAlpha(p.away ? 0.4 : 1)
+    const blink = (p.pvp?.protectMs ?? 0) > 0 && Math.floor(time / 100) % 2 === 0 // spawn protection
+    s.setPosition(x, y).setFlipX(p.facing < 0).setAlpha(p.away ? 0.4 : blink ? 0.35 : 1).setVisible(!p.pvp?.left)
     const me = p.id === world.myId ? '▼ ' : ''
     const top = Math.round(y) - 60 // above the tallest (54 px) design
-    av.label.setText(`${me}P${slot + 1} ${info?.name ?? ''}`).setPosition(Math.round(x), top)
+    av.label.setText(`${me}P${slot + 1} ${info?.name ?? ''}`).setPosition(Math.round(x), top).setVisible(!p.pvp?.left)
     av.ping.setText(PINGS[p.ping] ? `「${PINGS[p.ping]}」` : '').setPosition(Math.round(x), top - 18)
 
     av.bar.clear()
@@ -424,7 +447,13 @@ export class GameScene extends Phaser.Scene {
       av.bar.fillStyle(0x0b1020).fillRect(x - 20, y - 66, 40, 6)
       av.bar.fillStyle(color).fillRect(x - 19, y - 65, 38 * frac, 4)
     }
-    if (p.action === 'down') {
+    if (p.pvp) { // party: 100-HP bar, respawn countdown, P3 mark
+      if (p.pvp.left) return
+      if (p.pvp.dead) av.label.setText(`${av.label.text} · hồi sinh ${Math.ceil(p.pvp.respawnMs / 1000)}s`)
+      else bar(p.pvp.hp / 100, PartyView.hpColor(p.pvp.hp))
+      if (p.pvp.markedBy) av.label.setText(`${av.label.text} ◆`)
+      if (p.action === 'charge') av.bar.fillStyle(0x3fe0ff).fillRect(x - 19, y - 71, 38 * p.charge, 3)
+    } else if (p.action === 'down') {
       bar(p.revive, 0x8ef0b5)
       av.label.setText(`${av.label.text} · Nghỉ phép`)
     } else if (p.action === 'charge') bar(p.charge, 0x3fe0ff)
@@ -589,6 +618,7 @@ export class GameScene extends Phaser.Scene {
         v = { warn, mark, stack, x: d.x, bottom: d.bottom }
         this.drops.set(d.id, v)
       }
+      if (v.warn instanceof Phaser.GameObjects.TileSprite) v.warn.setFrame(Math.floor(this.time.now / 166) % 2)
       v.stack.setVisible(d.ms === 0)
       if (d.ms === 0) {
         const da = a.drops.find(o => o.id === d.id) ?? d
@@ -625,19 +655,20 @@ export class GameScene extends Phaser.Scene {
 
   private drawHud(b: Snapshot, time: number) {
     const { deadline, deadlineText, bossBar, result } = this.hud
-    const left = Math.max(0, b.deadlineMs) / Math.max(1, b.deadlineOf)
+    const [left, label, flash] = this.partyView ? this.partyView.timer(b, time) : this.deadlineInfo(b, time)
     const w = DEADLINE_W, x = DEADLINE_X
     deadline.clear().fillStyle(0x0b1020).fillRect(x - 2, 10, w + 4, 18)
-    deadline.fillStyle(left < 0.2 ? 0xff5a5a : 0x3fe0ff).fillRect(x, 12, w * left, 14)
-    const secs = Math.ceil(Math.max(0, b.deadlineMs) / 1000)
-    const flash = b.deadlineMs > 0 && b.deadlineMs <= 10_000 && Math.floor(time / 250) % 2 === 0 // with the last-10s tick
-    deadlineText.setText(`DEADLINE ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`).setColor(flash ? CORAL : CREAM)
+    deadline.fillStyle(left < 0.2 ? 0xff5a5a : 0x3fe0ff).fillRect(x, 12, w * Math.max(0, left), 14)
+    deadlineText.setText(label).setColor(flash ? CORAL : CREAM)
 
-    const boss = b.boss
-    const bw = 520, bx = VIEW_W / 2 - bw / 2
-    const open = boss.state === 'wind_clock' || boss.state === 'charge_recover' || boss.state === 'drop_jam' // good moment to hit
-    bossBar.clear().fillStyle(0x0b1020).fillRect(bx - 2, VIEW_H - 22, bw + 4, 14)
-    bossBar.fillStyle(open ? 0xffd25e : 0xff5a5a).fillRect(bx, VIEW_H - 20, bw * (boss.hp / Math.max(1, boss.maxHp)), 10)
+    bossBar.clear()
+    if (!this.partyView) {
+      const boss = b.boss
+      const bw = 520, bx = VIEW_W / 2 - bw / 2
+      const open = boss.state === 'wind_clock' || boss.state === 'charge_recover' || boss.state === 'drop_jam' // good moment to hit
+      bossBar.fillStyle(0x0b1020).fillRect(bx - 2, VIEW_H - 22, bw + 4, 14)
+      bossBar.fillStyle(open ? 0xffd25e : 0xff5a5a).fillRect(bx, VIEW_H - 20, bw * (boss.hp / Math.max(1, boss.maxHp)), 10)
+    }
 
     this.drawChips(b)
     this.drawSkill(b)
@@ -648,7 +679,15 @@ export class GameScene extends Phaser.Scene {
     } else result.setText('')
   }
 
-  // Own skill, bottom left: icon (once the art exists), name, key and cooldown.
+  // deadlineInfo is the co-op DEADLINE bar: [fraction left, label, flash in the last 10 s].
+  private deadlineInfo(b: Snapshot, time: number): [number, string, boolean] {
+    const secs = Math.ceil(Math.max(0, b.deadlineMs) / 1000)
+    const flash = b.deadlineMs > 0 && b.deadlineMs <= 10_000 && Math.floor(time / 250) % 2 === 0 // with the last-10s tick
+    return [Math.max(0, b.deadlineMs) / Math.max(1, b.deadlineOf),
+      `DEADLINE ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`, flash]
+  }
+
+  // Own skill, top left under the chips: icon (once the art exists), name, key and cooldown.
   private drawSkill(b: Snapshot) {
     const me = b.players.find(p => p.id === world.myId)
     if (!me) return
@@ -663,18 +702,20 @@ export class GameScene extends Phaser.Scene {
     skillBar.fillStyle(ready ? 0x3fe0ff : 0x2f4a7f).fillRect(46, SKILL_Y + 20, 200 * (1 - me.skillMs / Math.max(1, me.skillOf)), 4)
   }
 
-  // Status chips in a row, top left (as in the concept): portrait, P# name, hearts.
+  // Status chips in a row, top left (as in the concept): portrait, P# name, then hearts (co-op) or
+  // HP, wallet and deposited coins (party).
   private drawChips(b: Snapshot) {
     b.players.forEach((p, i) => {
       const slot = this.slotOf(p.id)
       let chip = this.chips[i]
       if (!chip) {
-        const x = 12 + i * CHIP_W
+        const x = 12 + i * (p.pvp ? PARTY_CHIP_W : CHIP_W)
         chip = {
           portrait: this.add.image(x, 8, PORTRAITS[slot]).setOrigin(0).setScale(1.25).setScrollFactor(0).setDepth(10),
           name: text(this, x + 34, 4, 12, SLOT_HEX[slot]).setScrollFactor(0).setDepth(10),
-          hearts: Array.from({ length: PLAYER_HP }, (_, h) =>
+          hearts: p.pvp ? [] : Array.from({ length: PLAYER_HP }, (_, h) =>
             this.add.image(x + 34 + h * 15, 24, 'ui/heart', 0).setOrigin(0).setScale(1.5).setScrollFactor(0).setDepth(10)),
+          money: p.pvp ? text(this, x + 34, 21, 10, CREAM).setScrollFactor(0).setDepth(10) : undefined,
         }
         this.chips[i] = chip
       }
@@ -682,9 +723,10 @@ export class GameScene extends Phaser.Scene {
       chip.portrait.setTexture(PORTRAITS[slot]).setAlpha(p.away ? 0.4 : 1)
       chip.name.setColor(SLOT_HEX[slot]).setText(`P${slot + 1} ${name}${p.away ? ' ⚠' : ''}`)
       chip.hearts.forEach((h, n) => h.setFrame(n < p.hp ? 0 : 1))
+      if (chip.money && this.partyView && p.pvp) chip.money.setText(this.partyView.chipLine(p))
     })
     for (const chip of this.chips.splice(b.players.length)) {
-      chip.portrait.destroy(); chip.name.destroy(); chip.hearts.forEach(h => h.destroy())
+      chip.portrait.destroy(); chip.name.destroy(); chip.hearts.forEach(h => h.destroy()); chip.money?.destroy()
     }
   }
 

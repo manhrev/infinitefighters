@@ -21,7 +21,22 @@ export type PlayerState = {
   charge: number // P1: 0..1 while charging
   // Counters only grow: a change means "play the one-shot now".
   attacks: number; pulses: number; dashes: number; hurts: number; hits: number
+  pvp?: PvPState // party only
   casts: number; skillHits: number; cancels: number; reflects: number; healed: number; coffees: number
+}
+
+// Party PvP phase (mirrors pvpMsg / partyMsg in protocol.go).
+export type PvPState = {
+  hp: number; wallet: number; balance: number; kills: number; dead: boolean; left: boolean
+  respawnMs: number; protectMs: number; markedBy: number
+  pickups: number; drops: number; deposits: number; atmStarts: number; atmCancels: number; respawns: number; marks: number
+}
+export type PartyState = {
+  countdownMs: number; timeLeftMs: number; solo: boolean; safeX: number; safeY: number; sprays: number
+  banner?: string
+  bundles: { id: number; x: number; y: number; value: number }[]
+  atms: { x: number; y: number; user: number; ms: number; of: number; amount: number }[]
+  results?: { id: number; balance: number; rank: number; kills: number }[]
 }
 
 export type BossState = {
@@ -41,12 +56,13 @@ export type Snapshot = {
   deadlineMs: number; deadlineOf: number
   result: '' | 'won' | 'lost'
   players: PlayerState[]; boss: BossState; shots: ShotState[]; waves: WaveState[]; items: ItemState[]; zones: ZoneState[]; drops: DropState[]
+  mode: 'coop' | 'party'; party?: PartyState
 }
 
 export type ServerMsg =
   | { type: 'welcome'; id: number; token: string; phase: string }
   | { type: 'lobby'; phase: 'lobby' | 'playing'; players: LobbyPlayer[] }
-  | { type: 'start'; level: string }
+  | { type: 'start'; level: string; mode: 'coop' | 'party' }
   | Snapshot
 
 export type Join = { name?: string; code?: string; token?: string }
