@@ -54,6 +54,11 @@ Tiệc tan, hệ thống quản trị biến thành thực thể QUY TRÌNH, kh�
 - Vòng lặp: vượt chướng ngại → nhặt cà phê/tài liệu → đến checkpoint → học nhịp đánh boss → mở khu vực tiếp theo.
 - Ưu tiên cảm giác di chuyển và chiến đấu; tình tiết công sở xuất hiện qua đòn đánh, vật thể và câu thoại ngắn.
 
+### Ý tưởng chiêu thức (chưa chốt)
+
+- **Méc sếp:** người chơi rút điện thoại gọi méc sếp. Sếp ập xuống, ra một đòn rồi biến mất.
+- **Gọi sếp nhà người ta:** triệu hồi sếp của địch. Sếp nhảy xuống bắt nạt và đánh đấm chính lính của mình.
+
 ## Âm thanh
 
 Bộ âm thanh được lưu riêng trong `assets/audio/`, gồm nhạc nền, hiệu ứng chung và phần bổ sung cho năm chiêu riêng; cần tích hợp và nghe thử phối âm trong gameplay. Phạm vi MVP vẫn là một màn co-op 1–5 người, boss Đốc Công Hôm Qua. Các phần âm thanh cho khu vực khác và PvP thuộc bản mở rộng.
