@@ -12,7 +12,7 @@ export const VIEW_H = 720
 const SLOT_COLORS = ['teal', 'violet', 'amber', 'mint', 'orange']
 const SLOT_HEX = ['#4FD1C5', '#B08CF0', '#FFD25E', '#8EF0B5', '#FFA25E']
 const PORTRAITS = ['ui/portrait', 'ui/portrait-violet', 'ui/portrait-amber', 'ui/portrait-mint', 'ui/portrait-orange']
-// Slot skills (docs/game-scenario.md, "Năm chiêu riêng"). Icons may not exist yet.
+// Slot skills (docs/levels/sprint.md, "Năm chiêu riêng"). Icons may not exist yet.
 const SKILLS = [
   { name: 'Em sửa có một dòng', icon: 'ui/skills/one-line-fix', quote: 'Một dòng thôi, sao production tối rồi?' },
   { name: 'Không thuộc scope em', icon: 'ui/skills/out-of-scope', quote: 'Em xin phép loop anh vào xử lý.' },

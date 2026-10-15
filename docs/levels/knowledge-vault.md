@@ -2,6 +2,8 @@
 
 Trạng thái: chốt thiết kế cho bản chơi thử ngày 2026-10-15; chưa triển khai. Các số liệu là cấu hình khởi đầu, cần cân bằng bằng chơi thử. Tài liệu này là nguồn thiết kế chi tiết của màn Hầm Tri Thức; không thay đổi luật màn Sprint.
 
+Tóm tắt trong bảng khu vực của [game-scenario.md](../game-scenario.md): Hai boss đứng ở hai cụm bục, khóa cầu nối bằng code bí truyền. Nhặt trang tài liệu để mở đường; đánh công tắc hai bên để vô hiệu khiên. Solo cho phép kích hoạt tuần tự trong cửa sổ dài hơn. Thoại: “Không hiểu thì cứ hỏi.” — trạng thái: Đang bận.
+
 ## Mục tiêu và phạm vi
 
 Màn co-op 1–5 người: học đường đi, mở cầu bằng tài liệu, dùng công tắc mở khiên rồi hạ hai boss. Độ khó đến từ thay đổi vị trí và phối hợp, không tăng sát thương mỗi đòn. Mọi slot đều chơi solo được; không yêu cầu P2 phản đạn hoặc P4 hồi máu để qua màn.
