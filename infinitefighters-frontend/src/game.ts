@@ -3,8 +3,10 @@ import { createAnims, firstFrame, preloadAssets } from './assets'
 import { SceneAudio, preloadAudio } from './audio'
 import { send, world, type Input, type PlayerState, type Snapshot } from './net'
 
-export const VIEW_W = 1920
-export const VIEW_H = 1080
+// A compact 1280×720 view of a crowded arena (concept: assets/concepts/multiplayer-arena-sample-02.png),
+// scaled up to fill the window: characters read about 1.5× larger than at 1920×1080.
+export const VIEW_W = 1280
+export const VIEW_H = 720
 
 const SLOT_COLORS = ['teal', 'violet', 'amber', 'mint', 'orange']
 const SLOT_HEX = ['#4FD1C5', '#B08CF0', '#FFD25E', '#8EF0B5', '#FFA25E']
@@ -22,12 +24,19 @@ const PLAYER_HP = 5 // server playerHP
 const BOSS = 'sprites/boss/doc-cong/'
 const SKILL_VFX = 'sprites/vfx/skills/'
 // Boss states without their own art yet borrow the closest existing animation.
-const BOSS_FALLBACK: Record<string, string> = { walk: 'idle', charge_windup: 'wave_windup', charge: 'idle', charge_recover: 'wind_clock' }
+const BOSS_FALLBACK: Record<string, string> = {
+  walk: 'idle', charge_windup: 'wave_windup', charge: 'idle', charge_recover: 'wind_clock',
+  drop_windup: 'volley_windup', drop: 'volley', drop_jam: 'wind_clock',
+}
 const CORAL = '#FF5A5A', CREAM = '#F2E3C2', CYAN = '#3FE0FF', OUTLINE = '#0B1020'
 // Render this far behind the newest snapshot: two snapshot intervals at 30 Hz.
 const RENDER_DELAY_MS = 70
-// Own skill panel, top left under the five player chips, clear of the play area.
-const SKILL_Y = 24 + 5 * 44 + 8
+// HUD rows, top of the view: player chips, then the own skill panel; the arena below stays clear.
+const CHIP_W = 124
+const DEADLINE_X = 760, DEADLINE_W = 480 // top right, clear of the chips
+const SKILL_Y = 52
+// Background decoration is dimmed so players, desks and hazards stand out.
+const DIM = 0x9aa6c4
 
 type Placed = Phaser.GameObjects.GameObject & { setPosition(x: number, y: number): unknown; setVisible(v: boolean): unknown }
 
@@ -55,6 +64,7 @@ export class GameScene extends Phaser.Scene {
   private waves = new Map<number, Phaser.GameObjects.Sprite>()
   private items = new Map<number, Phaser.GameObjects.Sprite>()
   private zones = new Map<number, Placed>()
+  private drops = new Map<number, { warn: Placed; mark: Placed; stack: Placed; x: number; bottom: number }>()
   private boss!: Phaser.GameObjects.Sprite
   private bossMark!: Placed
   private bossLine!: Phaser.GameObjects.Text
@@ -99,22 +109,25 @@ export class GameScene extends Phaser.Scene {
 
     // Background art is drawn standing on its bottom edge: put that edge on the level floor.
     for (const bg of ['bg-0-sky', 'bg-1-windows', 'bg-2-office']) {
-      this.add.image(0, this.floorY - this.cameras.main.scrollY, `backgrounds/${bg}`).setOrigin(0, 1).setScrollFactor(0)
+      const img = this.add.image(VIEW_W / 2, this.floorY - this.cameras.main.scrollY, `backgrounds/${bg}`)
+      img.setOrigin(0.5, 1).setScrollFactor(0)
     }
     const tiles = map.addTilesetImage('office', 'tiles/office')!
     for (const layer of map.layers) map.createLayer(layer.name, tiles)
+    this.drawDeskAprons(map)
 
     for (const o of objects) {
       if (o.type === 'prop') {
         const key = `sprites/props/${o.name}`
-        this.add.image(o.x!, o.y!, key, firstFrame(key)).setOrigin(0.5, 1)
+        this.add.image(o.x!, o.y!, key, firstFrame(key)).setOrigin(0.5, 1).setTint(DIM)
+        if (o.name === 'ceiling-light') this.hangLight(o.x!, o.y!)
       }
     }
     const bossAt = objects.find(o => o.type === 'boss')
     this.boss = this.add.sprite(bossAt?.x ?? 0, bossAt?.y ?? 0, BOSS + 'idle').setOrigin(0.5, 1).setDepth(1).play(BOSS + 'idle')
     this.bossMark = this.fx('boss-stamp-mark', 0, 0, () => this.add.circle(0, 0, 18).setStrokeStyle(3, 0xffd25e))
     this.bossMark.setVisible(false)
-    this.bossLine = text(this, 0, 0, 16, CORAL).setOrigin(0.5, 1).setDepth(6)
+    this.bossLine = text(this, 0, 0, 13, CORAL).setOrigin(0.5, 1).setDepth(6)
     // Floor telegraphs sit on the floor line only, never over platform edges.
     this.warning = this.add.tileSprite(map.tileWidth, this.floorY, map.widthInPixels - 2 * map.tileWidth, 8, 'sprites/vfx/floor-warning', 0)
       .setOrigin(0, 1).setVisible(false)
@@ -124,14 +137,14 @@ export class GameScene extends Phaser.Scene {
 
     this.hud = {
       deadline: this.add.graphics().setScrollFactor(0).setDepth(10),
-      deadlineText: text(this, VIEW_W / 2, 44, 18, CREAM).setOrigin(0.5, 0).setScrollFactor(0).setDepth(11),
+      deadlineText: text(this, DEADLINE_X + DEADLINE_W / 2, 30, 13, CREAM).setOrigin(0.5, 0).setScrollFactor(0).setDepth(11),
       bossBar: this.add.graphics().setScrollFactor(0).setDepth(10),
-      result: text(this, VIEW_W / 2, VIEW_H / 2 - 80, 56, CREAM).setOrigin(0.5).setScrollFactor(0).setDepth(20).setAlign('center'),
-      skillName: text(this, 64, SKILL_Y, 16, CREAM).setScrollFactor(0).setDepth(11),
+      result: text(this, VIEW_W / 2, VIEW_H / 2 - 60, 40, CREAM).setOrigin(0.5).setScrollFactor(0).setDepth(20).setAlign('center'),
+      skillName: text(this, 46, SKILL_Y - 2, 13, CREAM).setScrollFactor(0).setDepth(11),
       skillBar: this.add.graphics().setScrollFactor(0).setDepth(10),
     }
-    this.add.image(VIEW_W / 2 - 316, 30, 'ui/deadline-icon').setScale(2).setScrollFactor(0).setDepth(11)
-    text(this, VIEW_W / 2, VIEW_H - 64, 16, CREAM).setText('ĐỐC CÔNG HÔM QUA').setOrigin(0.5, 1).setScrollFactor(0).setDepth(11)
+    this.add.image(DEADLINE_X - 16, 19, 'ui/deadline-icon').setScale(1.5).setScrollFactor(0).setDepth(11)
+    text(this, VIEW_W / 2, VIEW_H - 26, 13, CREAM).setText('ĐỐC CÔNG HÔM QUA').setOrigin(0.5, 1).setScrollFactor(0).setDepth(11)
 
     this.keys = this.input.keyboard!.addKeys(
       'W,A,S,D,UP,LEFT,DOWN,RIGHT,SPACE,J,K,L,SHIFT,E,R,ONE,TWO,THREE',
@@ -274,10 +287,15 @@ export class GameScene extends Phaser.Scene {
         case 'wave_windup': s.play('boss-wave-windup', crit); break
         case 'wave': s.play('boss-wave-slam', crit); break
         case 'charge_windup':
-          s.play(s.has('boss-charge-windup') ? 'boss-charge-windup' : 'checkpoint', crit) // placeholder bell until the sound exists
+          s.play('boss-charge-windup', crit)
           this.say('Có 5 phút thôi, xuống đây anh trao đổi!')
           break
-        case 'charge': s.play(s.has('boss-charge') ? 'boss-charge' : 'dash', crit); break
+        case 'charge': s.play('boss-charge', crit); break
+        case 'drop_windup':
+          s.play(s.has('boss-drop-windup') ? 'boss-drop-windup' : 'ping', crit) // placeholder until the sound exists
+          this.say('Em đang ở trên thì tiện nhận luôn nhé!')
+          break
+        case 'drop_jam': s.play('boss-paper-jam', { x: b.x }); break
         case 'defeat': s.play('boss-defeat', crit); break
       }
       if (b.state === 'wind_clock') s.loop('wind', 'boss-wind-clock')
@@ -353,8 +371,8 @@ export class GameScene extends Phaser.Scene {
       av = {
         slot, step: 0,
         sprite: this.add.sprite(x, y, `sprites/player/${SLOT_COLORS[slot]}/idle`).setOrigin(0.5, 1).setDepth(2),
-        label: text(this, x, y, 14, SLOT_HEX[slot]).setOrigin(0.5, 1).setDepth(3),
-        ping: text(this, x, y, 16, CREAM).setOrigin(0.5, 1).setDepth(3),
+        label: text(this, x, y, 12, SLOT_HEX[slot]).setOrigin(0.5, 1).setDepth(3),
+        ping: text(this, x, y, 13, CREAM).setOrigin(0.5, 1).setDepth(3),
         bar: this.add.graphics().setDepth(3),
       }
       this.avatars.set(p.id, av)
@@ -464,9 +482,41 @@ export class GameScene extends Phaser.Scene {
     }
     if (boss.state === 'walk' && moving && time >= this.bossStep) {
       this.bossStep = time + 450
-      this.sfx.play(this.sfx.has('boss-footstep') ? 'boss-footstep' : 'footstep-1', { x: boss.x, rate: 0.6, volume: 0.5 })
+      this.sfx.play('boss-footstep', { x: boss.x })
     }
     this.lastBossX = boss.x
+  }
+
+  // drawDeskAprons gives each one-way desk run the body of an office desk under its top edge
+  // (frame, drawers, handles), so desks read as solid furniture rather than thin floating bars.
+  private drawDeskAprons(map: Phaser.Tilemaps.Tilemap) {
+    const g = this.add.graphics()
+    const ts = map.tileWidth
+    const desk = (i: number) => i >= 5 && i <= 7 // gids of the one-way desk tiles (local ids 4–6)
+    map.layers.forEach(layer => layer.data.forEach((row, r) => {
+      for (let c = 0; c < row.length; c++) {
+        if (!desk(row[c].index) || (c > 0 && desk(row[c - 1].index))) continue
+        let end = c
+        while (end + 1 < row.length && desk(row[end + 1].index)) end++
+        const x0 = c * ts + 2, x1 = (end + 1) * ts - 2, y = r * ts + 12 // below the 12 px cream top
+        g.fillStyle(0x0b1020).fillRect(x0, y, x1 - x0, 18)
+        g.fillStyle(0x22345f).fillRect(x0 + 1, y, x1 - x0 - 2, 16)
+        g.fillStyle(0x14234a).fillRect(x0 + 1, y, x1 - x0 - 2, 2) // shadow under the top
+        for (let dx = x0 + 6; dx + 40 <= x1 - 4; dx += 48) { // drawer fronts with a cream handle
+          g.lineStyle(1, 0x2f4a7f).strokeRect(dx + 0.5, y + 4.5, 40, 9)
+          g.fillStyle(0xc9b48c).fillRect(dx + 17, y + 8, 6, 2)
+        }
+      }
+    }))
+  }
+
+  // hangLight draws the cord up to the ceiling and a faint light cone down toward the desks,
+  // kept well under the contrast of players and hazards.
+  private hangLight(x: number, bottom: number) {
+    const g = this.add.graphics() // above the backgrounds, under players and hazards
+    g.lineStyle(2, 0x14234a).lineBetween(x, this.cameras.main.scrollY, x, bottom - 16)
+    g.fillStyle(0xf2e3c2, 0.05).fillTriangle(x - 20, bottom, x + 20, bottom, x + 110, bottom + 220)
+    g.fillTriangle(x - 20, bottom, x - 110, bottom + 220, x + 110, bottom + 220)
   }
 
   private say(line: string) {
@@ -477,7 +527,7 @@ export class GameScene extends Phaser.Scene {
   private flashQuote(p: PlayerState) {
     const av = this.avatars.get(p.id)
     if (!av) return
-    const t = text(this, av.sprite.x, av.label.y - 22, 14, CREAM).setText(SKILLS[av.slot].quote).setOrigin(0.5, 1).setDepth(6)
+    const t = text(this, av.sprite.x, av.label.y - 20, 12, CREAM).setText(SKILLS[av.slot].quote).setOrigin(0.5, 1).setDepth(6)
     // Several casts at once: lift this quote above the ones still showing.
     while (this.quotes.some(q => Phaser.Geom.Intersects.RectangleToRectangle(q.getBounds(), t.getBounds()))) t.y -= 20
     this.quotes.push(t)
@@ -517,6 +567,44 @@ export class GameScene extends Phaser.Scene {
       sprite.setPosition(Phaser.Math.Linear(wa.x, w.x, k), this.floorY)
     })
 
+    // Drop attack: a warning column and "!" from the start of the telegraph, then the falling stack.
+    const liveDrops = new Set(b.drops.map(d => d.id))
+    for (const d of b.drops) {
+      let v = this.drops.get(d.id)
+      if (!v) {
+        const h = d.bottom - d.top
+        const warn = this.textures.exists('sprites/vfx/drop-warning')
+          ? this.add.tileSprite(d.x, d.top, 64, h, 'sprites/vfx/drop-warning', 0).setOrigin(0.5, 0)
+          : this.add.rectangle(d.x, d.top, 64, h, 0xff5a5a, 0.12).setOrigin(0.5, 0).setStrokeStyle(1, 0xff5a5a, 0.6)
+        const mark = this.textures.exists('sprites/vfx/alert-mark')
+          ? this.add.sprite(d.x, d.bottom - 72, 'sprites/vfx/alert-mark')
+          : text(this, d.x, d.bottom - 60, 20, CORAL).setText('!').setOrigin(0.5, 1)
+        const stack = this.textures.exists('sprites/vfx/file-stack')
+          ? this.add.sprite(d.x, d.y, 'sprites/vfx/file-stack').setOrigin(0.5, 1)
+          : this.add.rectangle(d.x, d.y, 64, 48, 0xf2e3c2).setOrigin(0.5, 1).setStrokeStyle(2, 0xb8303a)
+        for (const o of [warn, mark, stack] as Placed[]) {
+          (o as unknown as Phaser.GameObjects.Components.Depth).setDepth(4)
+          if (o instanceof Phaser.GameObjects.Sprite && this.anims.exists(o.texture.key)) o.play(o.texture.key)
+        }
+        v = { warn, mark, stack, x: d.x, bottom: d.bottom }
+        this.drops.set(d.id, v)
+      }
+      v.stack.setVisible(d.ms === 0)
+      if (d.ms === 0) {
+        const da = a.drops.find(o => o.id === d.id) ?? d
+        v.stack.setPosition(d.x, Phaser.Math.Linear(da.y, d.y, k))
+      }
+    }
+    for (const [id, v] of this.drops) {
+      if (liveDrops.has(id)) continue
+      v.warn.destroy(); v.mark.destroy(); v.stack.destroy()
+      this.drops.delete(id)
+      if (b.result === '') { // landed: burst on the desk, once
+        this.vfx('sprites/vfx/file-burst', v.x, v.bottom, false, 0.5, 1)
+        this.sfx.play(this.sfx.has('boss-drop-impact') ? 'boss-drop-impact' : 'land', { x: v.x, critical: true })
+      }
+    }
+
     // Hotfix zones: the loop belongs to the zone id, so a reconnect restores it without replaying the deploy.
     const live = new Set(b.zones.map(z => z.id))
     for (const z of b.zones) {
@@ -538,18 +626,18 @@ export class GameScene extends Phaser.Scene {
   private drawHud(b: Snapshot, time: number) {
     const { deadline, deadlineText, bossBar, result } = this.hud
     const left = Math.max(0, b.deadlineMs) / Math.max(1, b.deadlineOf)
-    const w = 600, x = VIEW_W / 2 - w / 2
-    deadline.clear().fillStyle(0x0b1020).fillRect(x - 2, 20, w + 4, 20)
-    deadline.fillStyle(left < 0.2 ? 0xff5a5a : 0x3fe0ff).fillRect(x, 22, w * left, 16)
+    const w = DEADLINE_W, x = DEADLINE_X
+    deadline.clear().fillStyle(0x0b1020).fillRect(x - 2, 10, w + 4, 18)
+    deadline.fillStyle(left < 0.2 ? 0xff5a5a : 0x3fe0ff).fillRect(x, 12, w * left, 14)
     const secs = Math.ceil(Math.max(0, b.deadlineMs) / 1000)
     const flash = b.deadlineMs > 0 && b.deadlineMs <= 10_000 && Math.floor(time / 250) % 2 === 0 // with the last-10s tick
     deadlineText.setText(`DEADLINE ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`).setColor(flash ? CORAL : CREAM)
 
     const boss = b.boss
-    const bw = 800, bx = VIEW_W / 2 - bw / 2
-    const open = boss.state === 'wind_clock' || boss.state === 'charge_recover' // good moment to hit
-    bossBar.clear().fillStyle(0x0b1020).fillRect(bx - 2, VIEW_H - 58, bw + 4, 18)
-    bossBar.fillStyle(open ? 0xffd25e : 0xff5a5a).fillRect(bx, VIEW_H - 56, bw * (boss.hp / Math.max(1, boss.maxHp)), 14)
+    const bw = 520, bx = VIEW_W / 2 - bw / 2
+    const open = boss.state === 'wind_clock' || boss.state === 'charge_recover' || boss.state === 'drop_jam' // good moment to hit
+    bossBar.clear().fillStyle(0x0b1020).fillRect(bx - 2, VIEW_H - 22, bw + 4, 14)
+    bossBar.fillStyle(open ? 0xffd25e : 0xff5a5a).fillRect(bx, VIEW_H - 20, bw * (boss.hp / Math.max(1, boss.maxHp)), 10)
 
     this.drawChips(b)
     this.drawSkill(b)
@@ -567,32 +655,32 @@ export class GameScene extends Phaser.Scene {
     const skill = SKILLS[this.slotOf(me.id)]
     const { skillName, skillBar } = this.hud
     if (!this.hud.skillIcon && this.textures.exists(skill.icon)) {
-      this.hud.skillIcon = this.add.image(24, SKILL_Y, skill.icon).setOrigin(0).setScale(1.5).setScrollFactor(0).setDepth(11)
+      this.hud.skillIcon = this.add.image(12, SKILL_Y, skill.icon).setOrigin(0).setScale(1.25).setScrollFactor(0).setDepth(11)
     }
     const ready = me.skillMs === 0
     skillName.setText(`[R] ${skill.name}${ready ? '' : `  ${(me.skillMs / 1000).toFixed(1)}s`}`).setColor(ready ? CREAM : '#8899AA')
-    skillBar.clear().fillStyle(0x0b1020).fillRect(62, SKILL_Y + 24, 244, 10)
-    skillBar.fillStyle(ready ? 0x3fe0ff : 0x2f4a7f).fillRect(64, SKILL_Y + 26, 240 * (1 - me.skillMs / Math.max(1, me.skillOf)), 6)
+    skillBar.clear().fillStyle(0x0b1020).fillRect(44, SKILL_Y + 18, 204, 8)
+    skillBar.fillStyle(ready ? 0x3fe0ff : 0x2f4a7f).fillRect(46, SKILL_Y + 20, 200 * (1 - me.skillMs / Math.max(1, me.skillOf)), 4)
   }
 
-  // Status chips, top left: portrait, P# name, hearts.
+  // Status chips in a row, top left (as in the concept): portrait, P# name, hearts.
   private drawChips(b: Snapshot) {
     b.players.forEach((p, i) => {
       const slot = this.slotOf(p.id)
       let chip = this.chips[i]
       if (!chip) {
-        const y = 24 + i * 44
+        const x = 12 + i * CHIP_W
         chip = {
-          portrait: this.add.image(24, y, PORTRAITS[slot]).setOrigin(0).setScale(1.5).setScrollFactor(0).setDepth(10),
-          name: text(this, 64, y - 2, 14, SLOT_HEX[slot]).setScrollFactor(0).setDepth(10),
+          portrait: this.add.image(x, 8, PORTRAITS[slot]).setOrigin(0).setScale(1.25).setScrollFactor(0).setDepth(10),
+          name: text(this, x + 34, 4, 12, SLOT_HEX[slot]).setScrollFactor(0).setDepth(10),
           hearts: Array.from({ length: PLAYER_HP }, (_, h) =>
-            this.add.image(64 + h * 22, y + 20, 'ui/heart', 0).setOrigin(0).setScale(2).setScrollFactor(0).setDepth(10)),
+            this.add.image(x + 34 + h * 15, 24, 'ui/heart', 0).setOrigin(0).setScale(1.5).setScrollFactor(0).setDepth(10)),
         }
         this.chips[i] = chip
       }
       const name = world.lobby.find(l => l.id === p.id)?.name ?? ''
       chip.portrait.setTexture(PORTRAITS[slot]).setAlpha(p.away ? 0.4 : 1)
-      chip.name.setColor(SLOT_HEX[slot]).setText(`P${slot + 1} ${name}${p.away ? ' (mất kết nối)' : ''}`)
+      chip.name.setColor(SLOT_HEX[slot]).setText(`P${slot + 1} ${name}${p.away ? ' ⚠' : ''}`)
       chip.hearts.forEach((h, n) => h.setFrame(n < p.hp ? 0 : 1))
     })
     for (const chip of this.chips.splice(b.players.length)) {

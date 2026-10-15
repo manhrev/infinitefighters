@@ -31,6 +31,8 @@ export type BossState = {
 }
 export type ShotState = { id: number; kind: 'card' | 'pulse' | 'stamp' | 'returned'; x: number; y: number; vx: number }
 export type ZoneState = { id: number; x: number; y: number; ms: number }
+// A locked column of the drop attack: warn from top to bottom until the stack falls (ms = time left).
+export type DropState = { id: number; x: number; top: number; bottom: number; y: number; ms: number }
 export type WaveState = { id: number; x: number; dir: number }
 export type ItemState = { id: number; kind: 'coffee'; x: number; y: number }
 
@@ -38,7 +40,7 @@ export type Snapshot = {
   type: 'snapshot'; tick: number; serverTime: number
   deadlineMs: number; deadlineOf: number
   result: '' | 'won' | 'lost'
-  players: PlayerState[]; boss: BossState; shots: ShotState[]; waves: WaveState[]; items: ItemState[]; zones: ZoneState[]
+  players: PlayerState[]; boss: BossState; shots: ShotState[]; waves: WaveState[]; items: ItemState[]; zones: ZoneState[]; drops: DropState[]
 }
 
 export type ServerMsg =
@@ -77,3 +79,6 @@ export function connect(join: Join, onMessage: (m: ServerMsg) => void, onClose: 
 export function send(m: object) {
   if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(m))
 }
+
+// Browser tests read the live state from the console with ?debug in the URL.
+if (new URLSearchParams(location.search).has('debug')) Object.assign(window, { __world: world })

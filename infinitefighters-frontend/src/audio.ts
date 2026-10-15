@@ -63,7 +63,8 @@ export class SceneAudio {
   play(key: string, o: Opts = {}) {
     const a = byKey.get(key)
     if (!a || !this.has(key) || this.scene.sound.locked) return // no queued burst after an unlock
-    const critical = o.critical || (a.priority ?? 9) <= 1
+    // Manifest priority: higher matters more. 9–10 = boss telegraphs, a player down, deadline ticks, results.
+    const critical = o.critical || (a.priority ?? 0) >= 9
     if (this.voices >= mix.maxSfxVoices - (critical ? 0 : mix.reservedCriticalVoices)) return
     const mine = o.mine ?? true
     const pan = o.x === undefined ? 0 : Phaser.Math.Clamp((o.x / 1920) * 2 - 1, -1, 1) * 0.5
