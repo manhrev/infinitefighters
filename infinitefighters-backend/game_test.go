@@ -335,15 +335,33 @@ func TestJumpClearsCharge(t *testing.T) {
 	}
 }
 
-func TestChargeNearWallBecomesWindClock(t *testing.T) {
+func TestChargeNearWallGoesTheOtherWay(t *testing.T) {
 	r := testRoom(t, 1, 0)
 	settle(r)
 	r.players[0].X = 1230 // target behind the boss, toward the near wall
 	r.boss.X = r.bossMaxX - 10
 	r.boss.State, r.boss.ticks, r.boss.cycle = bossWalk, walkMaxTicks+1, 2 // next: charge
 	r.stepMatch()
-	if r.boss.State != bossWind {
-		t.Fatalf("state %q, want wind_clock when there is no room to charge", r.boss.State)
+	if r.boss.State != bossChargeWindup || r.boss.chargeTo >= r.boss.chargeFrom || r.boss.Facing != -1 {
+		t.Fatalf("state %q %v→%v, want a charge away from the wall", r.boss.State, r.boss.chargeFrom, r.boss.chargeTo)
+	}
+	if r.boss.chargeTo < r.bossMinX {
+		t.Fatalf("charge ends at %v, inside the wall gap", r.boss.chargeTo)
+	}
+}
+
+func TestEnragedAddsSecondWaveSolo(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	r.boss.HP = r.boss.MaxHP * 0.4
+	r.boss.State, r.boss.ticks = bossWave, 0
+	most := 0
+	for range waveTicks {
+		r.stepMatch()
+		most = max(most, len(r.waves))
+	}
+	if most != 4 {
+		t.Fatalf("%d waves in flight, want 4 (two pairs) when enraged", most)
 	}
 }
 
@@ -472,5 +490,47 @@ func TestTimecardHitsOnceStopsAtWallSharesCooldown(t *testing.T) {
 	}
 	if orange.X != 32+hitW/2 {
 		t.Fatalf("went through the wall: x=%v", orange.X)
+	}
+}
+
+func TestHardModeNoInvulnerabilityAfterHit(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	r.hard, r.boss.State = true, passive
+	p := r.players[0]
+	for i := range 2 { // two cards back to back
+		r.cards = append(r.cards, &Shot{ID: 900 + i, Kind: "card", X: p.X + 30, Y: p.Y - 22, VX: -cardSpeed, W: cardW, H: cardH})
+		steps(r, 3)
+	}
+	if p.Hurts != 2 || p.invuln != 0 {
+		t.Fatalf("hurts %d invuln %d, want 2 hits and no grace", p.Hurts, p.invuln)
+	}
+	// a wave still hits only once while it passes through the player
+	r.waves = append(r.waves, &Wave{ID: 950, X: p.X - 40, Dir: 1, hit: map[int]bool{}})
+	steps(r, 20)
+	if p.Hurts != 3 {
+		t.Fatalf("hurts %d, want 3: one more from the wave", p.Hurts)
+	}
+}
+
+func TestPhase2ChargeStillJumpable(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	r.boss.State = passive
+	r.boss.HP = r.boss.MaxHP * 0.4
+	p := r.players[0]
+	r.boss.X, p.X = 900, 700 // open floor: the desk above is too high to land on, so only a jump over works
+	if !r.lockCharge() {
+		t.Fatal("no room")
+	}
+	r.boss.State, r.boss.ticks = bossChargeWindup, 0
+	for i := range r.t(windupTicks) + r.chargeDur() + 5 {
+		if i == r.t(windupTicks)-6 { // jump just before the body launches
+			p.pressed.jump = true
+		}
+		r.stepMatch()
+	}
+	if p.Hurts != 0 {
+		t.Fatal("a well-timed jump should still clear the twice-as-fast phase 2 charge")
 	}
 }

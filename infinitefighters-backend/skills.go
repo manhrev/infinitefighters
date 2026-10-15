@@ -59,6 +59,9 @@ type Zone struct {
 	X, Y   float64 // bottom-centre
 	ticks  int
 	healed map[int]bool // at most one heart per player per cast
+	// party: the P4 who placed it, and how much it may still heal that P4
+	owner    int
+	healLeft float64
 }
 
 func (r *Room) startSkill(p *Player) {

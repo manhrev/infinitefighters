@@ -14,7 +14,7 @@ const (
 	tickRate      = 60
 	snapshotEvery = 2 // ticks: 60 Hz simulation, 30 Hz snapshots
 	maxNameRunes  = 16
-	levelURL      = "/levels/sprint.json"
+	coopLevelURL  = "/levels/sprint.json"
 
 	phaseLobby   = "lobby"
 	phasePlaying = "playing"
@@ -31,6 +31,7 @@ type Player struct {
 	Body
 	fighter
 	counts
+	pvp
 }
 
 type presses struct {
@@ -50,10 +51,15 @@ type Room struct {
 	hostID  int
 	tick    uint64
 	match
+	mode       string // modeCoop or modeParty while playing
+	coopLevel  *Level
+	partyLevel *Level // nil: no party after the win
+	partyOnly  bool   // -party: Start goes straight to the party (playtests)
+	party      partyState
 }
 
 func newRoom(code string, level *Level) *Room {
-	r := &Room{code: code, level: level, inbox: make(chan func(), 256), phase: phaseLobby, nextID: 1}
+	r := &Room{code: code, level: level, coopLevel: level, mode: modeCoop, inbox: make(chan func(), 256), phase: phaseLobby, nextID: 1}
 	r.deadlineTicks = 10 * 60 * tickRate
 	r.bossBaseHP = bossBaseHP
 	return r
@@ -79,9 +85,14 @@ func (r *Room) update() {
 	if r.phase != phasePlaying || !r.anyConnected() {
 		return
 	}
-	r.stepMatch()
-	if r.phase != phasePlaying {
-		return // the win sent everyone back to the lobby
+	mode := r.mode
+	if mode == modeParty {
+		r.stepParty()
+	} else {
+		r.stepMatch()
+	}
+	if r.phase != phasePlaying || r.mode != mode {
+		return // back to the lobby, or on to the party: the next tick starts fresh
 	}
 	r.tick++
 	if r.tick%snapshotEvery == 0 {
@@ -100,7 +111,7 @@ func (r *Room) handle(c *client, m clientMsg) {
 		}
 	case "start":
 		if p := c.player; p != nil && p.ID == r.hostID && r.phase == phaseLobby {
-			r.start()
+			r.startLevel(m.Level)
 		}
 	case "input":
 		if p := c.player; p != nil {
@@ -153,7 +164,7 @@ func (r *Room) attach(p *Player, c *client) {
 	p.in, p.pressed = Input{}, presses{}
 	c.push(encode(welcomeMsg{Type: "welcome", ID: p.ID, Token: p.Token, Phase: r.phase}))
 	if r.phase == phasePlaying {
-		c.push(encode(startMsg{Type: "start", Level: levelURL}))
+		c.push(encode(r.startMsg()))
 	}
 	r.broadcast(encode(r.lobby()))
 }
@@ -186,17 +197,34 @@ func (r *Room) disconnect(c *client) {
 	r.broadcast(encode(r.lobby()))
 }
 
-func (r *Room) start() {
+func (r *Room) startMsg() startMsg {
+	if r.mode == modeParty {
+		return startMsg{Type: "start", Level: partyLevelURL, Mode: modeParty}
+	}
+	return startMsg{Type: "start", Level: coopLevelURL, Mode: modeCoop}
+}
+
+func (r *Room) start() { r.startLevel("") }
+
+// startLevel starts the level the host picked: "party" is "Anh em cây khế" (the party PvP level),
+// anything else the boss level. -party makes the party the default.
+func (r *Room) startLevel(level string) {
+	if (level == modeParty || (level == "" && r.partyOnly)) && r.partyLevel != nil {
+		log.Printf("party started with %d players", len(r.players))
+		r.startParty()
+		return
+	}
+	r.mode, r.level = modeCoop, r.coopLevel
 	r.phase, r.tick = phasePlaying, 0
 	r.scaleN = len(r.players) // fixed for the whole match, restarts included
 	r.resetMatch()
 	log.Printf("match started with %d players", len(r.players))
-	r.broadcast(encode(startMsg{Type: "start", Level: levelURL}))
+	r.broadcast(encode(r.startMsg()))
 }
 
-// toLobby ends the match after a win. Away players lose their slot.
+// toLobby ends the match after a win or the party. Away players lose their slot.
 func (r *Room) toLobby() {
-	r.phase = phaseLobby
+	r.phase, r.mode, r.level = phaseLobby, modeCoop, r.coopLevel
 	r.players = keep(r.players, func(p *Player) bool { return p.client != nil })
 	if r.byID(r.hostID) == nil {
 		r.hostID = 0
@@ -204,7 +232,7 @@ func (r *Room) toLobby() {
 			r.hostID = r.players[0].ID
 		}
 	}
-	log.Printf("match won, back to lobby")
+	log.Printf("back to lobby")
 	r.broadcast(encode(r.lobby()))
 }
 
@@ -224,11 +252,16 @@ func (r *Room) lobby() lobbyMsg {
 	return m
 }
 
+func serverNow() int64 { return time.Now().UnixMilli() }
+
 func (r *Room) snapshot() snapshotMsg {
+	if r.mode == modeParty {
+		return r.partySnapshot()
+	}
 	b := r.boss
 	ms := func(ticks int) int64 { return int64(ticks) * 1000 / tickRate }
 	m := snapshotMsg{
-		Type: "snapshot", Tick: r.tick, ServerTime: time.Now().UnixMilli(),
+		Type: "snapshot", Tick: r.tick, ServerTime: serverNow(), Mode: modeCoop,
 		DeadlineMs: ms(r.deadline), DeadlineOf: ms(r.deadlineTicks), Result: r.result,
 		Boss: bossState{
 			X: b.X, Y: b.Y, Facing: b.Facing, HP: b.HP, MaxHP: b.MaxHP, State: b.State,
@@ -259,7 +292,7 @@ func (r *Room) snapshot() snapshotMsg {
 	for _, d := range r.drops {
 		wait := d.delay
 		if b.State == bossDropWindup {
-			wait += dropWindupTicks - b.ticks
+			wait += r.t(dropWindupTicks) - b.ticks
 		}
 		m.Drops = append(m.Drops, dropState{ID: d.ID, X: d.X, Top: d.Top, Bottom: d.Bottom, Y: d.Y, Ms: ms(wait)})
 	}

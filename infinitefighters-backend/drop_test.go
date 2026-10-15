@@ -1,11 +1,14 @@
 package main
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 // onDesk puts a player standing on the desk whose top is y, at x.
 func onDesk(p *Player, x, y float64) { p.X, p.Y, p.VY, p.OnGround = x, y, 0, true }
 
-// dropReady is a match with the boss under 60% HP, passive until a test starts a turn.
+// dropReady is a match with the boss under the drop threshold, passive until a test starts a turn.
 func dropReady(t *testing.T, n int) *Room {
 	r := testRoom(t, n, 0)
 	settle(r)
@@ -29,16 +32,16 @@ func runDrop(t *testing.T, r *Room) {
 	}
 }
 
-func TestDropOnlyBelow60PercentAndWithSomeoneOnADesk(t *testing.T) {
+func TestDropOnlyBelowThresholdAndWithSomeoneOnADesk(t *testing.T) {
 	r := dropReady(t, 1)
 	p := r.players[0]
 	if r.lockDrops() {
 		t.Fatal("dropped on a player standing on the floor")
 	}
 	onDesk(p, 300, 480)
-	r.boss.HP = r.boss.MaxHP * 0.7
+	r.boss.HP = r.boss.MaxHP * (dropHPFrac + 0.05)
 	if r.lockDrops() {
-		t.Fatal("dropped above 60% HP")
+		t.Fatal("dropped above the HP threshold")
 	}
 	r.boss.HP = r.boss.MaxHP * 0.5
 	if !r.lockDrops() || len(r.drops) != 1 {
@@ -46,7 +49,7 @@ func TestDropOnlyBelow60PercentAndWithSomeoneOnADesk(t *testing.T) {
 	}
 	r.drops = nil
 	if r.lockDrops() {
-		t.Fatal("dropped again within 12 s")
+		t.Fatal("dropped again within the cooldown")
 	}
 }
 
@@ -153,5 +156,64 @@ func TestDropSkipsDownedAndAwayAndJamDoublesDamage(t *testing.T) {
 	r.damageBoss(1, false)
 	if !near(hp-r.boss.HP, 2) {
 		t.Fatalf("paper jam damage %v, want 2", hp-r.boss.HP)
+	}
+}
+
+func TestHardModeDropsAtFullHP(t *testing.T) {
+	r := testRoom(t, 1, 0)
+	settle(r)
+	onDesk(r.players[0], 300, 480)
+	if r.lockDrops() {
+		t.Fatal("dropped at full HP in normal mode")
+	}
+	r.hard = true
+	if !r.lockDrops() || !r.enraged() {
+		t.Fatal("hard mode: want falling files and enrage from full HP")
+	}
+}
+
+func TestHardModeSixColumnsAtOnceWithGaps(t *testing.T) {
+	for range 50 { // random positions: check the rules hold every time
+		r := testRoom(t, 2, 0)
+		settle(r)
+		r.hard = true
+		onDesk(r.players[1], 300, 480)
+		if !r.lockHardDrops() || len(r.drops) != hardDrops {
+			t.Fatalf("%d columns, want %d", len(r.drops), hardDrops)
+		}
+		desks := map[float64]int{}
+		for i, d := range r.drops {
+			if d.delay != 0 {
+				t.Fatal("hard mode stacks must fall together")
+			}
+			for _, e := range r.drops[i+1:] {
+				if d.Bottom == e.Bottom && math.Abs(d.X-e.X) < hardDropSpacing {
+					t.Fatalf("columns at %v and %v on the same level leave no 2-tile gap", d.X, e.X)
+				}
+			}
+			found := false
+			for _, s := range r.surfaces(d.X) {
+				if float64(s[0]*r.level.Tile) == d.Bottom {
+					found = true
+					if s[1] >= 0 {
+						desks[d.Bottom*1000+float64(s[1])]++
+					}
+				}
+			}
+			if !found {
+				t.Fatalf("column at %v does not land on a whole surface at %v", d.X, d.Bottom)
+			}
+			if d.Top >= d.Bottom-dropH {
+				t.Fatalf("column at %v has no room to fall: %v→%v", d.X, d.Top, d.Bottom)
+			}
+		}
+		for k, n := range desks {
+			if n > 1 {
+				t.Fatalf("desk %v has %d columns", k, n)
+			}
+		}
+		if math.Abs(r.drops[0].X-300) > 1 && math.Abs(r.drops[1].X-300) > 1 {
+			t.Fatal("the player on a desk was not targeted first")
+		}
 	}
 }

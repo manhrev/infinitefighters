@@ -14,14 +14,21 @@ import (
 //   - a tileset tile collides when it has the string property collision = "solid" | "oneway";
 //     tiles without it are decoration
 //   - point objects of type "spawn" give player spawn feet positions, in order P1..P5
-//   - one point object of type "boss" gives the boss feet position
-//   - point objects of type "coffee" are healing pickups (bottom-centre)
+//   - boss arenas: one point object of type "boss" gives the boss feet position; "coffee" points are
+//     healing pickups (bottom-centre)
+//   - party hall: one "safe" point (sprays money), "atm" points (deposit), "respawn" points
+//   - a map needs either a boss or a safe
 type Level struct {
 	W, H, Tile int // size in tiles, tile size in px
 	tiles      []tileKind
 	Spawns     []Point
 	Boss       Point
+	HasBoss    bool
 	Coffees    []Point
+	Safe       Point
+	HasSafe    bool
+	ATMs       []Point
+	Respawns   []Point
 	// PlatformTops are the y of every row holding one-way tiles, top to bottom.
 	PlatformTops []float64
 }
@@ -110,7 +117,6 @@ func parseLevel(data []byte) (*Level, error) {
 	}
 
 	l := &Level{W: m.Width, H: m.Height, Tile: m.TileWidth, tiles: make([]tileKind, m.Width*m.Height)}
-	hasBoss := false
 	for _, layer := range m.Layers {
 		switch layer.Type {
 		case "tilelayer":
@@ -128,9 +134,15 @@ func parseLevel(data []byte) (*Level, error) {
 				case "spawn":
 					l.Spawns = append(l.Spawns, Point{o.X, o.Y})
 				case "boss":
-					l.Boss, hasBoss = Point{o.X, o.Y}, true
+					l.Boss, l.HasBoss = Point{o.X, o.Y}, true
 				case "coffee":
 					l.Coffees = append(l.Coffees, Point{o.X, o.Y})
+				case "safe":
+					l.Safe, l.HasSafe = Point{o.X, o.Y}, true
+				case "atm":
+					l.ATMs = append(l.ATMs, Point{o.X, o.Y})
+				case "respawn":
+					l.Respawns = append(l.Respawns, Point{o.X, o.Y})
 				}
 			}
 		}
@@ -138,8 +150,8 @@ func parseLevel(data []byte) (*Level, error) {
 	if len(l.Spawns) == 0 {
 		return nil, errors.New(`tiled map: needs at least one "spawn" point object`)
 	}
-	if !hasBoss {
-		return nil, errors.New(`tiled map: needs a "boss" point object`)
+	if !l.HasBoss && !l.HasSafe {
+		return nil, errors.New(`tiled map: needs a "boss" or a "safe" point object`)
 	}
 	for row := range l.H {
 		for col := range l.W {

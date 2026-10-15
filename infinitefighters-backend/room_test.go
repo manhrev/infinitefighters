@@ -128,7 +128,7 @@ func TestRoomFlow(t *testing.T) {
 	var st startMsg
 	next(a, "start", &st)
 	next(b, "start", &st)
-	if st.Level != levelURL {
+	if st.Level != coopLevelURL {
 		t.Fatalf("level = %q", st.Level)
 	}
 

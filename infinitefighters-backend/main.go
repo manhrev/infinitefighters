@@ -28,16 +28,12 @@ func main() {
 	code := flag.String("code", "", "room code (default: random)")
 	deadline := flag.Duration("deadline", 10*time.Minute, "DEADLINE timer per attempt")
 	bossHP := flag.Int("boss-hp", bossBaseHP, "boss HP with one player (playtest tuning)")
+	party := flag.Bool("party", false, "Start goes straight to the party PvP phase (playtests)")
+	hard := flag.Bool("hard", false, "hard mode: 6 falling file stacks and enrage from the start, no invulnerability after a hit")
 	flag.Parse()
 
-	data, err := levelFS.ReadFile("levels/sprint.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	level, err := parseLevel(data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	level := mustLevel("levels/sprint.json")
+	partyLevel := mustLevel("levels/party.json")
 	if *code == "" {
 		*code = newRoomCode()
 	}
@@ -48,6 +44,8 @@ func main() {
 	room := newRoom(*code, level)
 	room.deadlineTicks = int(deadline.Seconds() * tickRate)
 	room.bossBaseHP = max(1, *bossHP)
+	room.hard = *hard
+	room.partyLevel, room.partyOnly = partyLevel, *party
 	go room.run(ctx)
 
 	srv := &http.Server{Addr: *addr, Handler: newMux(room)}
@@ -72,6 +70,18 @@ func main() {
 	if err := srv.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
+}
+
+func mustLevel(path string) *Level {
+	data, err := levelFS.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	l, err := parseLevel(data)
+	if err != nil {
+		log.Fatalf("%s: %v", path, err)
+	}
+	return l
 }
 
 func newMux(room *Room) *http.ServeMux {

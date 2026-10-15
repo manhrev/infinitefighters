@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
 // Combat, boss and match flow for the MVP level (dev/game-scenario.md).
 //
@@ -29,9 +32,9 @@ const (
 const (
 	playerHP        = 5
 	reviveHP        = 3
-	reviveHoldTicks = 2 * tickRate // a teammate holds interact this long next to a downed player
+	reviveHoldTicks = 3 * tickRate // a teammate holds interact this long next to a downed player
 	reviveReach     = 48.0
-	invulnTicks     = tickRate // after a hit
+	invulnTicks     = 36 // 0.6 s after a hit
 	knockSpeed      = 220.0
 	knockHop        = 380.0
 	dashSpeed       = 700.0
@@ -44,32 +47,33 @@ const (
 	pulseLife       = 27 // ticks, ≈ 270 px
 	pulseDamage     = 2.0
 	pingTicks       = 2 * tickRate
-	coffeeRespawn   = 20 * tickRate
+	coffeeRespawn   = 30 * tickRate
 	coffeeSize      = 16.0
 
 	bossBaseHP      = 120
 	bossHPPerPlayer = 60 // per player beyond the first
 	bossW, bossH    = 70.0, 110.0
-	bossIdleTicks   = tickRate
-	windupTicks     = 54 // telegraph; well above the clients' ~70 ms render delay
-	volleyTicks     = 30
-	waveTicks       = 40
-	windTicks       = 150 // vulnerable window: damage ×2
-	extraAt         = 24  // 4+ players: a second salvo / wave this many ticks into the attack
-	cardSpeed       = 480.0
+	bossIdleTicks   = tickRate / 3
+	windupTicks     = 45 // 0.75 s telegraph; well above the clients' ~70 ms render delay
+	volleyTicks     = 24
+	waveTicks       = 32
+	windTicks       = 90  // vulnerable window: damage ×2
+	enrageHPFrac    = 0.5 // below this: always a second salvo / wave, no rest between turns
+	extraAt         = 16  // 3+ players: a second salvo / wave this many ticks into the attack
+	cardSpeed       = 600.0
 	cardW, cardH    = 16.0, 12.0
-	waveSpeed       = 420.0
+	waveSpeed       = 540.0
 	waveW, waveH    = 32.0, 32.0
 
 	walkSpeed     = 0.4 * runSpeed
-	walkMaxTicks  = 2 * tickRate
+	walkMaxTicks  = tickRate
 	walkStopTiles = 3 // stop this close to the target
 	walkMaxTiles  = 6
 	wallGapTiles  = 3 // between the boss body and each wall
 	chargeTiles   = 8
 	chargeMinTile = 3
 	chargeTicks   = 36 // 0.6 s
-	recoverTicks  = 90 // 1.5 s, no damage
+	recoverTicks  = 60 // 1 s, no damage
 
 	lostTicks = 4 * tickRate // show why the team lost, then restart the level
 	wonTicks  = 6 * tickRate // show the win, then back to the lobby
@@ -156,12 +160,16 @@ type Shot struct {
 	W, H     float64
 	Dmg      float64
 	life     int // player shots only
+	// party: who fired it (no self-hits, kill credit, cleared on death) and whether P2 may bounce it
+	owner       int
+	reflectable bool
 }
 
 type Wave struct {
 	ID  int
 	X   float64 // centre
 	Dir int
+	hit map[int]bool // each wave hurts a player once, even without invulnerability frames
 }
 
 type match struct {
@@ -177,6 +185,7 @@ type match struct {
 	zones         []*Zone
 	nextShotID    int
 	bossBaseHP    int   // configurable for playtests
+	hard          bool  // hard mode: falling files and enrage from the start, no invulnerability after a hit
 	coffeeIn      []int // per level coffee point: ticks until it is back; 0 = on the shelf
 	bossMinX      float64
 	bossMaxX      float64
@@ -204,25 +213,35 @@ func (r *Room) resetMatch() {
 
 // bossRange finds the walls left and right of the boss spawn and keeps the wall gap from both.
 func (r *Room) bossRange() (lo, hi float64) {
+	left, right := r.arenaWalls()
+	gap := wallGapTiles*float64(r.level.Tile) + bossW/2
+	return left + gap, right - gap
+}
+
+// arenaWalls is the open floor between the walls left and right of the boss spawn, in px.
+func (r *Room) arenaWalls() (left, right float64) {
 	l, ts := r.level, float64(r.level.Tile)
 	row := cell(l.Boss.Y-1, ts)
-	left, right := cell(l.Boss.X, ts), cell(l.Boss.X, ts)
-	for l.at(left-1, row) != tileSolid {
-		left--
+	c0, c1 := cell(l.Boss.X, ts), cell(l.Boss.X, ts)
+	for l.at(c0-1, row) != tileSolid {
+		c0--
 	}
-	for l.at(right+1, row) != tileSolid {
-		right++
+	for l.at(c1+1, row) != tileSolid {
+		c1++
 	}
-	gap := wallGapTiles*ts + bossW/2
-	return float64(left)*ts + gap, float64(right+1)*ts - gap
+	return float64(c0) * ts, float64(c1+1) * ts
 }
 
 func (r *Room) stepMatch() {
 	if r.result != "" {
 		if r.resultTicks--; r.resultTicks <= 0 {
-			if r.result == resultLost {
+			switch {
+			case r.result == resultLost:
 				r.resetMatch()
-			} else {
+			case r.partyLevel != nil:
+				log.Printf("boss beaten, on to the party")
+				r.startParty() // the extension: the survivors are invited to the year-end party
+			default:
 				r.toLobby()
 			}
 		}
@@ -398,7 +417,7 @@ func (r *Room) stepBoss() {
 	switch b.State {
 	case bossIdle:
 		r.faceNearest()
-		if b.ticks >= bossIdleTicks && len(r.cards) == 0 && len(r.waves) == 0 {
+		if (b.ticks >= r.t(bossIdleTicks) || r.enraged()) && len(r.cards) == 0 && len(r.waves) == 0 {
 			b.target, b.walkFrom = r.nearestTarget(), b.X
 			set(bossWalk)
 		}
@@ -415,48 +434,49 @@ func (r *Room) stepBoss() {
 			set(next)
 		}
 	case bossVolleyWindup:
-		if b.ticks >= windupTicks {
+		if b.ticks >= r.t(windupTicks) {
 			set(bossVolley)
 		}
 	case bossWaveWindup:
-		if b.ticks >= windupTicks {
+		if b.ticks >= r.t(windupTicks) {
 			set(bossWave)
 		}
 	case bossChargeWindup:
-		if b.ticks >= windupTicks {
+		if b.ticks >= r.t(windupTicks) {
 			b.chargeHit = map[int]bool{}
 			set(bossCharge)
 		}
 	case bossVolley:
-		if b.ticks == 1 || (r.scaleN >= 4 && b.ticks == extraAt) {
+		if b.ticks == 1 || ((r.scaleN >= 3 || r.enraged()) && b.ticks == r.t(extraAt)) {
 			r.fireVolley()
 		}
-		if b.ticks >= volleyTicks {
+		if b.ticks >= r.t(volleyTicks) {
 			set(bossIdle)
 		}
 	case bossWave:
-		if b.ticks == 1 || (r.scaleN >= 4 && b.ticks == extraAt) {
+		if b.ticks == 1 || ((r.scaleN >= 3 || r.enraged()) && b.ticks == r.t(extraAt)) {
 			for _, d := range []int{-1, 1} {
 				r.nextShotID++
-				r.waves = append(r.waves, &Wave{ID: r.nextShotID, X: b.X + float64(d)*(bossW/2+waveW/2), Dir: d})
+				r.waves = append(r.waves, &Wave{ID: r.nextShotID, X: b.X + float64(d)*(bossW/2+waveW/2), Dir: d, hit: map[int]bool{}})
 			}
 		}
-		if b.ticks >= waveTicks {
+		if b.ticks >= r.t(waveTicks) {
 			set(bossIdle)
 		}
 	case bossCharge:
-		b.X = b.chargeFrom + (b.chargeTo-b.chargeFrom)*float64(b.ticks)/chargeTicks
+		dur := r.chargeDur()
+		b.X = b.chargeFrom + (b.chargeTo-b.chargeFrom)*float64(min(b.ticks, dur))/float64(dur)
 		for _, p := range r.players { // only the moving body hurts, once per player per charge
 			if !b.chargeHit[p.ID] && r.canHurt(p) && overlaps(playerBox(p), r.bossBox()) {
 				b.chargeHit[p.ID] = true
 				r.hurt(p, 1, b.X)
 			}
 		}
-		if b.ticks >= chargeTicks {
+		if b.ticks >= dur {
 			set(bossChargeRecover)
 		}
 	case bossDropWindup:
-		if b.ticks >= dropWindupTicks {
+		if b.ticks >= r.t(dropWindupTicks) {
 			set(bossDrop)
 		}
 	case bossDrop:
@@ -464,15 +484,15 @@ func (r *Room) stepBoss() {
 			set(bossDropJam)
 		}
 	case bossDropJam:
-		if b.ticks >= dropJamTicks {
+		if b.ticks >= r.t(dropJamTicks) {
 			set(bossIdle)
 		}
 	case bossChargeRecover:
-		if b.ticks >= recoverTicks {
+		if b.ticks >= r.t(recoverTicks) {
 			set(bossIdle)
 		}
 	case bossWind:
-		if b.ticks >= windTicks {
+		if b.ticks >= r.t(windTicks) {
 			set(bossIdle)
 		}
 	}
@@ -491,7 +511,7 @@ func (r *Room) faceNearest() {
 func (r *Room) walkBoss() bool {
 	b, ts := &r.boss, float64(r.level.Tile)
 	t := b.target
-	if t == nil || t.client == nil || t.action == actDown || b.ticks > walkMaxTicks {
+	if t == nil || t.client == nil || t.action == actDown || b.ticks > r.t(walkMaxTicks) {
 		return true
 	}
 	dx := t.X - b.X
@@ -502,7 +522,7 @@ func (r *Room) walkBoss() bool {
 	if dx < 0 {
 		b.Facing = -1
 	}
-	x := math.Max(r.bossMinX, math.Min(r.bossMaxX, b.X+float64(b.Facing)*walkSpeed*dt))
+	x := math.Max(r.bossMinX, math.Min(r.bossMaxX, b.X+float64(b.Facing)*walkSpeed*r.moveMul()*dt))
 	if x == b.X {
 		return true // at the wall gap
 	}
@@ -510,24 +530,63 @@ func (r *Room) walkBoss() bool {
 	return false
 }
 
-// lockCharge fixes the charge direction and end point at the start of the telegraph.
-// It reports false when there is less than chargeMinTile of room that way.
+// lockCharge fixes the charge direction and end point at the start of the telegraph: toward the
+// nearest player, or the other way when that side has less than chargeMinTile of room.
+// It reports false only when neither side has room.
 func (r *Room) lockCharge() bool {
 	b, ts := &r.boss, float64(r.level.Tile)
 	r.faceNearest()
-	to := math.Max(r.bossMinX, math.Min(r.bossMaxX, b.X+float64(b.Facing)*chargeTiles*ts))
-	if math.Abs(to-b.X) < chargeMinTile*ts {
-		return false
+	for _, dir := range []int{b.Facing, -b.Facing} {
+		to := math.Max(r.bossMinX, math.Min(r.bossMaxX, b.X+float64(dir)*chargeTiles*ts))
+		if math.Abs(to-b.X) >= chargeMinTile*ts {
+			b.Facing, b.chargeFrom, b.chargeTo = dir, b.X, to
+			return true
+		}
 	}
-	b.chargeFrom, b.chargeTo = b.X, to
-	return true
+	return false
 }
 
-// fireVolley throws one card per platform height, toward the facing side (both sides with 3+ players).
+// Phase 2 starts at half HP in every mode: the boss moves twice as fast and attacks 1.5× as often
+// (every boss timer at 2/3, task cards and waves 1.5× faster so the arena clears sooner).
+func (r *Room) phase2() bool { return r.boss.HP < 0.5*r.boss.MaxHP }
+
+// t scales a boss timer for the current phase.
+func (r *Room) t(ticks int) int {
+	if r.phase2() {
+		return max(1, ticks*2/3)
+	}
+	return ticks
+}
+
+func (r *Room) attackMul() float64 {
+	if r.phase2() {
+		return 1.5
+	}
+	return 1
+}
+
+func (r *Room) moveMul() float64 {
+	if r.phase2() {
+		return 2
+	}
+	return 1
+}
+
+// chargeDur is the charge travel time: half as long, so twice as fast, in phase 2.
+func (r *Room) chargeDur() int {
+	if r.phase2() {
+		return chargeTicks / 2
+	}
+	return chargeTicks
+}
+
+func (r *Room) enraged() bool { return r.hard || r.boss.HP < enrageHPFrac*r.boss.MaxHP }
+
+// fireVolley throws one card per platform height, toward the facing side (both sides with 2+ players).
 // Cards fly at the body height of someone standing on a platform, above anyone standing on the floor.
 func (r *Room) fireVolley() {
 	dirs := []int{r.boss.Facing}
-	if r.scaleN >= 3 {
+	if r.scaleN >= 2 {
 		dirs = append(dirs, -r.boss.Facing)
 	}
 	for _, d := range dirs {
@@ -535,7 +594,7 @@ func (r *Room) fireVolley() {
 			r.nextShotID++
 			r.cards = append(r.cards, &Shot{
 				ID: r.nextShotID, Kind: "card", X: r.boss.X + float64(d)*(bossW/2+cardW/2), Y: top - hitH/2,
-				VX: float64(d) * cardSpeed, W: cardW, H: cardH,
+				VX: float64(d) * cardSpeed * r.attackMul(), W: cardW, H: cardH,
 			})
 		}
 	}
@@ -592,14 +651,15 @@ func (r *Room) moveShot(s *Shot) bool {
 
 func (r *Room) stepWaves() {
 	r.waves = keep(r.waves, func(w *Wave) bool {
-		w.X += float64(w.Dir) * waveSpeed * dt
+		w.X += float64(w.Dir) * waveSpeed * r.attackMul() * dt
 		ts := float64(r.level.Tile)
 		if r.level.at(cell(w.X+float64(w.Dir)*waveW/2, ts), cell(r.boss.Y-1, ts)) == tileSolid {
 			return false
 		}
 		box := rect{w.X - waveW/2, r.boss.Y - waveH, w.X + waveW/2, r.boss.Y}
 		for _, p := range r.players {
-			if r.canHurt(p) && overlaps(box, playerBox(p)) {
+			if !w.hit[p.ID] && r.canHurt(p) && overlaps(box, playerBox(p)) {
+				w.hit[p.ID] = true
 				r.hurt(p, 1, w.X)
 			}
 		}
@@ -647,6 +707,9 @@ func (r *Room) hurt(p *Player, dmg int, fromX float64) {
 		dir = -1
 	}
 	p.action, p.actionTicks, p.invuln = actHurt, hurtTicks, invulnTicks
+	if r.hard {
+		p.invuln = 0 // hard mode: no grace after a hit, back-to-back hits land
+	}
 	p.pushVX, p.pushTicks, p.VY = dir*knockSpeed, hurtTicks, -knockHop
 }
 

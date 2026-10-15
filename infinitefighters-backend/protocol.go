@@ -8,7 +8,8 @@ import "encoding/json"
 //
 //	{"type":"join","name":"An","code":"ABCD"}       new player (lobby only)
 //	{"type":"join","token":"..."}                   resume a kept slot
-//	{"type":"start"}                                host only, lobby only
+//	{"type":"start","level":"party"}                host only, lobby only; level "coop" (boss, default)
+//	                                                or "party" (Anh em cây khế)
 //	{"type":"input","left":true,"jump":false,...}   held buttons; send on every change
 //
 // Presses (jump, attack, skill, special, dash, ping) act on the up→down edge; interact acts while held,
@@ -18,6 +19,7 @@ type clientMsg struct {
 	Name  string `json:"name,omitempty"`
 	Code  string `json:"code,omitempty"`
 	Token string `json:"token,omitempty"`
+	Level string `json:"level,omitempty"` // start: "coop" or "party"
 	Input
 }
 
@@ -63,6 +65,7 @@ type lobbyPlayer struct {
 type startMsg struct {
 	Type  string `json:"type"`  // "start"
 	Level string `json:"level"` // URL of the Tiled map
+	Mode  string `json:"mode"`  // "coop" (boss) or "party" (PvP money phase); a new mode means a new scene
 }
 
 type snapshotMsg struct {
@@ -79,6 +82,8 @@ type snapshotMsg struct {
 	Items      []itemState   `json:"items"` // pickups currently available
 	Zones      []zoneState   `json:"zones"` // P4 hotfix zones
 	Drops      []dropState   `json:"drops"` // falling file stacks, shown from the start of drop_windup
+	Mode       string        `json:"mode"`  // "coop" or "party"
+	Party      *partyMsg     `json:"party,omitempty"`
 }
 
 // playerState X/Y are the feet (bottom-centre of the 20×44 hitbox) in level pixels, +Y down.
@@ -100,17 +105,75 @@ type playerState struct {
 	SkillOf int64   `json:"skillOf"` // full cooldown
 	Charge  float64 `json:"charge"`  // P1: 0..1 while charging
 	// Counters only grow, across restarts too; play the one-shot animation or sound when one changes.
-	Attacks   uint32 `json:"attacks"`
-	Pulses    uint32 `json:"pulses"`
-	Dashes    uint32 `json:"dashes"`
-	Hurts     uint32 `json:"hurts"`
-	Hits      uint32 `json:"hits"`      // keyboard swing or P1 smash landed
-	Casts     uint32 `json:"casts"`     // slot skill used (P1: released)
-	SkillHits uint32 `json:"skillHits"` // P1 smash, P4 deploy pulse or P5 timecard hit the boss
-	Cancels   uint32 `json:"cancels"`   // P1 charge cancelled
-	Reflects  uint32 `json:"reflects"`  // P2 bounced a task card
-	Healed    uint32 `json:"healed"`    // this player got a heart from a hotfix zone
-	Coffees   uint32 `json:"coffees"`
+	Attacks   uint32  `json:"attacks"`
+	Pulses    uint32  `json:"pulses"`
+	Dashes    uint32  `json:"dashes"`
+	Hurts     uint32  `json:"hurts"`
+	Hits      uint32  `json:"hits"`      // keyboard swing or P1 smash landed
+	Casts     uint32  `json:"casts"`     // slot skill used (P1: released)
+	SkillHits uint32  `json:"skillHits"` // P1 smash, P4 deploy pulse or P5 timecard hit the boss
+	Cancels   uint32  `json:"cancels"`   // P1 charge cancelled
+	Reflects  uint32  `json:"reflects"`  // P2 bounced a task card
+	Healed    uint32  `json:"healed"`    // this player got a heart from a hotfix zone
+	Coffees   uint32  `json:"coffees"`
+	PvP       *pvpMsg `json:"pvp,omitempty"` // party only
+}
+
+// partyMsg is the money phase. Times count down; a deposit completes when ms reaches of.
+type partyMsg struct {
+	CountdownMs int64         `json:"countdownMs"` // > 0: rules on screen, nothing can be hit or picked up
+	TimeLeftMs  int64         `json:"timeLeftMs"`
+	Solo        bool          `json:"solo"`
+	SafeX       float64       `json:"safeX"`
+	SafeY       float64       `json:"safeY"`
+	Sprays      uint32        `json:"sprays"` // counter: play the safe burst when it grows
+	Banner      string        `json:"banner,omitempty"`
+	Bundles     []bundleState `json:"bundles"`
+	ATMs        []atmState    `json:"atms"`
+	Results     []resultState `json:"results,omitempty"` // set when the time is up
+}
+
+type bundleState struct {
+	ID    int     `json:"id"`
+	X     float64 `json:"x"` // bottom-centre of a 16×16 coin bundle
+	Y     float64 `json:"y"`
+	Value int     `json:"value"`
+}
+
+type atmState struct {
+	X      float64 `json:"x"`
+	Y      float64 `json:"y"`
+	User   int     `json:"user"`   // player depositing, 0 when free
+	Ms     int64   `json:"ms"`     // deposit progress
+	Of     int64   `json:"of"`     // deposit length
+	Amount int     `json:"amount"` // coins being deposited
+}
+
+type resultState struct {
+	ID      int `json:"id"`
+	Balance int `json:"balance"`
+	Rank    int `json:"rank"` // ties share a rank
+	Kills   int `json:"kills"`
+}
+
+type pvpMsg struct {
+	HP        float64 `json:"hp"` // of 100; show rounded
+	Wallet    int     `json:"wallet"`
+	Balance   int     `json:"balance"`
+	Kills     int     `json:"kills"`
+	Dead      bool    `json:"dead"`
+	Left      bool    `json:"left"` // gone after 5 s offline
+	RespawnMs int64   `json:"respawnMs"`
+	ProtectMs int64   `json:"protectMs"`
+	MarkedBy  int     `json:"markedBy"` // the P3 whose mark this player carries
+	// Counters for one-shot sounds and effects.
+	Pickups    uint32 `json:"pickups"`
+	Drops      uint32 `json:"drops"`
+	Deposits   uint32 `json:"deposits"`
+	AtmStarts  uint32 `json:"atmStarts"`
+	AtmCancels uint32 `json:"atmCancels"`
+	Respawns   uint32 `json:"respawns"`
+	Marks      uint32 `json:"marks"` // this P3's stamp marked someone
 }
 
 type bossState struct {
