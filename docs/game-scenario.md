@@ -23,7 +23,7 @@ Nhân vật và công ty đều hư cấu. Sự hài hước đến từ cách l
 
 ### Trạng thái triển khai
 
-Số liệu đang chạy, điều khiển và điểm lệch so với thiết kế: [01-sprint.md](levels/01-sprint.md) (co-op) và [06-party.md](levels/06-party.md) (loạn đấu).
+Số liệu đang chạy, điều khiển và điểm lệch so với thiết kế: [01-sprint.md](levels/01-sprint.md) (co-op) và [01b-party.md](levels/01b-party.md) (extension loạn đấu).
 
 **Chưa làm:** trang tài liệu nhặt được, checkpoint thang máy, chế độ Tay đôi, các khu vực và boss khác, trận cuối, phần NPC của extension.
 
@@ -158,7 +158,7 @@ Kiểm tra bằng tai nghe và loa laptop: phân biệt được ba đòn boss (
 
 ### Hướng mở rộng sau MVP
 
-Mỗi khu vực có một âm sắc riêng: Sảnh Onboarding dùng chuông họp, Tháp Kiến Trúc dùng tiếng giấy blueprint mở, Hầm Tri Thức dùng khóa và tiếng ổ cứng, QUY TRÌNH dùng máy in kẹt giấy. Chế độ tay đôi cần tín hiệu vào trận và kết quả riêng. Extension tiệc cuối game chuyển sang disco chiptune, tiếng tiền rơi, ATM chốt số dư và phản ứng NPC ngắn; giảm nhạc khi có đối thoại và không lặp câu thoại theo mỗi đòn đánh.
+Mỗi khu vực có một âm sắc riêng: Sảnh Onboarding dùng chuông họp, Tháp Kiến Trúc dùng tiếng giấy blueprint mở, Hầm Tri Thức dùng khóa và tiếng ổ cứng, QUY TRÌNH dùng máy in kẹt giấy. Chế độ tay đôi cần tín hiệu vào trận và kết quả riêng. Extension tiệc sau màn Sprint chuyển sang disco chiptune, tiếng tiền rơi, ATM chốt số dư và phản ứng NPC ngắn; giảm nhạc khi có đối thoại và không lặp câu thoại theo mỗi đòn đánh.
 
 ## Hai chế độ
 
@@ -200,12 +200,11 @@ Mỗi khu vực là một màn, mô tả trong file riêng ở `levels/`.
 | Khu vực | Boss | Trạng thái | Mô tả |
 | --- | --- | --- | --- |
 | Đường Đua Sprint — NA | Đốc Công Hôm Qua | Đã triển khai (MVP) | [01-sprint.md](levels/01-sprint.md) |
+| ↳ Extension màn 1: “Anh em cây khế” | Không (loạn đấu giành tiền) | Đã triển khai, trừ phần NPC | [01b-party.md](levels/01b-party.md) |
 | Sảnh Onboarding — Vacancy | Ngài Định Hướng | Định hướng | [02-onboarding.md](levels/02-onboarding.md) |
 | Tháp Kiến Trúc — Vacancy | Kiến Trúc Sư Ngoài Phạm Vi | Định hướng | [03-architecture-tower.md](levels/03-architecture-tower.md) |
 | Hầm Tri Thức — NA | Song Thần Giữ Bài FE & BE | Chốt thiết kế, chưa triển khai | [04-knowledge-vault.md](levels/04-knowledge-vault.md) |
 | Phòng Điều Hành | QUY TRÌNH | Định hướng; gồm trận cuối và kết thúc | [05-control-room.md](levels/05-control-room.md) |
-
-Extension sau chiến dịch: “Anh em cây khế” — loạn đấu giành tiền, đã triển khai trừ phần NPC: [06-party.md](levels/06-party.md).
 
 ## Hướng hình ảnh và asset mẫu
 

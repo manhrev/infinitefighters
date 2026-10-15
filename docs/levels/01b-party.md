@@ -1,6 +1,6 @@
-# Extension cuối game — Anh em hết mình, tiền tình hết hồn
+# Extension màn 1 — Anh em hết mình, tiền tình hết hồn
 
-Định hướng mở rộng sau chiến dịch, ngoài phạm vi MVP. Dù chọn kết thúc nào, những người chơi còn lại được mời đến tiệc tổng kết. Nhánh tái cấu trúc giữ hậu quả đã chọn: nhân vật bị hy sinh vẫn chỉ xuất hiện như boss trong đoạn kết.
+Extension của màn Đường Đua Sprint ([01-sprint.md](01-sprint.md)): hạ Đốc Công Hôm Qua xong, những người chơi còn kết nối được mời đến tiệc tổng kết.
 
 HR công bố quỹ thưởng chỉ đủ cho một người, kèm danh hiệu “Người gánh team” và một buổi hẹn do các cô nàng NPC khách mời tự chọn người tham gia. Màn hình hiện bảng công trạng: ai cũng được ghi là người đóng góp chính, trừ phần trách nhiệm. Một người nói: “Tiền chia sao cũng được, anh em là chính.” Ngay sau đó, người ấy nhặt chiếc vali tiền và chạy.
 
@@ -17,7 +17,7 @@ Chưa có: NPC khách mời, tặng quà, “Ai có hẹn” (phần “Tiền +
 
 ## Từ co-op sang loạn đấu — màn “Anh em cây khế”, luật đã chốt
 
-Chốt thiết kế ngày 2026-10-15; vẫn thuộc bản mở rộng sau chiến dịch, cần triển khai và thử cân bằng. Các thông số dưới đây là mốc thử nghiệm đầu tiên.
+Chốt thiết kế ngày 2026-10-15; thuộc extension của màn Sprint, cần triển khai và thử cân bằng. Các thông số dưới đây là mốc thử nghiệm đầu tiên.
 
 - **Mở phase:** cả đội nâng ly: “Anh em là chính.” HR đặt vali xuống: “Ngân sách chỉ đủ một suất.” Nhãn ĐỒNG ĐỘI chuyển thành ĐỐI TƯỢNG CẠNH TRANH, nhạc chuyển disco chiptune. Hiển thị luật “Nhặt tiền → đánh rơi tiền đối thủ → gửi ATM” và đếm ngược 5 giây; lúc này chưa đánh, nhặt hay gửi được. Vali trong cảnh mở đầu chỉ là đạo cụ, không cho ai lợi thế tiền trước giờ bắt đầu.
 - **Xuất phát:** giữ nhân vật và chiêu riêng P1–P5, mọi người bắt đầu với 100 máu, mọi chiêu sẵn sàng, ví và số dư ATM bằng 0. Xóa buff, đạn, vật phẩm và tài nguyên còn lại từ boss. Đặt người chơi ở các điểm xuất phát cách đều đường tới két. Trận kéo dài 180 giây từ khi đếm ngược kết thúc.
@@ -54,7 +54,7 @@ Sát thương có phần lẻ được giữ nguyên khi tính máu, UI làm tr�
 - **Bảo vệ hồi sinh:** bất tử 2 giây, có viền nhấp nháy và không nhặt/gửi tiền trong thời gian đó. Chủ động tấn công hoặc dùng chiêu riêng kết thúc bảo vệ ngay trước khi thực hiện hành động; đi, nhảy hoặc lướt thường không hủy sớm. Chết không mất lượt tham gia và không bị loại khỏi phase.
 - **Rớt mạng:** hủy gửi tiền và thao tác đang giữ; nhân vật đứng yên, vẫn có thể bị đánh trong tối đa 5 giây. Nếu bị hạ thì xử lý mất 50% ví một lần như bình thường, không tự hồi sinh khi còn offline. Sau 5 giây mất kết nối, toàn bộ phần ví còn lại rơi tại vị trí nhân vật rồi nhân vật rời sân; số dư đã gửi được giữ. Không phạt hay thả cùng khoản tiền hai lần.
 - **Vào lại:** nối lại trong 5 giây giữ đúng máu/vị trí hiện có, không cấp bất tử mới; nếu đã bị hạ thì tiếp tục thời gian chờ hồi sinh. Vào lại sau khi đã rời sân dùng quy trình hồi sinh, ví bằng 0 và giữ số dư ATM. Các timer hồi chiêu không được reset để lấy lợi thế.
-- **Số người:** nếu chỉ một người đủ điều kiện tham gia từ đầu (kể cả do nhánh tái cấu trúc), chơi bản gom thưởng solo với cùng luật két/ATM và thời gian; không thêm bot đối thủ. Nếu trận đã bắt đầu với từ hai người, một người rớt mạng không chuyển thành solo và không đổi luật thắng. Người bị hy sinh ở phần kết có thể xem trận, không điều khiển nhân vật trong sảnh.
+- **Số người:** nếu chỉ một người đủ điều kiện tham gia từ đầu, chơi bản gom thưởng solo với cùng luật két/ATM và thời gian; không thêm bot đối thủ. Nếu trận đã bắt đầu với từ hai người, một người rớt mạng không chuyển thành solo và không đổi luật thắng.
 - **Tạm dừng:** còn ít nhất một người kết nối thì đồng hồ tiếp tục. Khi tất cả cùng mất kết nối, dừng đồng hồ trận, timer rớt mạng, đạn và hiệu ứng; có người vào lại thì tiếp tục. Việc mất kết nối tự nó không trao chiến thắng sớm.
 
 ## Tiền + gái

@@ -1,6 +1,6 @@
 # Đường Đua Sprint — Đốc Công Hôm Qua
 
-Khu vực NA, màn co-op của bản MVP, đã triển khai. Tổng quan game, bối cảnh, âm thanh và không gian multiplayer: [game-scenario.md](../game-scenario.md).
+Khu vực NA, màn co-op của bản MVP, đã triển khai. Tổng quan game, bối cảnh, âm thanh và không gian multiplayer: [game-scenario.md](../game-scenario.md). Hạ boss xong chuyển sang extension loạn đấu: [01b-party.md](01b-party.md).
 
 Đi kiểm tra tiến độ trên sàn, phóng đạn task, tạo sóng deadline và lao tới bằng “Họp nhanh 5 phút”. Nhảy lên bục để né sóng/cú lao, xuống sàn né loạt đạn cao, đánh lúc boss lên dây đồng hồ hoặc hồi sức sau lao. Thoại: “Task nhỏ thôi!”
 
