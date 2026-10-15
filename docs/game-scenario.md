@@ -217,7 +217,7 @@ Pixel art 16-bit, silhouette rõ, nhân vật hài hước. Nền navy, màn hì
 
 Concept bố cục và phong cách (bảng mẫu v02) đã duyệt và dùng làm cơ sở cho sprite runtime. Ảnh mẫu và prompt nằm ở `assets/concepts/`.
 
-Danh sách asset runtime, kích thước, FPS và cờ loop: [sprite-spec.md](sprite-spec.md); cách tạo lại và thêm asset: [asset-pipeline.md](asset-pipeline.md) và `assets/sprites/manifest.json`. Âm thanh: `assets/audio/manifest.json`.
+Danh sách asset runtime, kích thước, FPS và cờ loop: [sprite-spec.md](sprite-spec.md) và `assets/sprites/manifest.json`. Âm thanh: `assets/audio/manifest.json`. Cách tạo lại và thêm asset: [asset-pipeline.md](asset-pipeline.md).
 
 ### Asset còn thiếu
 
