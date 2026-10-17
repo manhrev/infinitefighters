@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>engine-sandbox</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #14161c; color: #cfd3dc; font: 13px monospace; }
+  canvas { display: block; margin: 0 auto; max-width: 100vw; max-height: calc(100vh - 28px); background: #1d2029; }
+  #hud { height: 28px; line-height: 28px; text-align: center; }
+</style>
+</head>
+<body>
+<div id="hud">connecting…</div>
+<canvas id="c" width="1280" height="720"></canvas>
+<script>
+const cv = document.getElementById('c'), g = cv.getContext('2d'), hud = document.getElementById('hud')
+g.imageSmoothingEnabled = false
+let myId = 0, statics = [], bodies = [], tick = 0
+
+// Sprites come from assets/sprites via /sprites/; frame size, count and fps from its manifest.json.
+// Q cycles the controlled character on the server; each has its own sprites and hitbox. Bosses have no jump or fall
+// frames, so those reuse idle, and each has its own dash-like move.
+const DASH = { 'boss/doc-cong': 'charge', 'boss/khabib': 'press', 'boss/vought': 'deflect', 'boss/yasuka': 'dodge' }
+function anim(skin, state) {
+  if (!skin.startsWith('boss/')) return state
+  return { run: 'walk', jump: 'idle', fall: 'idle', dash: DASH[skin] }[state] ?? 'idle'
+}
+const meta = {}, imgs = {}
+fetch('/sprites/manifest.json').then(r => r.json()).then(m => {
+  for (const e of m.entries) meta[e.path.replace('assets/sprites/', '')] = e
+}).catch(() => {})
+// Draws the current frame of `name` (e.g. 'player/teal/run') at the current origin shifted down by dy; anchorY 1 puts the
+// bottom edge there, 0.5 centres it. Returns false while the image or manifest is not loaded.
+function sprite(name, anchorY, w, h, flip = 1, dy = 0) {
+  const e = meta[name + '.png']
+  if (!e) return false
+  let img = imgs[name]
+  if (!img) { img = imgs[name] = new Image(); img.src = `/sprites/${name}.png` }
+  if (!img.complete || !img.naturalWidth) return false
+  const f = e.fps ? Math.floor(performance.now() * e.fps / 1000) % e.frames : 0
+  w = w ?? e.frameWidth; h = h ?? e.frameHeight
+  g.save()
+  g.scale(flip, 1)
+  g.drawImage(img, f * e.frameWidth, 0, e.frameWidth, e.frameHeight, -w / 2, dy - h * anchorY, w, h)
+  g.restore()
+  return true
+}
+const ws = new WebSocket(`ws://${location.host}/ws`)
+ws.onopen = () => hud.textContent = 'A/D move · W/Space jump · S drop through one-way · Shift sprint · F dash · Q next character · click coffee · right-click document · B boss · R reset'
+ws.onclose = () => hud.textContent = 'disconnected'
+ws.onmessage = e => {
+  const m = JSON.parse(e.data)
+  if (m.type === 'init') { myId = m.id; statics = m.statics }
+  else { bodies = m.bodies; tick = m.tick }
+}
+
+const keys = {}
+const send = o => ws.readyState === 1 && ws.send(JSON.stringify(o))
+function sendInput() {
+  send({ In: {
+    Left: !!(keys.KeyA || keys.ArrowLeft), Right: !!(keys.KeyD || keys.ArrowRight),
+    Down: !!(keys.KeyS || keys.ArrowDown), Jump: !!(keys.KeyW || keys.ArrowUp || keys.Space),
+    Sprint: !!(keys.ShiftLeft || keys.ShiftRight), Dash: !!keys.KeyF,
+  } })
+}
+addEventListener('keydown', e => {
+  if (e.repeat) return
+  if (e.code === 'KeyR') send({ Reset: true })
+  if (e.code === 'KeyQ') send({ Cycle: true })
+  if (e.code === 'KeyB') send({ Spawn: 'boss', ...mouse })
+  keys[e.code] = true; sendInput()
+  if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault()
+})
+addEventListener('keyup', e => { keys[e.code] = false; sendInput() })
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; sendInput() })
+
+let mouse = { X: 640, Y: 100 }
+function worldPos(e) {
+  const r = cv.getBoundingClientRect()
+  return { X: (e.clientX - r.left) * cv.width / r.width, Y: (e.clientY - r.top) * cv.height / r.height }
+}
+cv.addEventListener('mousemove', e => mouse = worldPos(e))
+cv.addEventListener('mousedown', e => send({ Spawn: e.button === 2 ? 'box' : 'circle', ...worldPos(e) }))
+cv.addEventListener('contextmenu', e => e.preventDefault())
+
+function draw() {
+  g.clearRect(0, 0, cv.width, cv.height)
+  for (const s of statics) {
+    g.fillStyle = s.OneWay ? '#6d8f5e' : '#4a4f63'
+    g.fillRect(s.X, s.Y, s.W, s.H)
+  }
+  for (const b of bodies) {
+    g.save()
+    g.translate(b.X, b.Y)
+    g.rotate(b.A)
+    if (b.Kind === 'fan') {
+      g.fillStyle = '#b07ad0'
+      g.fillRect(-b.W / 2, -b.H / 2, b.W, b.H)
+      g.fillRect(-b.H / 2, -b.W / 2, b.H, b.W)
+      g.fillStyle = '#14161c'; g.beginPath(); g.arc(0, 0, 5, 0, 7); g.fill()
+    } else if (b.Kind === 'circle') {
+      if (!sprite('items/coffee', 0.5, b.R * 2, b.R * 2)) {
+        g.fillStyle = '#e0a040'
+        g.beginPath(); g.arc(0, 0, b.R, 0, 7); g.fill()
+      }
+      g.strokeStyle = '#14161c'; g.beginPath(); g.moveTo(0, 0); g.lineTo(b.R, 0); g.stroke() // shows spin
+    } else if (b.Kind === 'box' && sprite('items/document', 0.5, b.W, b.H)) {
+    } else if (b.Kind === 'boss' && sprite('boss/khabib/idle', 1, 160, 160, 1, b.H / 2)) {
+    } else if (b.Kind === 'mover' && sprite('props/ceiling-light', 0.5, b.W, b.H * 1.2)) {
+    } else if (b.Kind === 'player' && sprite(`${b.Skin}/${anim(b.Skin, b.State)}`, 1, undefined, undefined, b.Facing, b.H / 2)) {
+    } else {
+      g.fillStyle = { box: '#c0645a', mover: '#5a8fc0', player: b.ID === myId ? '#f2f2f2' : '#9aa3b5' }[b.Kind]
+      g.fillRect(-b.W / 2, -b.H / 2, b.W, b.H)
+      if (b.Kind === 'player') { g.fillStyle = '#14161c'; g.fillRect(b.Facing * 4 - 2, -b.H / 2 + 8, 4, 4) }
+    }
+    g.restore()
+  }
+  g.fillStyle = '#cfd3dc'
+  const me = bodies.find(b => b.ID === myId)
+  g.fillText(`tick ${tick} · bodies ${bodies.length} · ${me ? me.Skin : ''}`, 8, 14)
+  requestAnimationFrame(draw)
+}
+draw()
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+Use case: stylized-concept.
+Asset type: production sprite sheet atlas v2 (smooth movement redraw) for boss DOC CONG HOM QUA, corporate satire 2D pixel-art co-op platformer TASK VO TAN.
+Reference image: assets/source/boss-doc-cong.png (existing sheet, there is no separate concept board). Preserve this exact character identity, silhouette, palette and 16-bit style; redraw only the poses listed below.
+
+Character:
+DOC CONG HOM QUA, a stout angry office foreman-manager. Slick black swept hair with a pale streak, thick expressive eyebrows, dark navy suit (#0B1530 / #14234A), cream shirt and cream necktie (NO RED clothing, red is reserved for hazards), holding a giant silver/cream stopwatch with a cyan face and a blank unnumbered dial, with no numbers or text anywhere. Facing RIGHT in flat orthographic 2D platformer side view. 16-bit pixel art with clean #0B1020 dark pixel outlines and upper-left light. No anti-aliasing, no blur. Palette: navy #0B1530 #14234A, blue #22345F #2F4A7F, cream #F2E3C2 #C9B48C, skin #F6C9A0 #E0A274 #A86B4A, cyan #3FE0FF.
+
+Atlas layout:
+Solid pure magenta #FF00FF backdrop. Landscape 3:2 image. Exactly 6 columns and 4 rows of equal SQUARE cells (24 cells, numbered left to right, top to bottom), generous gutters between poses, no overlap, no grid lines, no labels, no text, no ground shadow, no speech bubbles, arrows, motion lines or effects on the character. Every pose stays fully inside its cell with clear margins. Same scale in every cell: boss stout body about 120 pixels tall. Facing RIGHT in every cell. Feet of the grounded foot on one shared baseline row inside every cell. The body stays near the horizontal center of its cell, because the game moves the sprite; never drift across the cell to suggest travel.
+
+Smoothness rules (this is a v2 redraw for smooth motion, so follow them strictly):
+- Every cell is a distinct pose. No duplicated frames. Poses within an animation differ by small, even steps so they play as continuous motion at 6 to 30 frames per second.
+- IDLE loops seamlessly: pose 6 flows back into pose 1. Breathing and small gestures only, the feet stay planted.
+- WALK is a classic 8-frame cycle: contact (right foot forward), down, passing, up, contact (left foot forward), down, passing, up. Arms swing opposite the legs. Head bobs 1 to 3 pixels only. Pose 8 flows back into pose 1.
+- Keep body, head and prop proportions identical across all cells.
+
+Grid cells:
+- Row 1 (cells 1-6): IDLE, 6 poses. Tapping foot, glaring, holding the large stopwatch in front of him, small breathing steps.
+- Row 2 (cells 7-12): WALK, poses 1-6 of the 8-frame cycle. Heavy deliberate office-manager steps, alternating legs and arms while cradling the stopwatch.
+- Row 3 (cells 13-14): WALK, poses 7-8 completing the cycle. Cells 15-18: CHARGE RUN, poses 1-4. Pose 1 plants, knees bend, leans forward locking aim. Pose 2 first driving stride. Pose 3 full fast horizontal run, torso leaning, stopwatch held forward and close. Pose 4 second driving stride, mid-air between steps but still readable.
+- Row 4 (cell 19): CHARGE RUN, pose 5: braking with a wide stance, shoulders starting to sag. Leave room around outstretched feet. Cells 20-24: leave completely EMPTY magenta.

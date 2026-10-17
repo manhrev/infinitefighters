@@ -1,0 +1,21 @@
+Use case: stylized-concept.
+Asset type: production sprite sheet atlas v2 (smooth movement redraw) for boss SA VOUGHT, corporate satire 2D pixel-art co-op platformer TASK VO TAN.
+Reference image: assets/concepts/bosses/boss-sa-vought-v1.png. Preserve this exact character identity, silhouette, palette and 16-bit style; redraw only the poses listed below.
+
+Character:
+SA VOUGHT, tall, exceptionally slim, narrow-cheeked solution architect. Neatly side-parted black hair, black rectangular eyeglasses (clear lenses). Slate-blue short sleeve polo shirt (#2F4A7F / #22345F) tucked into charcoal dress trousers (#14234A / #0B1530), black leather belt, polished dark loafers. NO RED clothing (red is reserved exclusively for hazard VFX). Slender silhouette, long limbs, relaxed persuasive smile, open gesturing hands. Facing RIGHT in flat orthographic 2D platformer side view. 16-bit pixel art with clean #0B1020 dark pixel outlines and upper-left light. No anti-aliasing, no blur.
+
+Atlas layout:
+Solid pure magenta #FF00FF backdrop. Landscape 3:2 image. Exactly 6 columns and 4 rows of equal SQUARE cells (24 cells, numbered left to right, top to bottom), generous gutters between poses, no overlap, no grid lines, no labels, no text, no ground shadow, no speech bubbles, arrows, motion lines or effects on the character. Every pose stays fully inside its cell with clear margins. Same scale in every cell: boss body about 95 pixels tall. Facing RIGHT in every cell. Feet of the grounded foot on one shared baseline row inside every cell. The body stays near the horizontal center of its cell, because the game moves the sprite; never drift across the cell to suggest travel.
+
+Smoothness rules (this is a v2 redraw for smooth motion, so follow them strictly):
+- Every cell is a distinct pose. No duplicated frames. Poses within an animation differ by small, even steps so they play as continuous motion at 6 to 30 frames per second.
+- IDLE loops seamlessly: pose 6 flows back into pose 1. Breathing and small gestures only, the feet stay planted.
+- WALK is a classic 8-frame cycle: contact (right foot forward), down, passing, up, contact (left foot forward), down, passing, up. Arms swing opposite the legs. Head bobs 1 to 3 pixels only. Pose 8 flows back into pose 1.
+- Keep body, head and prop proportions identical across all cells.
+
+Grid cells:
+- Row 1 (cells 1-6): IDLE, 6 poses. Persuasive smile, open hands explaining, slight breathing, weight shifting gently.
+- Row 2 (cells 7-12): WALK, poses 1-6 of the 8-frame cycle. Confident, graceful office stride, long limbs, hands still gesturing.
+- Row 3 (cells 13-14): WALK, poses 7-8 completing the cycle. Cells 15-18: DEFLECT SWAT, poses 1-4. Pose 1 sidesteps and draws one open palm back. Pose 2 palm starts the sweep across the body. Pose 3 full parry arc, hand extended forward, torso turned. Pose 4 holds the extended hand.
+- Row 4 (cell 19): DEFLECT SWAT, pose 5: lowers the hand and returns to a relaxed upright stance. Cells 20-24: leave completely EMPTY magenta.

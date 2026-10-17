@@ -1,0 +1,21 @@
+Use case: stylized-concept.
+Asset type: production sprite sheet atlas v2 (smooth movement redraw) for boss YASUKA, corporate satire 2D pixel-art co-op platformer TASK VO TAN.
+Reference image: assets/concepts/bosses/boss-yasuka-v1.png. Preserve this exact character identity, silhouette, palette and 16-bit style; redraw only the poses listed below.
+
+Character:
+YASUKA, mature middle-aged female senior HR executive. Voluminous shoulder-length softly wavy dark brown hair (#22345F / #14234A). Dignified conservative attire: high-neck ruffled cream blouse (#F2E3C2), deep muted plum-navy tailored blazer (#2F4A7F / #14234A), long below-knee tailored skirt, dark closed low heels. Holding a thick dark navy HR binder with cream label. Impassive, aloof expression, chin slightly tilted up, looking away with cold detachment. NO RED clothing (red is reserved exclusively for danger VFX). Elegant upright posture. Facing RIGHT in flat orthographic 2D platformer side view. 16-bit pixel art with clean #0B1020 dark pixel outlines and upper-left light. No anti-aliasing, no blur.
+
+Atlas layout:
+Solid pure magenta #FF00FF backdrop. Landscape 3:2 image. Exactly 6 columns and 4 rows of equal SQUARE cells (24 cells, numbered left to right, top to bottom), generous gutters between poses, no overlap, no grid lines, no labels, no text, no ground shadow, no speech bubbles, arrows, motion lines or effects on the character. Every pose stays fully inside its cell with clear margins. Same scale in every cell: boss body about 100 pixels tall. Facing RIGHT in every cell. Feet of the grounded foot on one shared baseline row inside every cell. The body stays near the horizontal center of its cell, because the game moves the sprite; never drift across the cell to suggest travel.
+
+Smoothness rules (this is a v2 redraw for smooth motion, so follow them strictly):
+- Every cell is a distinct pose. No duplicated frames. Poses within an animation differ by small, even steps so they play as continuous motion at 6 to 30 frames per second.
+- IDLE loops seamlessly: pose 6 flows back into pose 1. Breathing and small gestures only, the feet stay planted.
+- WALK is a classic 8-frame cycle: contact (right foot forward), down, passing, up, contact (left foot forward), down, passing, up. Arms swing opposite the legs. Head bobs 1 to 3 pixels only. Pose 8 flows back into pose 1.
+- Keep body, head and prop proportions identical across all cells.
+
+Grid cells:
+- Row 1 (cells 1-6): IDLE, 6 poses. Dignified poise, holding the HR binder against her chest, cold impassive breathing in small even steps.
+- Row 2 (cells 7-12): WALK, poses 1-6 of the 8-frame cycle. Composed, poised office walk in her long tailored skirt, short controlled steps, binder held still.
+- Row 3 (cells 13-14): WALK, poses 7-8 completing the cycle. Cells 15-18: EVASIVE DODGE SLIDE, poses 1-4. Pose 1 shifts weight, knees soften. Pose 2 starts a low graceful sidestep, skirt trailing. Pose 3 full forward glide on both feet, binder held to chest, hair streaming back. Pose 4 holds the glide, torso leaning slightly.
+- Row 4 (cell 19): EVASIVE DODGE SLIDE, pose 5: slows and straightens back to composed standing. Cells 20-24: leave completely EMPTY magenta.
